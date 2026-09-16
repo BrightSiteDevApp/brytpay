@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print ePINs — BRYT Pay</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        /* Premium Receipt Styles Adapted for ePIN Grid */
+        .epins-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+            gap: 24px; 
+            margin-top: 24px; 
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+        
+        .receipt-card { 
+            background: #FFFFFF; 
+            border-radius: 16px; 
+            padding: 32px 24px; 
+            box-shadow: 0 10px 30px rgba(7, 26, 58, 0.08); 
+            position: relative; 
+            overflow: hidden; 
+            page-break-inside: avoid; /* Keeps cards intact on PDF pages */
+        }
+        
+        /* Decorative Ticket Edge */
+        .receipt-card::before { 
+            content: ''; 
+            position: absolute; 
+            top: -10px; left: 0; right: 0; height: 20px; 
+            background: radial-gradient(circle, var(--bg-light) 10px, transparent 11px); 
+            background-size: 24px 20px; 
+            background-repeat: repeat-x; 
+            z-index: 2;
+        }
+
+        /* Subtle Watermark Logo */
+        .receipt-card::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px; height: 150px;
+            background-image: url('../../assets/img/brytpay-logo.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.04;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .receipt-content-wrapper { position: relative; z-index: 1; }
+        .receipt-header { text-align: center; margin-bottom: 24px; }
+        .receipt-logo-img { height: 36px; width: auto; object-fit: contain; margin-bottom: 12px; }
+        .receipt-title { font-size: 1.15rem; font-weight: 700; color: var(--bryt-navy); letter-spacing: -0.3px; text-transform: uppercase; }
+
+        .receipt-amount-box { text-align: center; padding: 20px 0; border-top: 2px dashed var(--border-color); border-bottom: 2px dashed var(--border-color); margin-bottom: 24px; }
+        .receipt-amount-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+        .receipt-amount { font-family: monospace; font-size: 1.8rem; font-weight: 700; color: var(--bryt-primary); letter-spacing: 2px; }
+
+        .receipt-details { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+        .receipt-row { display: flex; justify-content: space-between; align-items: flex-start; }
+        .receipt-key { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+        .receipt-value { font-size: 0.9rem; font-weight: 700; color: var(--bryt-navy); text-align: right; max-width: 65%; word-break: break-word; }
+
+        .receipt-footer { text-align: center; font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+        .action-buttons { display: flex; gap: 12px; margin-top: 24px; max-width: 520px; margin-left: auto; margin-right: auto; }
+    </style>
+</head>
+<body>
+
+   <main class="app-container" style="max-width: 800px;">
+        <!-- THIS DIV ALIGNS THE BUTTON CORRECTLY -->
+        <div style="max-width: 520px; margin: 0 auto;">
+            <a href="/dashboard/" class="no-print" id="back-link" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; margin-bottom: 24px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Back to Dashboard
+            </a>
+        </div>
+        
+        <!-- ... (keep your existing form-card and success-view here) ... -->
+        <!-- MAIN PURCHASE FORM -->
+        <div class="form-card" id="epin-form-container" style="max-width: 520px; margin: 0 auto;">
+            <header style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 style="font-size: 1.35rem; color: var(--bryt-navy); margin-bottom: 4px;">Print ePINs</h1>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Generate physical recharge cards</p>
+                </div>
+                <div style="text-align: right; background: var(--bg-light); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px;">Balance</div>
+                    <strong id="user-balance" style="color: var(--bryt-navy); font-size: 0.95rem;">₦0.00</strong>
+                </div>
+            </header>
+
+            <form id="epin-form">
+                <div class="form-group">
+                    <label class="provider-select-label">Select Network</label>
+                    <div class="provider-grid">
+                        <div class="provider-btn network-btn active" data-network="mtn">
+                            <div class="provider-logo" id="logo-mtn"></div>
+                        </div>
+                        <div class="provider-btn network-btn" data-network="airtel">
+                            <div class="provider-logo" id="logo-airtel"></div>
+                        </div>
+                        <div class="provider-btn network-btn" data-network="glo">
+                            <div class="provider-logo" id="logo-glo"></div>
+                        </div>
+                        <div class="provider-btn network-btn" data-network="9mobile">
+                            <div class="provider-logo" id="logo-9mo"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 16px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label" for="denomination">Denomination</label>
+                        <select id="denomination" class="form-select" required>
+                            <option value="100">₦100</option>
+                            <option value="200">₦200</option>
+                            <option value="500">₦500</option>
+                            <option value="1000">₦1,000</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label" for="quantity">Quantity (Max 40)</label>
+                        <input type="number" id="quantity" class="form-input" min="1" max="40" value="1" required>
+                    </div>
+                </div>
+
+                <div style="padding: 16px; background: var(--bg-light); border-radius: 8px; margin-top: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                        <span style="color: var(--text-muted);">Total Cost:</span>
+                        <strong id="calc-total" style="color: var(--bryt-navy); font-size: 1.1rem;">₦100.00</strong>
+                    </div>
+                </div>
+
+                <button type="submit" id="submit-btn" class="btn-primary" style="margin-top: 24px;">
+                    Generate PINs
+                </button>
+            </form>
+        </div>
+
+        <!-- SUCCESS / PRINT VIEW -->
+        <div id="success-view" style="display: none;">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h2 style="color: var(--bryt-primary);">PINs Generated!</h2>
+                <p style="color: var(--text-muted);">Your recharge cards are ready to be printed or downloaded.</p>
+            </div>
+
+            <!-- The Downloadable Area containing the grid of premium cards -->
+            <div id="printable-vouchers" class="epins-grid">
+                <!-- PINs injected here via JS -->
+            </div>
+            
+            <!-- Download Actions -->
+            <div class="action-buttons">
+                <button id="download-pdf-btn" class="btn-primary" style="flex: 1;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Save PDF
+                </button>
+                <button id="download-img-btn" class="btn-secondary" style="flex: 1; border-color: var(--bryt-primary); color: var(--bryt-primary);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    Save Image
+                </button>
+                <button id="new-btn" class="btn-secondary" style="flex: 1;">
+                    Generate More
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="modal-title">Confirm Generation</h3>
+            <p class="modal-desc">Are you sure you want to generate these PINs?</p>
+            <div class="modal-breakdown">
+                <div class="modal-row">
+                    <span style="color: var(--text-muted);">Network</span>
+                    <strong id="modal-network" style="color: var(--bryt-navy); text-transform: uppercase;">---</strong>
+                </div>
+                <div class="modal-row">
+                    <span style="color: var(--text-muted);">Order</span>
+                    <strong id="modal-qty" style="color: var(--bryt-navy);">---</strong>
+                </div>
+                <div class="modal-row" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+                    <span style="color: var(--bryt-navy);">Total Debit</span>
+                    <strong id="modal-amount" style="color: var(--bryt-primary); font-size: 1.1rem;">₦0.00</strong>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="modal-cancel" class="btn-secondary">Cancel</button>
+                <button type="button" id="modal-confirm" class="btn-primary" style="flex: 2;">Confirm & Pay</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <a href="/dashboard/" class="nav-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            <span>Home</span>
+        </a>
+        <a href="/dashboard/epins/" class="nav-item active">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            <span>ePINs</span>
+        </a>
+    </nav>
+
+    <!-- Download Libraries from your receipt design -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script src="../../assets/js/supabase-client.js"></script>
+    <script src="../../assets/js/brands.js"></script>
+    <script src="../../assets/js/epins.js"></script>
+</body>
+</html>

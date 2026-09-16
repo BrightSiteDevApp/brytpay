@@ -182,54 +182,87 @@
     </div>
 </div>
 
-<!-- PWA Registration Logic -->
-<script>
-    // 1. Register Service Worker
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js').then(reg => {
-                console.log('PWA Service worker registered');
-            }).catch(err => {
-                console.log('PWA SW registration failed: ', err);
+<!-- Smart App Install / Download Popup UI -->
+    <div id="pwa-install-prompt" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #ffffff; padding: 16px 20px; border-radius: 16px; box-shadow: 0 10px 40px rgba(7, 26, 58, 0.2); z-index: 10000; width: 90%; max-width: 360px; border: 1px solid #e2e8f0; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="/assets/img/brytpay-logo.png" style="width: 40px; height: 40px; object-fit: contain; background: #f8fafc; border-radius: 8px; padding: 4px;" alt="BRYT Pay">
+            <div>
+                <div style="font-weight: 800; color: #071A3A; font-size: 0.9rem; font-family: 'Sora', system-ui, sans-serif;">Install BRYT Pay</div>
+                <div style="font-size: 0.75rem; color: #64748B; font-family: 'Sora', system-ui, sans-serif;">Fast, easy access on your screen</div>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <button id="pwa-close" aria-label="Close" style="background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer; padding: 4px; line-height: 1;">&times;</button>
+            <button id="pwa-install-btn" style="background: #1D5ED0; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-family: 'Sora', system-ui, sans-serif; cursor: pointer; font-size: 0.85rem;">Install</button>
+        </div>
+    </div>
+
+    <!-- Smart App Install & Service Worker Script -->
+    <script>
+        // 1. Maintain Service Worker for Android TWA App & Caching
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(err => {
+                    console.log('PWA Service worker registration failed:', err);
+                });
             });
-        });
-    }
-
-    // 2. Handle Install Prompt
-    let deferredPrompt;
-    const installPromptUI = document.getElementById('pwa-install-prompt');
-    const installBtn = document.getElementById('pwa-install-btn');
-    const closeBtn = document.getElementById('pwa-close');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent Chrome 67+ from automatically showing the prompt
-        e.preventDefault();
-        deferredPrompt = e;
-        
-        // Show our beautiful custom UI after 3 seconds of being on the page
-        setTimeout(() => {
-            installPromptUI.style.display = 'flex';
-        }, 3000);
-    });
-
-    installBtn.addEventListener('click', async () => {
-        installPromptUI.style.display = 'none';
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log(`User ${outcome} the PWA installation`);
-            deferredPrompt = null;
         }
-    });
 
-    closeBtn.addEventListener('click', () => {
-        installPromptUI.style.display = 'none';
-    });
-</script>
+        // 2. Check if already inside the native Android App or standalone PWA
+        const isRunningInApp = window.matchMedia('(display-mode: standalone)').matches 
+            || window.navigator.standalone 
+            || document.referrer.includes('android-app://');
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../assets/js/supabase-client.js"></script>
-    <script src="../assets/js/brands.js"></script>
-    <script src="../assets/js/ui.js"></script>
+        const installPromptUI = document.getElementById('pwa-install-prompt');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const closeBtn = document.getElementById('pwa-close');
+
+        let deferredPrompt = null;
+        const isDismissed = sessionStorage.getItem('brytpay_prompt_dismissed');
+
+        // Only listen and display if NOT already running in the installed app
+        if (!isRunningInApp && !isDismissed && installPromptUI) {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                showInstallUI();
+            });
+
+            // If the browser does not fire beforeinstallprompt within 3 seconds, show fallback
+            setTimeout(() => {
+                showInstallUI();
+            }, 3000);
+        }
+
+        function showInstallUI() {
+            if (!isRunningInApp && !sessionStorage.getItem('brytpay_prompt_dismissed') && installPromptUI) {
+                installPromptUI.style.display = 'flex';
+            }
+        }
+
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                installPromptUI.style.display = 'none';
+
+                if (deferredPrompt) {
+                    // Browser supports direct WebAPK prompt
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`User ${outcome} installation`);
+                    deferredPrompt = null;
+                } else {
+                    // Direct APK download fallback
+                    window.location.href = '/app/brytpay.apk';
+                }
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                installPromptUI.style.display = 'none';
+                sessionStorage.setItem('brytpay_prompt_dismissed', 'true');
+            });
+        }
+    </script>
 </body>
 </html>
