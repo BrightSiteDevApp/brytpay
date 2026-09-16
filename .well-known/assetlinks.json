@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "ng.name.brytpay.twa",
+        "sha256_cert_fingerprints": ["CC:0F:0D:FE:CC:F3:B0:56:6B:C6:6F:37:A5:F2:29:9F:91:05:D4:9B:16:F2:90:83:F4:4A:CF:7E:7F:3A:AB:03"]
+      }
+    }]
