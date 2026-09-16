@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin: Users — BRYT Pay</title>
+
+    <!-- STRICT APP PRIVACY DIRECTIVE: Do not index or crawl admin routes -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Branding -->
+    <meta name="theme-color" content="#1D5ED0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { background: #f8fafc; margin: 0; font-family: system-ui, -apple-system, sans-serif; overflow-x: hidden; }
+        
+        .admin-container { max-width: 900px; margin: 0 auto; padding: 16px 12px 60px; width: 100%; }
+        
+        .admin-header-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .page-title { font-size: 1.2rem; color: #0f172a; margin: 0 0 4px 0; font-weight: 800; }
+        .page-desc { font-size: 0.75rem; color: #64748b; margin: 0; }
+
+        .search-bar-wrap { display: flex; gap: 8px; align-items: center; width: 100%; max-width: 300px; }
+        .search-input { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.75rem; outline: none; background: #ffffff; }
+        .search-input:focus { border-color: #1D5ED0; }
+
+        /* Mobile-Responsive Table Design */
+        .admin-table { width: 100%; border-collapse: collapse; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; }
+        .admin-table th { background: #f8fafc; padding: 10px 12px; text-align: left; font-size: 0.65rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; }
+        .admin-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.75rem; color: #1e293b; vertical-align: middle; }
+        .admin-table tr:hover { background: #f8fafc; cursor: pointer; }
+        
+        .user-col { display: flex; flex-direction: column; }
+        .user-name { font-weight: 700; color: #0f172a; }
+        .user-email { font-size: 0.65rem; color: #64748b; }
+        
+        .acc-id { font-family: monospace; font-weight: 700; color: #1D5ED0; background: #eff6ff; padding: 3px 6px; border-radius: 6px; }
+        .balance-text { font-weight: 800; color: #16a34a; }
+
+        .status-badge { font-size: 0.6rem; font-weight: 800; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; display: inline-block;}
+        .badge-active { background: #dcfce7; color: #15803d; }
+        .badge-suspended { background: #fee2e2; color: #b91c1c; }
+
+        /* Accordion Modal System */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(7, 26, 58, 0.7); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 16px; }
+        .modal-content { background: #ffffff; width: 100%; max-width: 400px; max-height: 85vh; overflow-y: auto; border-radius: 16px; padding: 20px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); position: relative; }
+        .close-btn { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; line-height: 1; color: #94a3b8; cursor: pointer; }
+        
+        .modal-title { margin: 0 0 4px 0; font-size: 1.1rem; font-weight: 800; color: #0f172a; padding-right: 20px;}
+        .modal-subtitle { font-size: 0.75rem; color: #64748b; margin-bottom: 20px; font-family: monospace;}
+
+        /* Dropdown Accordion UI */
+        .accordion-item { border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 10px; overflow: hidden; background: #f8fafc;}
+        .accordion-header { width: 100%; text-align: left; padding: 14px; background: transparent; border: none; font-weight: 800; font-size: 0.8rem; color: #0f172a; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; font-family: system-ui, -apple-system, sans-serif;}
+        .accordion-header:hover { background: #f1f5f9; }
+        .accordion-body { padding: 14px; background: #ffffff; border-top: 1px solid #e2e8f0; display: none; }
+        .accordion-item.active .accordion-body { display: block; }
+        .accordion-item.active .accordion-header { background: #f1f5f9; color: #1D5ED0; }
+        .accordion-icon { font-size: 0.7rem; transition: transform 0.2s; }
+        .accordion-item.active .accordion-icon { transform: rotate(180deg); }
+        
+        /* Transaction List UI */
+        .tx-list { display: flex; flex-direction: column; gap: 8px; }
+        .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.75rem; }
+        .tx-item:last-child { border-bottom: none; }
+        .tx-name { font-weight: 700; color: #0f172a; text-transform: capitalize; }
+        .tx-date { font-size: 0.65rem; color: #64748b; }
+        .tx-amount { font-weight: 800; color: #16a34a; }
+        
+        /* Forms */
+        .form-group { margin-bottom: 12px; }
+        .form-label { display: block; font-weight: 800; font-size: 0.65rem; color: #475569; margin-bottom: 4px; text-transform: uppercase; }
+        .form-input, .form-select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.8rem; outline: none; background: #ffffff;}
+        .form-input:focus, .form-select:focus { border-color: #1D5ED0; }
+        .pin-input { font-family: monospace; letter-spacing: 2px; text-align: center; border: 2px solid #f87171 !important; background: #fef2f2; font-weight: 800; }
+        
+        .btn-action { width: 100%; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; border: none; cursor: pointer; transition: 0.2s; margin-top: 4px; }
+        .btn-primary { background: #1D5ED0; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-dark { background: #0f172a; color: white; }
+
+        /* 🚀 FIX: Mobile Table Swipe Fix */
+        @media (max-width: 600px) {
+            .admin-header-row { flex-direction: column; align-items: flex-start; }
+            .search-bar-wrap { max-width: 100%; }
+            .admin-table thead { display: none; }
+            .admin-table, .admin-table tbody, .admin-table tr, .admin-table td { display: block; width: 100%; }
+            .admin-table { background: transparent; border: none; box-shadow: none; }
+            .admin-table tr { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+            .admin-table td { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed #f1f5f9; text-align: right; }
+            .admin-table td:last-child { border-bottom: none; }
+            .admin-table td::before { content: attr(data-label); font-weight: 800; color: #64748b; font-size: 0.65rem; text-transform: uppercase; }
+            .user-col { align-items: flex-end; text-align: right; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="admin-container">
+        <div class="admin-header-row">
+            <div>
+                <a href="../index.html" style="display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Back to Admin Hub
+                </a>
+                <h1 class="page-title">User Management</h1>
+                <p class="page-desc">Manage profiles, wallets, and access levels.</p>
+            </div>
+            <div class="search-bar-wrap">
+                <input type="text" id="search-users" class="search-input" placeholder="Search Email or ID...">
+            </div>
+        </div>
+
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Account ID</th>
+                    <th>Wallet Balance</th>
+                </tr>
+            </thead>
+            <tbody id="admin-users-body">
+                <tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 20px; font-size: 0.75rem;">Loading users...</td></tr>
+            </tbody>
+        </table>
+    </main>
+
+    <!-- NEW ACCORDION MODAL -->
+    <div id="user-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="document.getElementById('user-modal').style.display='none'">&times;</button>
+            <h3 class="modal-title" id="m-name">User Name</h3>
+            <div class="modal-subtitle" id="m-email">user@email.com</div>
+
+            <!-- Transaction History Dropdown -->
+            <div class="accordion-item" id="acc-history">
+                <button class="accordion-header" onclick="toggleAccordion('acc-history')">
+                    Recent Transactions <span class="accordion-icon">▼</span>
+                </button>
+                <div class="accordion-body">
+                    <div id="tx-list" class="tx-list">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Wallet Action Dropdown -->
+            <div class="accordion-item" id="acc-wallet">
+                <button class="accordion-header" onclick="toggleAccordion('acc-wallet')">
+                    Adjust Wallet Balance <span class="accordion-icon">▼</span>
+                </button>
+                <div class="accordion-body">
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                        <select id="wallet-action" class="form-select" style="flex: 1;">
+                            <option value="CREDIT">Add Funds</option>
+                            <option value="DEBIT">Deduct</option>
+                        </select>
+                        <input type="number" id="wallet-amount" class="form-input" placeholder="Amount (₦)" style="flex: 1.5;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" style="color: #ef4444;">Master PIN Required</label>
+                        <input type="password" id="wallet-pin" class="form-input pin-input" placeholder="******">
+                    </div>
+                    <button id="btn-submit-wallet" class="btn-action btn-primary">Confirm Transaction</button>
+                </div>
+            </div>
+
+            <!-- Status Dropdown -->
+            <div class="accordion-item" id="acc-status">
+                <button class="accordion-header" onclick="toggleAccordion('acc-status')">
+                    Account Status <span class="accordion-icon">▼</span>
+                </button>
+                <div class="accordion-body">
+                    <button id="btn-toggle-suspend" class="btn-action btn-danger">Suspend Account</button>
+                </div>
+            </div>
+
+            <!-- Make Admin Dropdown -->
+            <div class="accordion-item" id="acc-admin">
+                <button class="accordion-header" onclick="toggleAccordion('acc-admin')">
+                    Promote to Admin <span class="accordion-icon">▼</span>
+                </button>
+                <div class="accordion-body">
+                    <div class="form-group">
+                        <input type="password" id="admin-pin" class="form-input pin-input" placeholder="Master PIN">
+                    </div>
+                    <button id="btn-make-admin" class="btn-action btn-dark">Grant Admin Access</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../assets/js/supabase-client.js"></script>
+    <script src="../../assets/js/admin-users.js"></script>
+</body>
+</html>

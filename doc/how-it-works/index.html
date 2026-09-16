@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Core SEO -->
+    <title>How It Works | BRYT Pay Digital Wallet Guide</title>
+    <meta name="description" content="Learn the step-by-step process of using BRYT Pay to fund your wallet, buy digital services, and process manual JAMB and NIN documents securely in Nigeria.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://brytpay.name.ng/doc/how-it-works/">
+
+    <!-- Branding & PWA -->
+    <meta name="theme-color" content="#1D5ED0">
+    <link rel="icon" type="image/png" href="../../assets/img/brytpay-logo.png">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://brytpay.name.ng/doc/how-it-works/">
+    <meta property="og:title" content="How It Works | BRYT Pay Digital Wallet Guide">
+    <meta property="og:description" content="Learn how to easily create an account, fund your wallet, and purchase digital services like Airtime, Data, and Education PINs on BRYT Pay.">
+    <meta property="og:image" content="https://brytpay.name.ng/assets/img/brytpay-logo.png">
+    <meta property="og:site_name" content="BRYT Pay">
+    <meta property="og:locale" content="en_NG">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:url" content="https://brytpay.name.ng/doc/how-it-works/">
+    <meta name="twitter:title" content="How BRYT Pay Works">
+    <meta name="twitter:description" content="Step-by-step guide to funding your wallet and buying digital services on BRYT Pay.">
+    <meta name="twitter:image" content="https://brytpay.name.ng/assets/img/brytpay-logo.png">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": "https://brytpay.name.ng/doc/how-it-works/#webpage",
+          "url": "https://brytpay.name.ng/doc/how-it-works/",
+          "name": "How BRYT Pay Works",
+          "description": "Step-by-step instructions on how to use the BRYT Pay platform.",
+          "inLanguage": "en-NG",
+          "publisher": {
+            "@id": "https://brytpay.name.ng/#organization"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://brytpay.name.ng/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "How It Works",
+              "item": "https://brytpay.name.ng/doc/how-it-works/"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Shared Styles */
+        :root { --bryt-primary: #1D5ED0; --bryt-accent: #159FE3; --bryt-navy: #071A3A; --bryt-black: #0B1220; --bryt-light: #F5F8FC; --text-muted: #475569; --border-color: #E2E8F0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Sora', sans-serif; background-color: var(--bryt-light); color: var(--bryt-black); line-height: 1.6; }
+        a { text-decoration: none; color: var(--bryt-primary); transition: color 0.2s; }
+        a:hover { color: var(--bryt-navy); }
+        .bryt-header { background: #fff; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+        .bryt-logo img { height: 32px; object-fit: contain; }
+        .nav-links { display: flex; gap: 24px; align-items: center; }
+        .nav-links a { color: var(--bryt-navy); font-weight: 600; font-size: 0.9rem; }
+        .btn-primary { background: linear-gradient(to right, var(--bryt-primary), var(--bryt-accent)); color: #fff !important; padding: 10px 20px; border-radius: 8px; font-weight: 700; }
+        
+        .doc-container { max-width: 800px; margin: 40px auto; background: #fff; padding: 48px; border-radius: 16px; box-shadow: 0 4px 20px rgba(7, 26, 58, 0.05); }
+        .doc-title { font-size: 2.2rem; font-weight: 800; color: var(--bryt-navy); margin-bottom: 16px; text-align: center; }
+        .doc-subtitle { text-align: center; color: var(--text-muted); margin-bottom: 48px; font-size: 1.1rem; }
+
+        .step-block { display: flex; gap: 24px; margin-bottom: 40px; }
+        .step-number { flex-shrink: 0; width: 48px; height: 48px; background: var(--bryt-light); color: var(--bryt-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800; border: 2px solid var(--bryt-accent); }
+        .step-content h3 { font-size: 1.3rem; color: var(--bryt-navy); margin-bottom: 8px; padding-top: 8px; }
+        .step-content p { color: var(--text-muted); font-size: 0.95rem; }
+
+        .bryt-footer { background: var(--bryt-navy); color: #fff; padding: 48px 24px 24px; margin-top: 64px; }
+        .footer-grid { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; margin-bottom: 48px; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 16px; color: #fff; }
+        .footer-col a, .footer-col p { display: block; color: #cbd5e1; font-size: 0.9rem; margin-bottom: 12px; }
+        .footer-bottom { text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); color: #94a3b8; font-size: 0.85rem; }
+        @media (max-width: 768px) { .nav-links { display: none; } .doc-container { margin: 20px; padding: 24px; } .step-block { flex-direction: column; gap: 12px; } }
+    </style>
+</head>
+<body>
+
+    <header class="bryt-header">
+        <a href="/" class="bryt-logo"><img src="../../assets/img/brytpay-logo.png" alt="BRYT Pay" onerror="this.src=''; this.alt='BRYT Pay';"></a>
+        <nav class="nav-links">
+            <a href="/">Home</a>
+            <a href="/dashboard/">Services</a>
+            <a href="/doc/how-it-works/" style="color: var(--bryt-primary);">How It Works</a>
+            <a href="/doc/faq/">FAQ</a>
+            <a href="/doc/about/">About</a>
+            <a href="/auth/login.html">Login</a>
+            <a href="/auth/register.html" class="btn-primary">Get Started</a>
+        </nav>
+    </header>
+
+    <main class="doc-container">
+        <h1 class="doc-title">How It Works</h1>
+        <p class="doc-subtitle">From creating an account to securing your digital documents, BRYT Pay makes the process incredibly simple.</p>
+        
+        <div class="step-block">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>Create Your Account</h3>
+                <p>Sign up securely on our platform. Once logged in, you will have access to your personal dashboard and digital wallet where you can manage all your transactions.</p>
+            </div>
+        </div>
+
+        <div class="step-block">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>Fund Your Wallet</h3>
+                <p>Before purchasing services, add funds to your BRYT Pay wallet. We support secure transfers processed by robust payment infrastructure so you can top up easily and safely.</p>
+            </div>
+        </div>
+
+        <div class="step-block">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h3>Choose a Service</h3>
+                <p>Select from our array of available services directly on your dashboard. Whether you need instant Airtime, Data, TV Subscriptions, WAEC PINs, or JAMB manual processing, the choice is yours.</p>
+            </div>
+        </div>
+
+        <div class="step-block">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h3>Confirm Details</h3>
+                <p>Double-check your inputs. Ensure you have the correct phone number, smartcard IUC, or JAMB Registration Number, and verify the service amount before completing the payment.</p>
+            </div>
+        </div>
+
+        <div class="step-block">
+            <div class="step-number">5</div>
+            <div class="step-content">
+                <h3>Processing</h3>
+                <p><strong>Instant Services:</strong> Things like Airtime, Data, and TV are processed automatically in seconds via third-party providers.<br><strong>Manual Services:</strong> Services like JAMB Admission letters are routed to our administrative desk where real agents process your details.</p>
+            </div>
+        </div>
+
+        <div class="step-block">
+            <div class="step-number">6</div>
+            <div class="step-content">
+                <h3>Track Your Transaction</h3>
+                <p>Keep an eye on your transaction history. Your order will move from <em>Pending</em> to <em>Processing</em>, and finally to <em>Processed</em> as we fulfill your request.</p>
+            </div>
+        </div>
+
+        <div class="step-block">
+            <div class="step-number">7</div>
+            <div class="step-content">
+                <h3>Completion & Delivery</h3>
+                <p>Once a manual service is successfully completed, your official document is securely uploaded to your account. You can instantly download the PDF or Image file directly to your phone or computer!</p>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bryt-footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>BRYT Pay</h4>
+                <p>Making everyday digital services fast, simple, and reliable for Nigerians.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <a href="/">Home</a>
+                <a href="/dashboard/">Services</a>
+                <a href="/doc/how-it-works/">How It Works</a>
+                <a href="/doc/faq/">FAQ</a>
+                <a href="/doc/about/">About</a>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <a href="/doc/terms/">Terms & Conditions</a>
+                <a href="/doc/privacy/">Privacy Policy</a>
+                <a href="/doc/refund/">Refund Policy</a>
+            </div>
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <a href="tel:09153375488">09153375488</a>
+                <a href="mailto:bryttechnologies@gmail.com">bryttechnologies@gmail.com</a>
+                <p>Kaduna, Nigeria</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            A product of <a href="https://bryttechnologies.name.ng" target="_blank" style="color: var(--bryt-accent);">BRYT Technologies</a><br>
+            &copy; 2026 BRYT Technologies. All rights reserved.
+        </div>
+    </footer>
+</body>
+</html>

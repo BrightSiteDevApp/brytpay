@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education PINs — BRYT Pay</title>
+    
+    <!-- STRICT APP PRIVACY DIRECTIVE: Do not index or crawl -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Branding -->
+    <meta name="theme-color" content="#1D5ED0">
+     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        /* 🚀 FIX: Reduced padding and fonts for better mobile responsiveness */
+        .tab-container { display: flex; background: var(--bg-light); border-radius: 8px; padding: 4px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 6px; transition: all 0.2s ease; font-size: 0.8rem; }
+        .tab-btn.active { background: white; color: var(--bryt-navy); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        
+        .provider-grid { display: grid; gap: 10px; margin-bottom: 20px; }
+        .provider-btn { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .provider-btn.active { border-color: var(--bryt-primary); background: #f0f9ff; box-shadow: 0 4px 12px rgba(29, 94, 208, 0.1); }
+        .provider-logo { width: 40px; height: 40px; margin: 0 auto 8px; object-fit: contain; display: block; }
+        .provider-btn-label { font-size: 0.75rem; font-weight: 800; color: var(--bryt-navy); display: block; }
+
+        /* Custom Dropdown - Made more compact */
+        .custom-select-wrapper { position: relative; user-select: none; }
+        .custom-select-trigger { background: #f8fafc; border: 1px solid var(--border-color); padding: 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: var(--bryt-navy); font-size: 0.8rem; font-weight: 600; transition: border-color 0.2s; }
+        .custom-select-wrapper.open .custom-select-trigger { border-color: var(--bryt-primary); background: #fff; }
+        .custom-options { position: absolute; display: none; top: 100%; left: 0; right: 0; background: #ffffff; border: 1px solid var(--border-color); border-radius: 12px; margin-top: 8px; z-index: 10; max-height: 250px; overflow-y: auto; box-shadow: 0 10px 40px rgba(7, 26, 58, 0.15); }
+        .custom-select-wrapper.open .custom-options { display: block; }
+        .custom-option { padding: 14px; border-bottom: 1px solid #f1f5f9; cursor: pointer; font-size: 0.8rem; color: var(--bryt-navy); font-weight: 600; transition: background 0.2s; display: flex; justify-content: space-between; }
+        .custom-option:last-child { border-bottom: none; }
+        .custom-option:hover { background: #f0f9ff; color: var(--bryt-primary); }
+
+        /* Toast Notification */
+        .bryt-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150px); background: #ffffff; padding: 14px 20px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; z-index: 9999; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); min-width: 300px; border-left: 4px solid var(--bryt-primary); }
+        .bryt-toast.show { transform: translateX(-50%) translateY(0); }
+        .toast-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+        .toast-success .toast-icon { background: #16a34a; }
+        .toast-success { border-left-color: #16a34a; }
+        .toast-error .toast-icon { background: #dc2626; }
+        .toast-error { border-left-color: #dc2626; }
+        .toast-text { font-size: 0.85rem; font-weight: 600; color: var(--bryt-navy); }
+
+        /* Manual Slip - Compacted */
+        .payment-slip { background: #ffffff; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .payment-slip-header { background: #f8fafc; padding: 14px; text-align: center; border-bottom: 1px solid var(--border-color); }
+        .payment-slip-title { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 2px; }
+        .payment-slip-amount { font-size: 1.5rem; font-weight: 800; color: var(--bryt-primary); }
+        .payment-slip-body { padding: 16px; }
+        .slip-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px dashed #e2e8f0; }
+        .slip-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .slip-label { color: var(--text-muted); font-size: 0.8rem; font-weight: 600; }
+        .slip-value { font-weight: 700; color: var(--bryt-navy); font-size: 0.85rem; text-align: right; }
+        .slip-acc-num { font-size: 1.15rem; color: var(--bryt-primary); font-family: monospace; letter-spacing: 1px; font-weight: 800; }
+        .copy-btn { display: inline-flex; align-items: center; gap: 6px; background: #e0f2fe; color: #0284c7; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: background 0.2s; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .copy-btn:hover { background: #bae6fd; }
+    </style>
+</head>
+<body>
+
+    <div id="bryt-toast" class="bryt-toast">
+        <div id="toast-icon-wrap" class="toast-icon"></div>
+        <div id="toast-text" class="toast-text">Message</div>
+    </div>
+
+    <main class="app-container" style="max-width: 520px; padding-bottom: 80px;">
+        <a href="/dashboard/" class="no-print" style="text-decoration:none; color:var(--text-muted); font-size:0.8rem; font-weight:700; display:inline-flex; align-items:center; gap:6px; margin-bottom: 20px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back to Dashboard
+        </a>
+
+        <div class="form-card" style="padding: 20px 16px;">
+            <header style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 style="font-size: 1.2rem; color: var(--bryt-navy); margin-bottom: 4px;">Education PINs</h1>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Instant Result Checkers & Tokens</p>
+                </div>
+                <div style="text-align: right; background: var(--bg-light); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px;">Balance</div>
+                    <strong id="user-balance" style="color: var(--bryt-navy); font-size: 0.9rem;">₦0.00</strong>
+                </div>
+            </header>
+
+            <div class="tab-container">
+                <button class="tab-btn active" id="tab-auto">Automatic (Instant)</button>
+                <button class="tab-btn" id="tab-manual">Manual Order</button>
+            </div>
+
+            <!-- AUTOMATIC SECTION -->
+            <div id="auto-section">
+                <!-- 🚀 FIX: Calm Blue Information Banner instead of scary red -->
+                <div style="background-color: #eff6ff; border: 1px dashed #3b82f6; border-radius: 12px; padding: 12px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 10px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    <p style="margin: 0; font-size: 0.75rem; color: #1e3a8a; line-height: 1.4; font-weight: 600;">
+                        Automated vending is temporarily under maintenance. Please click on the <strong>Manual Order</strong> tab above to get your PIN instantly.
+                    </p>
+                </div>
+
+                <form id="auto-exam-form">
+                    <div class="form-group">
+                        <label class="provider-select-label" style="font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; display: block;">Select Exam</label>
+                        <div class="provider-grid" style="grid-template-columns: repeat(2, 1fr);">
+                            <div class="provider-btn auto-exam-btn active" data-exam="waec" data-logo="waec-logo.png">
+                                <img src="../../assets/img/waec-logo.png" class="provider-logo" alt="WAEC" onerror="this.style.display='none'">
+                                <span class="provider-btn-label">WAEC</span>
+                            </div>
+                            <div class="provider-btn auto-exam-btn" data-exam="nabteb" data-logo="nabteb-logo.png">
+                                <img src="../../assets/img/nabteb-logo.png" class="provider-logo" alt="NABTEB" onerror="this.style.display='none'">
+                                <span class="provider-btn-label">NABTEB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" style="font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; display: block;">Quantity</label>
+                        <div class="custom-select-wrapper" id="custom-select-wrapper">
+                            <div class="custom-select-trigger" id="custom-select-trigger">
+                                <span id="custom-select-text" style="opacity: 0.6;">Select quantity...</span>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="custom-options" id="custom-options-list">
+                            </div>
+                        </div>
+                        <input type="hidden" id="exam-quantity" required>
+                    </div>
+
+                    <button type="submit" id="auto-submit-btn" class="btn-primary" style="margin-top: 24px; width: 100%; padding: 14px; font-size: 0.95rem; background: #94a3b8; border-color: #94a3b8; cursor: not-allowed;">
+                        Service Unavailable
+                    </button>
+                </form>
+            </div>
+
+            <!-- MANUAL SECTION -->
+            <div id="manual-section" style="display: none;">
+                
+                <div class="form-group">
+                    <label class="provider-select-label" style="font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; display: block;">Select Exam</label>
+                    <div class="provider-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <div class="provider-btn manual-exam-btn active" data-exam="WAEC" data-price="6000">
+                            <img src="../../assets/img/waec-logo.png" class="provider-logo" alt="WAEC" onerror="this.style.display='none'">
+                            <span class="provider-btn-label">WAEC</span>
+                        </div>
+                        <div class="provider-btn manual-exam-btn" data-exam="NECO" data-price="2500">
+                            <img src="../../assets/img/neco-logo.png" class="provider-logo" alt="NECO" onerror="this.style.display='none'">
+                            <span class="provider-btn-label">NECO</span>
+                        </div>
+                        <div class="provider-btn manual-exam-btn" data-exam="NABTEB" data-price="1500">
+                            <img src="../../assets/img/nabteb-logo.png" class="provider-logo" alt="NABTEB" onerror="this.style.display='none'">
+                            <span class="provider-btn-label">NABTEB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-slip">
+                    <div class="payment-slip-header">
+                        <div class="payment-slip-title">Amount to Pay</div>
+                        <div class="payment-slip-amount" id="slip-amount">₦6,000</div>
+                    </div>
+                    <div class="payment-slip-body">
+                        <div class="slip-row">
+                            <div class="slip-label">Bank Name</div>
+                            <div class="slip-value">Fidelity Bank</div>
+                        </div>
+                        <div class="slip-row">
+                            <div class="slip-label">Account Name</div>
+                            <div class="slip-value">IKHUORIA JOSEPH</div>
+                        </div>
+                        <div class="slip-row" style="align-items: flex-start;">
+                            <div class="slip-label" style="padding-top: 4px;">Account Number</div>
+                            <div style="text-align: right;">
+                                <div class="slip-acc-num" id="acc-no">4568970719</div>
+                                <button type="button" class="copy-btn" id="copy-btn">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                    Copy Number
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" id="whatsapp-btn" class="btn-primary" style="background: #25D366; border-color: #25D366; font-size: 0.95rem; padding: 14px; width: 100%;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                    I have made the payment
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../assets/js/supabase-client.js"></script>
+    <script src="../../assets/js/education.js"></script>
+</body>
+</html>

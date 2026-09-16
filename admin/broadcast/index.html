@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Email Broadcast Studio — BRYT Admin</title>
+
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#1D5ED0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../../assets/css/main.css">
+
+    <!-- Hide body until security authentication completes -->
+    <style>
+        body { display: none; background: #f8fafc; margin: 0; font-family: system-ui, -apple-system, sans-serif; color: #0f172a; }
+        .admin-container { max-width: 900px; margin: 0 auto; padding: 24px 16px 80px; }
+        .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
+        .back-link:hover { color: #1D5ED0; }
+        
+        /* Layout Split */
+        .studio-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; align-items: start; }
+        @media (max-width: 860px) { .studio-grid { grid-template-columns: 1fr; } }
+
+        .composer-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .form-group { margin-bottom: 18px; }
+        .form-label { display: flex; justify-content: space-between; font-weight: 800; font-size: 0.75rem; color: #475569; margin-bottom: 8px; text-transform: uppercase; }
+        .form-input { width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 0.9rem; outline: none; background: #f8fafc; font-family: inherit; transition: 0.2s; box-sizing: border-box; }
+        .form-input:focus { border-color: #1D5ED0; background: #ffffff; box-shadow: 0 0 0 3px rgba(29, 94, 208, 0.1); }
+        
+        /* Mode Switcher Tabs */
+        .mode-tabs { display: flex; background: #f1f5f9; padding: 4px; border-radius: 10px; margin-bottom: 20px; gap: 4px; }
+        .mode-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer; color: #64748b; background: transparent; transition: 0.2s; }
+        .mode-btn.active { background: #ffffff; color: #1D5ED0; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+
+        /* Cloudinary Upload Box */
+        .upload-dropzone { border: 2px dashed #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc; cursor: pointer; position: relative; transition: 0.2s; }
+        .upload-dropzone:hover { border-color: #1D5ED0; background: #eff6ff; }
+        .upload-dropzone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .upload-preview { max-width: 100%; max-height: 180px; border-radius: 8px; margin-top: 12px; display: none; object-fit: contain; margin-left: auto; margin-right: auto; }
+
+        /* Live Preview Container */
+        .preview-pane { position: sticky; top: 20px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .preview-screen { border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; min-height: 480px; max-height: 600px; overflow-y: auto; padding: 12px; }
+
+        .btn-dispatch { background: #0f172a; color: #ffffff; width: 100%; padding: 16px; border-radius: 12px; font-weight: 800; font-size: 1rem; border: none; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-dispatch:hover { background: #1D5ED0; }
+        .counter-badge { background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; }
+        .counter-badge.valid { background: #dcfce7; color: #15803d; }
+    </style>
+</head>
+<body>
+
+    <main class="admin-container">
+        <div class="header-row">
+            <a href="../index.html" class="back-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Back to Admin Hub
+            </a>
+            <span style="background: #f0fdf4; color: #16a34a; font-weight: 800; font-size: 0.7rem; padding: 4px 10px; border-radius: 12px; border: 1px solid #bbf7d0;">Brevo + Cloudinary</span>
+        </div>
+
+        <div class="studio-grid">
+            <!-- LEFT COLUMN: CONTROLS -->
+            <div class="composer-card">
+                <!-- Mode Selection -->
+                <div class="mode-tabs">
+                    <button type="button" class="mode-btn active" id="tab-newsletter" onclick="setMode('newsletter')">Standard Newsletter</button>
+                    <button type="button" class="mode-btn" id="tab-flyer" onclick="setMode('flyer')">Flyer Only</button>
+                </div>
+
+                <!-- 1. Recipients -->
+                <div class="form-group">
+                    <div class="form-label">
+                        <span>Recipients</span>
+                        <span id="email-counter" class="counter-badge">0 / 300</span>
+                    </div>
+                    <textarea id="recipient-list" class="form-input" style="min-height: 80px;" placeholder="user1@gmail.com, user2@yahoo.com..."></textarea>
+                </div>
+
+                <!-- 2. Subject Line -->
+                <div class="form-group">
+                    <div class="form-label">Subject Line</div>
+                    <input type="text" id="email-subject" class="form-input" placeholder="e.g. Special Weekend Announcement from BRYT Pay">
+                </div>
+
+                <!-- MODE A: NEWSLETTER FIELDS -->
+                <div id="newsletter-fields">
+                    
+                    <!-- NEW: Header Logo Upload -->
+                    <div class="form-group">
+                        <div class="form-label">Header Logo (Optional)</div>
+                        <div class="upload-dropzone" style="padding: 12px;">
+                            <span id="upload-status-logo" style="font-size: 0.75rem; color: #64748b;">Click to upload a custom logo (Defaults to BRYT Pay)</span>
+                            <input type="file" id="logo-file-picker" accept="image/*" onchange="handleCloudinaryUpload(event, 'logo')">
+                            <img id="logo-preview-img" class="upload-preview" alt="Logo Preview" style="max-height: 40px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-label">Intro Text</div>
+                        <textarea id="nl-intro" class="form-input" style="min-height: 90px;" placeholder="Hey there! Here is the latest update..."></textarea>
+                    </div>
+
+                    <!-- Landscape Middle Image -->
+                    <div class="form-group">
+                        <div class="form-label">Middle Landscape Image (Optional)</div>
+                        <div class="upload-dropzone">
+                            <span id="upload-status-middle">Click to Upload via Cloudinary</span>
+                            <input type="file" id="middle-file-picker" accept="image/*" onchange="handleCloudinaryUpload(event, 'middle')">
+                            <img id="middle-preview-img" class="upload-preview" alt="Middle Preview">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-label">Body Text</div>
+                        <textarea id="nl-body" class="form-input" style="min-height: 100px;" placeholder="Further details, terms, or notes..."></textarea>
+                    </div>
+
+                    <!-- Call To Action Button -->
+                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div>
+                            <div class="form-label">Button Label</div>
+                            <input type="text" id="cta-label" class="form-input" placeholder="e.g. Claim Discount">
+                        </div>
+                        <div>
+                            <div class="form-label">Button Link (URL)</div>
+                            <input type="text" id="cta-url" class="form-input" placeholder="https://brytpay.name.ng/dashboard/">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODE B: FLYER ONLY FIELDS -->
+                <div id="flyer-fields" style="display: none;">
+                    <div class="form-group">
+                        <div class="form-label">Upload Promotional Flyer</div>
+                        <div class="upload-dropzone">
+                            <span id="upload-status-flyer">Click to Upload Flyer to Cloudinary</span>
+                            <input type="file" id="flyer-file-picker" accept="image/*" onchange="handleCloudinaryUpload(event, 'flyer')">
+                            <img id="flyer-preview-img" class="upload-preview" alt="Flyer Preview">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-label">Flyer Click Action Link</div>
+                        <input type="text" id="flyer-click-url" class="form-input" placeholder="https://brytpay.name.ng/dashboard/" value="https://brytpay.name.ng/">
+                    </div>
+                </div>
+
+                <!-- Send Button -->
+                <button id="btn-dispatch" class="btn-dispatch">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    Send Broadcast
+                </button>
+            </div>
+
+            <!-- RIGHT COLUMN: LIVE PHONE PREVIEW -->
+            <div class="preview-pane">
+                <div class="form-label" style="margin-bottom: 12px;">Live Mobile Preview</div>
+                <div class="preview-screen" id="live-preview-box"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Supabase CDN & Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../assets/js/supabase-client.js"></script>
+
+    <script>
+        // ==========================================
+        // 1. CONFIGURATION
+        // ==========================================
+        const CLOUDINARY_CLOUD_NAME = "y2tsggmu"; // Insert your Cloud Name
+        const CLOUDINARY_UPLOAD_PRESET = "email-img"; // Insert your Unsigned Preset Name
+        
+        let currentMode = 'newsletter';
+        let headerLogoUrl = "https://brytpay.name.ng/assets/img/brytpay-logo.png"; // Default Logo
+        let middleImageUrl = '';
+        let flyerImageUrl = '';
+        let validRecipients = [];
+
+        // ==========================================
+        // 2. STRICT ADMIN SECURITY GUARD
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const { data: { session } } = await window.db.auth.getSession();
+                if (!session) { window.location.href = '/auth/login.html'; return; }
+
+                const { data: adminRecord } = await window.db
+                    .from('admins')
+                    .select('email')
+                    .eq('email', session.user.email)
+                    .maybeSingle();
+
+                if (!adminRecord) {
+                    alert('Unauthorized access. Admin privileges required.');
+                    window.location.href = '/dashboard/';
+                    return;
+                }
+
+                // If authorized, reveal UI and start live preview
+                document.body.style.display = 'block';
+                updateLivePreview();
+            } catch (err) {
+                console.error('Security check error:', err);
+                window.location.href = '/dashboard/';
+            }
+        });
+
+        // ==========================================
+        // 3. RECIPIENT COUNTING & VALIDATION
+        // ==========================================
+        const recipientInput = document.getElementById('recipient-list');
+        const counterBadge = document.getElementById('email-counter');
+
+        recipientInput.addEventListener('input', () => {
+            const raw = recipientInput.value;
+            const matches = raw.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || [];
+            validRecipients = [...new Set(matches)];
+            counterBadge.textContent = `${validRecipients.length} / 300`;
+            counterBadge.className = validRecipients.length > 0 && validRecipients.length <= 300 ? 'counter-badge valid' : 'counter-badge';
+        });
+
+        // ==========================================
+        // 4. CLOUDINARY DIRECT UPLOAD
+        // ==========================================
+        async function handleCloudinaryUpload(event, target) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const statusText = document.getElementById(`upload-status-${target}`);
+            const previewImg = document.getElementById(`${target}-preview-img`);
+            
+            statusText.textContent = "Uploading...";
+
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+            try {
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data.error?.message || "Upload failed");
+
+                // Route the returned URL to the correct variable
+                if (target === 'middle') {
+                    middleImageUrl = data.secure_url;
+                } else if (target === 'flyer') {
+                    flyerImageUrl = data.secure_url;
+                } else if (target === 'logo') {
+                    headerLogoUrl = data.secure_url;
+                }
+
+                previewImg.src = data.secure_url;
+                previewImg.style.display = 'block';
+                statusText.textContent = "Uploaded successfully!";
+                updateLivePreview();
+            } catch (err) {
+                alert(`Upload failed: ${err.message}`);
+                statusText.textContent = "Error uploading. Try again.";
+            }
+        }
+
+        // ==========================================
+        // 5. TEMPLATE COMPILER & PREVIEW
+        // ==========================================
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('tab-newsletter').className = mode === 'newsletter' ? 'mode-btn active' : 'mode-btn';
+            document.getElementById('tab-flyer').className = mode === 'flyer' ? 'mode-btn active' : 'mode-btn';
+            document.getElementById('newsletter-fields').style.display = mode === 'newsletter' ? 'block' : 'none';
+            document.getElementById('flyer-fields').style.display = mode === 'flyer' ? 'block' : 'none';
+            updateLivePreview();
+        }
+
+        function generateEmailHtml() {
+            if (currentMode === 'flyer') {
+                const clickUrl = document.getElementById('flyer-click-url').value || 'https://brytpay.name.ng';
+                const flyerSrc = flyerImageUrl || 'https://via.placeholder.com/600x800.png?text=Upload+Your+Flyer+Here';
+
+                return `
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; padding: 20px 0;">
+                    <tr>
+                        <td align="center">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
+                                <tr>
+                                    <td align="center" style="padding: 0;">
+                                        <a href="${clickUrl}" target="_blank" style="display: block; text-decoration: none;">
+                                            <img src="${flyerSrc}" alt="Announcement" style="display: block; width: 100%; max-width: 600px; height: auto; border: none;">
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding: 24px; font-family: sans-serif; font-size: 11px; color: #94a3b8; line-height: 1.5;">
+                                        BRYT Technologies | Kaduna, Nigeria<br>
+                                        <a href="#" style="color: #1D5ED0; text-decoration: none;">Unsubscribe</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>`;
+            }
+
+            // Standard Newsletter Mode
+            const intro = document.getElementById('nl-intro').value.replace(/\n/g, '<br>') || 'Introductory message here...';
+            const body = document.getElementById('nl-body').value.replace(/\n/g, '<br>');
+            const ctaLabel = document.getElementById('cta-label').value;
+            const ctaUrl = document.getElementById('cta-url').value;
+
+            let imageBlock = '';
+            if (middleImageUrl) {
+                imageBlock = `
+                <tr>
+                    <td align="center" style="padding: 0 0 20px 0;">
+                        <img src="${middleImageUrl}" alt="Feature" style="width: 100%; max-width: 520px; height: auto; border-radius: 8px; display: block; margin: 0 auto;">
+                    </td>
+                </tr>`;
+            }
+
+            let ctaBlock = '';
+            if (ctaLabel && ctaUrl) {
+                ctaBlock = `
+                <tr>
+                    <td align="center" style="padding: 10px 0 24px 0;">
+                        <a href="${ctaUrl}" target="_blank" style="background: linear-gradient(135deg, #1D5ED0, #159FE3); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: bold; font-family: sans-serif; font-size: 14px; display: inline-block;">
+                            ${ctaLabel}
+                        </a>
+                    </td>
+                </tr>`;
+            }
+
+            return `
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; padding: 20px 0;">
+                <tr>
+                    <td align="center">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; padding: 32px 24px;">
+                            <!-- Dynamic Header Logo -->
+                            <tr>
+                                <td align="center" style="padding-bottom: 24px;">
+                                    <img src="${headerLogoUrl}" alt="Brand Logo" style="height: 36px; object-fit: contain;">
+                                </td>
+                            </tr>
+                            <!-- Intro Text -->
+                            <tr>
+                                <td style="font-family: sans-serif; font-size: 15px; color: #1e293b; line-height: 1.6; padding-bottom: 20px;">
+                                    ${intro}
+                                </td>
+                            </tr>
+                            <!-- Middle Landscape Image -->
+                            ${imageBlock}
+                            <!-- Body Text -->
+                            <tr>
+                                <td style="font-family: sans-serif; font-size: 14px; color: #475569; line-height: 1.6; padding-bottom: 20px;">
+                                    ${body}
+                                </td>
+                            </tr>
+                            <!-- CTA Button -->
+                            ${ctaBlock}
+                            <!-- Social & Platform Links -->
+                            <tr>
+                                <td align="center" style="padding-top: 16px; border-top: 1px dashed #e2e8f0; font-family: sans-serif; font-size: 12px;">
+                                    <a href="https://brytpay.name.ng" style="color: #1D5ED0; text-decoration: none; margin: 0 8px; font-weight: 600;">Website</a> &bull;
+                                    <a href="https://www.instagram.com/bryttechnologies" style="color: #1D5ED0; text-decoration: none; margin: 0 8px; font-weight: 600;">Instagram</a> &bull;
+                                    <a href="https://wa.me/2349153375488" style="color: #1D5ED0; text-decoration: none; margin: 0 8px; font-weight: 600;">WhatsApp</a>
+                                </td>
+                            </tr>
+                            <!-- Legal Footer -->
+                            <tr>
+                                <td align="center" style="padding-top: 16px; font-family: sans-serif; font-size: 11px; color: #94a3b8; line-height: 1.4;">
+                                    BRYT Technologies | Kaduna, Nigeria<br>
+                                    <a href="#" style="color: #94a3b8; text-decoration: underline;">Unsubscribe</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>`;
+        }
+
+        function updateLivePreview() {
+            document.getElementById('live-preview-box').innerHTML = generateEmailHtml();
+        }
+
+        // Bind form inputs to live preview
+        ['nl-intro', 'nl-body', 'cta-label', 'cta-url', 'flyer-click-url'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', updateLivePreview);
+        });
+
+        // ==========================================
+        // 6. DISPATCH VIA EDGE FUNCTION
+        // ==========================================
+        document.getElementById('btn-dispatch').addEventListener('click', async () => {
+            if (validRecipients.length === 0) return alert("Please enter at least one valid recipient.");
+            if (validRecipients.length > 300) return alert("Free limit is 300 recipients per day.");
+            
+            const subject = document.getElementById('email-subject').value;
+            if (!subject) return alert("Subject line is required.");
+
+            const fullHtml = generateEmailHtml();
+            const btn = document.getElementById('btn-dispatch');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = "Sending Broadcast...";
+            btn.disabled = true;
+
+            try {
+                const { data, error } = await window.db.functions.invoke('send-broadcast', {
+                    body: {
+                        recipients: validRecipients,
+                        subject: subject,
+                        rawCompiledHtml: fullHtml
+                    }
+                });
+
+                if (error) throw new Error(error.message);
+                if (data && !data.success) throw new Error(data.error);
+
+                alert(`Broadcast dispatched successfully to ${validRecipients.length} recipients!`);
+                recipientInput.value = '';
+                document.getElementById('email-subject').value = '';
+                counterBadge.textContent = '0 / 300';
+            } catch (err) {
+                alert(`Dispatch Error: ${err.message}`);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

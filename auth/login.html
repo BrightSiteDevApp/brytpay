@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — BRYT Pay</title>
+
+    <!-- STRICT APP PRIVACY DIRECTIVE: Do not index or crawl thin auth pages -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Branding -->
+    <meta name="theme-color" content="#1D5ED0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <style>
+        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; background: radial-gradient(circle at top right, rgba(21, 159, 227, 0.08), transparent 400px), var(--bg-light); }
+        .auth-card { width: 100%; max-width: 440px; padding: 40px 32px; }
+        .auth-brand { display: flex; justify-content: center; margin-bottom: 24px; }
+        .brand-logo-img { max-width: 200px; height: auto; object-fit: contain; display: block; margin: 0 auto; }
+        .auth-header { text-align: center; margin-bottom: 32px; }
+        .auth-header h1 { font-size: 1.5rem; color: var(--bryt-navy); margin-bottom: 8px; letter-spacing: -0.5px; }
+        .auth-header p { font-size: 0.9rem; color: var(--text-muted); }
+        .auth-error { background: var(--failed-bg); color: var(--failed-text); padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; margin-bottom: 24px; display: none; border: 1px solid var(--failed-border); }
+        .auth-success { background: var(--success-bg); color: var(--success-text); padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; margin-bottom: 24px; display: none; border: 1px solid var(--status-success-border); }
+        .auth-footer { text-align: center; margin-top: 28px; font-size: 0.9rem; color: var(--text-muted); }
+        .auth-footer a { color: var(--bryt-primary); font-weight: 600; text-decoration: none; transition: var(--transition); }
+        .auth-footer a:hover { text-decoration: underline; }
+        .back-link { display: inline-flex; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
+        
+        /* Password Visibility Styles */
+        .password-wrapper { position: relative; }
+        .toggle-password { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
+        .toggle-password:hover { color: var(--bryt-primary); }
+    </style>
+</head>
+<body>
+    <div class="form-card auth-card">
+        <div class="auth-brand">
+            <img src="../assets/img/brytpay-logo.png" alt="BRYT Pay" class="brand-logo-img">
+        </div>
+
+        <div class="auth-header" id="auth-title">
+            <h1>Welcome Back</h1>
+            <p>Sign in to manage your utility payments.</p>
+        </div>
+
+        <div id="auth-error" class="auth-error"></div>
+        <div id="auth-success" class="auth-success"></div>
+
+        <!-- FORM 1: EMAIL & PASSWORD -->
+        <form id="login-form">
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" id="email" class="form-input" placeholder="name@example.com" required>
+            </div>
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between;">
+                    <label class="form-label" for="password">Password</label>
+                    <span id="forgot-pwd-trigger" style="font-size: 0.8rem; color: var(--bryt-primary); font-weight: 600; cursor: pointer;">Forgot password?</span>
+                </div>
+                <div class="password-wrapper">
+                    <input type="password" id="password" class="form-input" placeholder="••••••••" style="padding-right: 40px;" required>
+                    <div class="toggle-password">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" id="login-btn" class="btn-primary" style="margin-top: 24px;">Sign In</button>
+            <div class="auth-footer">Don't have an account? <a href="/auth/signup.html">Create one</a></div>
+        </form>
+
+        <!-- FORM 2: TWO-STEP LOGIN OTP -->
+        <form id="login-otp-form" style="display: none; text-align: center;">
+            <div class="form-group" style="text-align: left;">
+                <label class="form-label" for="login-otp-code">8-Digit Security Code</label>
+                <input type="text" id="login-otp-code" class="form-input" placeholder="12345678" maxlength="8" style="letter-spacing: 2px; font-weight: 700; text-align: center;" required>
+            </div>
+            <button type="submit" id="verify-login-btn" class="btn-primary" style="margin-top: 16px; width: 100%;">Verify & Sign In</button>
+            <div class="auth-footer"><a href="#" id="cancel-login-otp" style="color: var(--text-muted);">&larr; Cancel Login</a></div>
+        </form>
+
+        <!-- FORM 3: FORGOT PASSWORD (EMAIL) -->
+        <form id="reset-email-form" style="display: none;">
+            <div class="back-link" id="back-to-login">&larr; Back to login</div>
+            <div class="form-group">
+                <label class="form-label" for="reset-email">Enter your Email</label>
+                <input type="email" id="reset-email" class="form-input" placeholder="name@example.com" required>
+            </div>
+            <button type="submit" id="send-otp-btn" class="btn-primary" style="margin-top: 16px; width: 100%;">Send 8-Digit Code</button>
+        </form>
+
+        <!-- FORM 4: FORGOT PASSWORD (OTP + NEW PWD) -->
+        <form id="reset-pwd-form" style="display: none;">
+            <div class="form-group">
+                <label class="form-label" for="reset-otp">8-Digit Recovery Code</label>
+                <input type="text" id="reset-otp" class="form-input" placeholder="12345678" maxlength="8" style="letter-spacing: 2px; font-weight: 700; text-align: center;" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="new-password">New Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="new-password" class="form-input" placeholder="••••••••" style="padding-right: 40px;" required>
+                    <div class="toggle-password">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" id="save-pwd-btn" class="btn-primary" style="margin-top: 16px; width: 100%;">Save & Sign In</button>
+        </form>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-client.js"></script>
+    <script src="../assets/js/auth.js"></script>
+</body>
+</html>

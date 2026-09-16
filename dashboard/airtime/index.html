@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Airtime — BRYT Pay</title>
+    
+    <!-- STRICT APP PRIVACY DIRECTIVE: Do not index or crawl -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Branding -->
+    <meta name="theme-color" content="#1D5ED0">
+     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        .provider-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+        .provider-btn { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .provider-btn.active { border-color: var(--bryt-primary); background: #f0f9ff; box-shadow: 0 4px 12px rgba(29, 94, 208, 0.1); }
+        /* Network Logos using Images */
+        .provider-logo { width: 42px; height: 42px; margin: 0 auto 8px; border-radius: 50%; object-fit: contain; background: transparent; }
+        .provider-btn-label { font-size: 0.75rem; font-weight: 700; color: var(--bryt-navy); display: block; }
+
+        /* BRYT Custom Toast Notification */
+        .bryt-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150px); background: #ffffff; padding: 14px 20px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; z-index: 9999; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); min-width: 300px; border-left: 4px solid var(--bryt-primary); }
+        .bryt-toast.show { transform: translateX(-50%) translateY(0); }
+        .toast-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+        .toast-success .toast-icon { background: #16a34a; }
+        .toast-success { border-left-color: #16a34a; }
+        .toast-error .toast-icon { background: #dc2626; }
+        .toast-error { border-left-color: #dc2626; }
+        .toast-text { font-size: 0.85rem; font-weight: 600; color: var(--bryt-navy); }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Toast Container -->
+    <div id="bryt-toast" class="bryt-toast">
+        <div id="toast-icon-wrap" class="toast-icon"></div>
+        <div id="toast-text" class="toast-text">Message goes here</div>
+    </div>
+
+    <main class="app-container" style="max-width: 520px;">
+        <a href="/dashboard/" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; margin-bottom: 24px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back to Dashboard
+        </a>
+
+        <div class="form-card">
+            <header style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 style="font-size: 1.35rem; color: var(--bryt-navy); margin-bottom: 4px;">Airtime Purchase</h1>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Instant top-up to any network</p>
+                </div>
+                <div style="text-align: right; background: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px;">Balance</div>
+                    <strong id="user-balance" style="color: var(--bryt-navy); font-size: 0.95rem;">₦0.00</strong>
+                </div>
+            </header>
+
+            <form id="airtime-form">
+                <div class="form-group">
+                    <label class="provider-select-label" style="font-weight: 700; margin-bottom: 12px; display: block;">Select Network</label>
+                    <div class="provider-grid" id="provider-container">
+                        <div class="provider-btn network-btn active" data-network="mtn" data-logo="mtn-logo.png">
+                            <img src="../../assets/img/mtn-logo.png" class="provider-logo" alt="MTN">
+                            <span class="provider-btn-label">MTN</span>
+                        </div>
+                        <div class="provider-btn network-btn" data-network="airtel" data-logo="airtel-logo.png">
+                            <img src="../../assets/img/airtel-logo.png" class="provider-logo" alt="Airtel">
+                            <span class="provider-btn-label">Airtel</span>
+                        </div>
+                        <div class="provider-btn network-btn" data-network="glo" data-logo="glo-logo.png">
+                            <img src="../../assets/img/glo-logo.png" class="provider-logo" alt="Glo">
+                            <span class="provider-btn-label">Glo</span>
+                        </div>
+                        <div class="provider-btn network-btn" data-network="9mobile" data-logo="9mob-logo.png">
+                            <img src="../../assets/img/9mob-logo.png" class="provider-logo" alt="9mobile">
+                            <span class="provider-btn-label">9mobile</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="phone" style="font-weight: 700;">Recipient Phone Number</label>
+                    <input type="tel" id="phone" class="form-input" style="padding: 16px; font-size: 1.1rem; letter-spacing: 2px;" placeholder="080 0000 0000" maxlength="11" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="amount" style="font-weight: 700;">Amount</label>
+                    <div class="input-currency-wrapper">
+                        <span class="input-currency-prefix">₦</span>
+                        <input type="number" id="amount" class="form-input form-input-currency" min="100" max="50000" placeholder="0.00" required>
+                    </div>
+                    
+                    <div class="preset-grid" style="margin-top: 16px;">
+                        <div class="preset-chip" data-amt="100">₦100</div>
+                        <div class="preset-chip" data-amt="200">₦200</div>
+                        <div class="preset-chip" data-amt="500">₦500</div>
+                        <div class="preset-chip" data-amt="1000">₦1,000</div>
+                    </div>
+                </div>
+
+                <button type="submit" id="submit-btn" class="btn-primary" style="margin-top: 32px; width: 100%; padding: 18px; font-size: 1.05rem;">
+                    Proceed
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Redesigned Confirmation Modal -->
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-content" style="padding: 32px 24px; text-align: center;">
+            
+            <img id="modal-network-logo" src="../../assets/img/mtn-logo.png" alt="Network" style="width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 16px; object-fit: contain; background: #f8fafc; padding: 8px; border: 1px solid var(--border-color);">
+            
+            <h3 class="modal-title" style="font-size: 1.4rem; margin-bottom: 8px;">Confirm Purchase</h3>
+            <p class="modal-desc" style="margin-bottom: 24px;">Please review the details below before paying.</p>
+
+            <div class="modal-breakdown" style="background: #f8fafc; border-radius: 16px; padding: 16px 20px; text-align: left; margin-bottom: 32px; border: 1px solid var(--border-color);">
+                <div class="modal-row" style="margin-bottom: 12px; display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Service</span>
+                    <strong id="modal-network" style="color: var(--bryt-navy); font-size: 0.9rem;">MTN Airtime</strong>
+                </div>
+                <div class="modal-row" style="margin-bottom: 16px; display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Recipient</span>
+                    <strong id="modal-phone" style="color: var(--bryt-navy); font-size: 1rem; letter-spacing: 1px;">---</strong>
+                </div>
+                <div class="modal-row" style="padding-top: 16px; border-top: 1px dashed #cbd5e1; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Total Debit</span>
+                    <strong id="modal-amount" style="color: var(--bryt-primary); font-size: 1.4rem; font-weight: 800;">₦0.00</strong>
+                </div>
+            </div>
+
+            <div class="modal-actions" style="display: flex; gap: 12px;">
+                <button type="button" id="modal-cancel" class="btn-secondary" style="flex: 1; padding: 16px; font-weight: 700; color: #64748b; border-color: #cbd5e1;">Cancel</button>
+                <button type="button" id="modal-confirm" class="btn-primary" style="flex: 2.2; padding: 16px; font-weight: 800; font-size: 1.05rem;">Pay Securely</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../assets/js/supabase-client.js"></script>
+    <script src="../../assets/js/airtime.js"></script>
+</body>
+</html>

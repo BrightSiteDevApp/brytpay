@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Core SEO -->
+    <title>BRYT Pay | Airtime, Data & Digital Services in Nigeria</title>
+    <meta name="description" content="Buy Airtime, Data, TV subscriptions, Education PINs, and access manual JAMB & NIN processing securely online in Nigeria with the BRYT Pay wallet.">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://brytpay.name.ng/">
+    <link rel="manifest" href="manifest.json">
+    
+    
+    <!-- Branding & PWA -->
+    <meta name="theme-color" content="#1D5ED0">
+     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    
+    <!-- Open Graph / Social Media (Facebook, WhatsApp, LinkedIn) -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://brytpay.name.ng/">
+    <meta property="og:title" content="BRYT Pay | Airtime, Data & Digital Services in Nigeria">
+    <meta property="og:description" content="The smartest, most reliable platform to purchase airtime, data, TV subscriptions, and process educational PINs securely in Nigeria.">
+    <meta property="og:image" content="https://brytpay.name.ng/assets/img/brytpay-logo.png">
+    <meta property="og:site_name" content="BRYT Pay">
+    <meta property="og:locale" content="en_NG">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:url" content="https://brytpay.name.ng/">
+    <meta name="twitter:title" content="BRYT Pay | Digital Services in Nigeria">
+    <meta name="twitter:description" content="Purchase Airtime, Data, TV subscriptions, and access manual JAMB & NIN processing securely online with BRYT Pay.">
+    <meta name="twitter:image" content="https://brytpay.name.ng/assets/img/brytpay-logo.png">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://brytpay.name.ng/#website",
+          "url": "https://brytpay.name.ng/",
+          "name": "BRYT Pay",
+          "description": "Nigerian digital-services and payment platform offering Airtime, Mobile data, Educational PINs, and utility services.",
+          "inLanguage": "en-NG"
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://brytpay.name.ng/#organization",
+          "name": "BRYT Technologies",
+          "url": "https://brytpay.name.ng/",
+          "logo": "https://brytpay.name.ng/assets/img/brytpay-logo.png",
+          "brand": {
+            "@type": "Brand",
+            "name": "BRYT Pay"
+          },
+          "location": {
+            "@type": "Place",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Kaduna",
+              "addressCountry": "NG"
+            }
+          },
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+23409153375488",
+            "contactType": "customer support",
+            "areaServed": "NG",
+            "availableLanguage": "English"
+          }
+        }
+      ]
+    }
+    </script>
+
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        /* =========================================
+           BRYT PAY LANDING PAGE STYLES
+           ========================================= */
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+        body { margin: 0; padding: 0; background-color: var(--bg-light); color: var(--text-main); font-family: 'Sora', sans-serif; overflow-x: hidden; }
+        section { padding: 80px 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        .text-gradient { background: linear-gradient(135deg, var(--bryt-primary), var(--bryt-accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .text-center { text-align: center; }
+        .section-header { text-align: center; margin-bottom: 56px; max-width: 600px; margin-inline: auto; }
+        .section-header h2 { font-size: 2.2rem; font-weight: 800; color: var(--bryt-navy); margin-bottom: 16px; letter-spacing: -0.5px; }
+        .section-header p { font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; }
+        .bryt-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; transition: box-shadow 0.3s; }
+        .bryt-header.scrolled { box-shadow: var(--shadow-sm); }
+        .bryt-logo img { height: 32px; object-fit: contain; }
+        .nav-links { display: none; gap: 24px; align-items: center; }
+        .nav-links a { color: var(--bryt-navy); font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--bryt-primary); }
+        .btn-nav-primary { background: linear-gradient(to right, var(--bryt-primary), var(--bryt-accent)); color: #fff !important; padding: 10px 20px; border-radius: 8px; font-weight: 700; transition: transform 0.2s; display: inline-block; }
+        .btn-nav-primary:hover { transform: translateY(-2px); }
+        .mobile-toggle { display: block; background: none; border: none; font-size: 1.5rem; color: var(--bryt-navy); cursor: pointer; }
+        .mobile-menu { position: fixed; top: 65px; left: 0; right: 0; background: var(--surface-white); padding: 24px; border-bottom: 1px solid var(--border-color); box-shadow: var(--shadow-md); display: none; flex-direction: column; gap: 20px; z-index: 999; }
+        .mobile-menu.active { display: flex; }
+        .mobile-menu a { text-decoration: none; color: var(--bryt-navy); font-weight: 600; font-size: 1.1rem; }
+        .hero { position: relative; padding: 60px 20px 100px; overflow: hidden; background: radial-gradient(circle at top right, rgba(29, 94, 208, 0.05), transparent 50%); }
+        .hero-container { display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center; max-width: 1100px; margin: 0 auto; }
+        .hero-content h1 { font-size: 3rem; font-weight: 800; color: var(--bryt-navy); line-height: 1.15; margin-bottom: 24px; letter-spacing: -1px; }
+        .hero-content p { font-size: 1.15rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 32px; max-width: 480px; }
+        .hero-actions { display: flex; flex-direction: column; gap: 16px; }
+        .hero-visual { position: relative; display: flex; justify-content: center; }
+        .mockup-card { background: var(--bryt-navy); width: 100%; max-width: 340px; border-radius: 24px; padding: 32px 24px; box-shadow: 0 20px 40px rgba(7, 26, 58, 0.15); position: relative; z-index: 2; transform: rotate(-2deg); transition: transform 0.5s ease; }
+        .mockup-card:hover { transform: rotate(0deg) translateY(-10px); }
+        .mockup-glow { position: absolute; top: 10%; left: 10%; right: 10%; bottom: 10%; background: linear-gradient(135deg, var(--bryt-primary), var(--bryt-accent)); filter: blur(60px); opacity: 0.3; z-index: 1; }
+        .mk-header { display: flex; justify-content: space-between; margin-bottom: 32px; opacity: 0.8; }
+        .mk-dot { width: 32px; height: 12px; background: rgba(255,255,255,0.2); border-radius: 6px; }
+        .mk-avatar { width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 50%; }
+        .mk-balance-label { color: var(--bryt-accent); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .mk-balance { color: white; font-size: 2.5rem; font-weight: 800; margin-bottom: 32px; display: flex; align-items: baseline; gap: 4px; }
+        .mk-balance span { font-size: 1.2rem; }
+        .mk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .mk-icon { aspect-ratio: 1; background: rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; }
+        .trust-strip { background: var(--surface-white); padding: 40px 20px; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .trust-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; max-width: 1100px; margin: 0 auto; text-align: center; }
+        .trust-item { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .trust-icon { width: 48px; height: 48px; background: #F0F6FF; color: var(--bryt-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .trust-item h4 { font-size: 0.95rem; font-weight: 700; color: var(--bryt-navy); margin: 0; }
+        .trust-item p { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
+        .services-section { background: var(--bg-light); }
+        .services-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        .srv-card { background: var(--surface-white); padding: 32px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); transition: var(--transition); display: flex; flex-direction: column; align-items: flex-start; }
+        .srv-card:hover { border-color: var(--bryt-primary); box-shadow: var(--shadow-md); transform: translateY(-4px); }
+        .srv-icon { width: 56px; height: 56px; background: #F0F6FF; color: var(--bryt-primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+        .srv-card h3 { font-size: 1.25rem; font-weight: 700; color: var(--bryt-navy); margin-bottom: 12px; }
+        .srv-card p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin: 0; }
+        .steps-section { background: var(--surface-white); }
+        .steps-grid { display: grid; grid-template-columns: 1fr; gap: 32px; position: relative; }
+        .step-card { text-align: center; position: relative; z-index: 2; }
+        .step-num { width: 48px; height: 48px; background: var(--bryt-navy); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 800; margin: 0 auto 20px; box-shadow: 0 0 0 8px var(--surface-white); }
+        .step-card h3 { font-size: 1.2rem; font-weight: 700; color: var(--bryt-navy); margin-bottom: 12px; }
+        .step-card p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; }
+        .jamb-banner { background: linear-gradient(135deg, var(--bryt-navy), #0a2554); border-radius: 24px; padding: 48px 32px; text-align: center; color: white; position: relative; overflow: hidden; margin: 40px auto; max-width: 1100px; box-shadow: var(--shadow-md); }
+        .jamb-banner h2 { font-size: 2rem; font-weight: 800; margin-bottom: 16px; }
+        .jamb-banner p { font-size: 1.1rem; color: #94a3b8; max-width: 700px; margin: 0 auto 32px; line-height: 1.6; }
+        .jamb-disclaimer { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 24px; }
+        .final-cta { text-align: center; padding: 100px 20px; background: var(--bg-light); }
+        .final-cta h2 { font-size: 2.5rem; font-weight: 800; color: var(--bryt-navy); margin-bottom: 24px; letter-spacing: -0.5px; }
+        .final-cta p { font-size: 1.15rem; color: var(--text-muted); margin-bottom: 40px; }
+        .final-cta-btns { display: flex; flex-direction: column; gap: 16px; justify-content: center; align-items: center; }
+        .bryt-footer { background: var(--bryt-navy); color: #fff; padding: 64px 24px 24px; }
+        .footer-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; margin-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 48px; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 16px; color: #fff; font-weight: 700; }
+        .footer-col p { color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; }
+        .footer-col a { display: block; color: #cbd5e1; font-size: 0.95rem; margin-bottom: 12px; text-decoration: none; transition: color 0.2s; }
+        .footer-col a:hover { color: var(--bryt-accent); }
+        .footer-brand-logo { height: 32px; filter: brightness(0) invert(1); margin-bottom: 16px; }
+        .footer-bottom { text-align: center; color: #94a3b8; font-size: 0.85rem; max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+        .footer-tech-link { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: white; text-decoration: none; background: rgba(255,255,255,0.05); padding: 8px 16px; border-radius: 20px; transition: var(--transition); }
+        .footer-tech-link:hover { background: rgba(255,255,255,0.1); color: var(--bryt-accent); }
+
+        @media (min-width: 600px) {
+            .trust-grid { grid-template-columns: repeat(4, 1fr); }
+            .services-grid { grid-template-columns: repeat(2, 1fr); }
+            .hero-actions, .final-cta-btns { flex-direction: row; }
+            .btn-primary, .btn-secondary { width: auto; padding: 16px 32px; }
+        }
+        @media (min-width: 900px) {
+            .nav-links { display: flex; }
+            .mobile-toggle { display: none; }
+            .hero-container { grid-template-columns: 1fr 1fr; }
+            .hero { padding: 100px 20px 140px; }
+            .hero-content h1 { font-size: 4rem; }
+            .services-grid { grid-template-columns: repeat(3, 1fr); }
+            .steps-grid { grid-template-columns: repeat(3, 1fr); }
+            .steps-grid::before { content: ''; position: absolute; top: 24px; left: 10%; right: 10%; height: 2px; background: dashed 2px var(--border-color); z-index: 1; }
+            .footer-bottom { flex-direction: row; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 🚀 NEW: Navigation Header from About Page -->
+    <header class="bryt-header" id="navbar">
+        <a href="/" class="bryt-logo">
+            <img src="assets/img/brytpay-logo.png" alt="BRYT Pay" onerror="this.src=''; this.alt='BRYT Pay';">
+        </a>
+        <nav class="nav-links">
+            <a href="/" style="color: var(--bryt-primary);">Home</a>
+            <a href="#services">Services</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="/doc/faq/">FAQ</a>
+            <a href="/doc/about/">About</a>
+            <a href="/auth/login.html" class="auth-login">Login</a>
+            <a href="/auth/signup.html" class="btn-nav-primary auth-signup">Get Started</a>
+        </nav>
+        <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle Menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="#services" class="mobile-link">Services</a>
+        <a href="#how-it-works" class="mobile-link">How It Works</a>
+        <a href="/doc/faq/" class="mobile-link">FAQ</a>
+        <a href="/doc/about/" class="mobile-link">About</a>
+        <hr style="border: none; border-top: 1px solid var(--border-color); margin: 8px 0;">
+        <a href="/auth/login.html" class="auth-login" style="color: var(--text-muted);">Log In</a>
+        <a href="/auth/signup.html" class="btn-nav-primary auth-signup" style="text-align: center;">Get Started</a>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>One wallet.<br><span class="text-gradient">Everyday digital services.</span></h1>
+                <p>The smartest, most reliable platform to purchase airtime, data, TV subscriptions, Education PINs, and process JAMB & NIN services securely in Nigeria.</p>
+                <div class="hero-actions">
+                    <a href="/auth/signup.html" class="btn-primary auth-signup">Create Free Account</a>
+                    <a href="/auth/login.html" class="btn-secondary auth-login">Log In to Wallet</a>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="mockup-glow"></div>
+                <div class="mockup-card">
+                    <div class="mk-header">
+                        <div class="mk-dot"></div>
+                        <div class="mk-avatar"></div>
+                    </div>
+                    <div class="mk-balance-label">Total Balance</div>
+                    <div class="mk-balance"><span>₦</span>14,500.00</div>
+                    <div class="mk-grid">
+                        <div class="mk-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div>
+                        <div class="mk-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>
+                        <div class="mk-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg></div>
+                        <div class="mk-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Strip -->
+    <section class="trust-strip">
+        <div class="trust-grid">
+            <div class="trust-item">
+                <div class="trust-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>
+                <h4>One Wallet</h4>
+                <p>Manage all your payments.</p>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
+                <h4>Fast Processing</h4>
+                <p>Automated digital delivery.</p>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+                <h4>Secure Payments</h4>
+                <p>Bank-grade encryption.</p>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12 11 15 16 9"></polyline></svg></div>
+                <h4>Simple Experience</h4>
+                <p>Designed for convenience.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services-section" id="services">
+        <div class="container">
+            <div class="section-header">
+                <h2>Everything you need, in one place.</h2>
+                <p>Experience seamless transactions and instant delivery for your everyday utility and educational needs.</p>
+            </div>
+            
+            <div class="services-grid">
+                <div class="srv-card">
+                    <div class="srv-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div>
+                    <h3>Airtime Top-up</h3>
+                    <p>Recharge your mobile line or send airtime to family and friends instantly across all major Nigerian networks.</p>
+                </div>
+                
+                <div class="srv-card">
+                    <div class="srv-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>
+                    <h3>Data Bundles</h3>
+                    <p>Purchase affordable internet data directly from your BRYT Pay wallet. Access special SME data plans effortlessly.</p>
+                </div>
+                
+                <div class="srv-card">
+                    <div class="srv-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg></div>
+                    <h3>TV Subscriptions</h3>
+                    <p>Pay for supported television packages including DStv, GOtv, and StarTimes without leaving your couch.</p>
+                </div>
+
+                <!-- 🚀 FIX: Changed to Education PINs -->
+                <div class="srv-card">
+                    <div class="srv-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
+                    <h3>Education PINs</h3>
+                    <p>Purchase digital WAEC, NECO, and NABTEB Result Checker PINs securely and have them delivered instantly to your dashboard.</p>
+                </div>
+                
+                <div class="srv-card">
+                    <div class="srv-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
+                    <h3>JAMB Desk</h3>
+                    <p>Access available JAMB processing services. Request your Admission Letters and track fulfillment securely.</p>
+                </div>
+                
+                <!-- 🚀 FIX: Added NIN Services -->
+                <div class="srv-card">
+                    <div class="srv-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><circle cx="10" cy="13" r="2"></circle><line x1="14" y1="13" x2="16" y2="13"></line><line x1="10" y1="17" x2="16" y2="17"></line></svg></div>
+                    <h3>NIN Services</h3>
+                    <p>Request and print your standard or premium NIN slip directly from your dashboard with fast and secure processing.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="steps-section" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2>Designed for Simplicity</h2>
+                <p>Start transacting on BRYT Pay in three simple steps.</p>
+            </div>
+            
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <h3>Create your account</h3>
+                    <p>Sign up for BRYT Pay in less than a minute using your email address and basic details.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <h3>Fund your wallet</h3>
+                    <p>Add money securely to your BRYT Pay wallet via bank transfer or card payments.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <h3>Pay for services</h3>
+                    <p>Select your desired service, confirm the details, and checkout directly from your wallet balance.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- JAMB Feature Banner -->
+    <section class="container" id="jamb" style="padding-top: 0; padding-bottom: 0;">
+        <div class="jamb-banner">
+            <h2>Need JAMB Services?</h2>
+            <!-- 🚀 FIX: Expanded Text for all JAMB Services -->
+            <p>Get access to available JAMB processing services directly through BRYT Pay. Submit your details securely and download your processed Admission Letters, Original Result Slips, UTME Registration Slips, Exam Slips, Change of Course Slips, DE Registration Slips, and check your Admission Status straight from your dashboard.</p>
+            <a href="/auth/signup.html" class="btn-primary auth-signup" style="width: auto; display: inline-flex; background: white; color: var(--bryt-navy);">Access JAMB Desk</a>
+            <p class="jamb-disclaimer">BRYT Pay acts as an independent processing platform. Services are fulfilled based on availability.</p>
+        </div>
+    </section>
+
+    <!-- Final CTA (Left completely untouched!) -->
+    <section class="final-cta">
+        <div class="container">
+            <h2>Your everyday digital services,<br>made simpler.</h2>
+            <p>Join BRYT Pay today and experience a faster way to pay.</p>
+            <div class="final-cta-btns">
+                <a href="/auth/signup.html" class="btn-primary auth-signup">Get Started Now</a>
+                <a href="/auth/login.html" class="btn-secondary auth-login">Log In to Account</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 🚀 NEW: Footer from the About Page -->
+    <footer class="bryt-footer" id="contact">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <img src="assets/img/brytpay-logo.png" alt="BRYT Pay" class="footer-brand-logo">
+                <p>Making everyday digital services fast, simple, and reliable for Nigerians.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <a href="/">Home</a>
+                <a href="#services">Services</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="/doc/faq/">FAQ</a>
+                <a href="/doc/about/">About</a>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <a href="/doc/terms/">Terms & Conditions</a>
+                <a href="/doc/privacy/">Privacy Policy</a>
+                <a href="/doc/refund/">Refund Policy</a>
+            </div>
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <a href="tel:09153375488">0915 337 5488</a>
+                <a href="mailto:bryttechnologies@gmail.com">bryttechnologies@gmail.com</a>
+                <p>Kaduna, Nigeria</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>A product of <a href="https://bryttechnologies.name.ng" target="_blank" style="color: var(--bryt-accent); text-decoration: none;">BRYT Technologies</a></span>
+            <span>&copy; <script>document.write(new Date().getFullYear())</script> BRYT Technologies. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-client.js"></script>
+    <script>
+        // Mobile Menu Toggle
+        const mobileToggle = document.getElementById('mobile-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        mobileToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // PRESERVED SUPABASE AUTH LOGIC
+        window.onload = async () => {
+            try {
+                const { data: { session } } = await window.db.auth.getSession();
+                
+                if (session) {
+                    document.querySelectorAll('.auth-login').forEach(btn => {
+                        btn.textContent = 'Go to Dashboard';
+                        btn.href = '/dashboard/';
+                        if(btn.classList.contains('btn-secondary')) {
+                            btn.classList.remove('btn-secondary');
+                            btn.classList.add('btn-primary');
+                        }
+                    });
+
+                    document.querySelectorAll('.auth-signup').forEach(btn => {
+                        btn.style.display = 'none';
+                    });
+                }
+            } catch(e) {
+                console.error("Session check skipped or failed:", e);
+            }
+        };
+    </script>
+
+    <!-- PWA Install Popup UI -->
+<div id="pwa-install-prompt" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #ffffff; padding: 16px 20px; border-radius: 16px; box-shadow: 0 10px 40px rgba(7, 26, 58, 0.2); z-index: 10000; width: 90%; max-width: 360px; border: 1px solid #e2e8f0; align-items: center; justify-content: space-between;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="/assets/img/brytpay-logo.png" style="width: 40px; height: 40px; object-fit: contain; background: #f8fafc; border-radius: 8px; padding: 4px;" alt="Icon">
+        <div>
+            <div style="font-weight: 800; color: #071A3A; font-size: 0.9rem; font-family: 'Sora', sans-serif;">Install BRYT Pay</div>
+            <div style="font-size: 0.75rem; color: #64748B; font-family: 'Sora', sans-serif;">Fast, easy access on your screen</div>
+        </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <button id="pwa-close" style="background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer; padding: 4px;">&times;</button>
+        <button id="pwa-install-btn" style="background: #1D5ED0; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-family: 'Sora', sans-serif; cursor: pointer;">Install</button>
+    </div>
+</div>
+
+<!-- PWA Registration Logic -->
+<script>
+    // 1. Register Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').then(reg => {
+                console.log('PWA Service worker registered');
+            }).catch(err => {
+                console.log('PWA SW registration failed: ', err);
+            });
+        });
+    }
+
+    // 2. Handle Install Prompt
+    let deferredPrompt;
+    const installPromptUI = document.getElementById('pwa-install-prompt');
+    const installBtn = document.getElementById('pwa-install-btn');
+    const closeBtn = document.getElementById('pwa-close');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent Chrome 67+ from automatically showing the prompt
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Show our beautiful custom UI after 3 seconds of being on the page
+        setTimeout(() => {
+            installPromptUI.style.display = 'flex';
+        }, 3000);
+    });
+
+    installBtn.addEventListener('click', async () => {
+        installPromptUI.style.display = 'none';
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User ${outcome} the PWA installation`);
+            deferredPrompt = null;
+        }
+    });
+
+    closeBtn.addEventListener('click', () => {
+        installPromptUI.style.display = 'none';
+    });
+</script>
+</body>
+</html>

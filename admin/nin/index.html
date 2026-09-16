@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 🚀 FIX: Corrected Title from JAMB to NIN -->
+    <title>Admin: NIN Orders — BRYT Pay</title>
+
+    <!-- STRICT APP PRIVACY DIRECTIVE: Do not index or crawl admin routes -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Branding -->
+    <meta name="theme-color" content="#1D5ED0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <!-- 🚀 CACHE BUSTER PRESERVED -->
+    <link rel="stylesheet" href="../../assets/css/main.css?v=2.0">
+    <style>
+        * { box-sizing: border-box; }
+        body { background: #f8fafc; margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+        
+        .admin-container { max-width: 900px; margin: 0 auto; padding: 16px 12px 60px; }
+        
+        .admin-header-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .page-title { font-size: 1.2rem; color: #0f172a; margin: 0 0 4px 0; font-weight: 800; }
+        .page-desc { font-size: 0.75rem; color: #64748b; margin: 0; }
+
+        .search-bar-wrap { display: flex; gap: 8px; align-items: center; width: 100%; max-width: 300px; }
+        .search-input { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.75rem; outline: none; background: #ffffff; }
+        .search-input:focus { border-color: #1D5ED0; }
+
+        .admin-table { width: 100%; border-collapse: collapse; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; }
+        .admin-table th { background: #f8fafc; padding: 10px 12px; text-align: left; font-size: 0.65rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; }
+        .admin-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.75rem; color: #1e293b; vertical-align: middle; }
+        .admin-table tr:hover { background: #f8fafc; cursor: pointer; }
+        .admin-table tr:last-child td { border-bottom: none; }
+
+        .service-col { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+        .jamb-logo { width: 24px; height: 24px; border-radius: 6px; object-fit: cover; background: #f1f5f9; padding: 2px; }
+
+        .order-ref { font-family: monospace; font-weight: 700; color: #1D5ED0; background: #eff6ff; padding: 4px 8px; border-radius: 6px; letter-spacing: 0.5px; }
+
+        .status-badge { font-size: 0.6rem; font-weight: 800; padding: 4px 8px; border-radius: 12px; text-transform: uppercase; white-space: nowrap; }
+        .badge-paid { background: #f1f5f9; color: #475569; }
+        .badge-processing { background: #fef9c3; color: #a16207; }
+        .badge-completed { background: #dcfce7; color: #15803d; }
+        .badge-failed { background: #fee2e2; color: #b91c1c; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(7, 26, 58, 0.7); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 16px; }
+        .modal-content { background: #ffffff; width: 100%; max-width: 360px; max-height: 90vh; overflow-y: auto; border-radius: 16px; padding: 20px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); }
+        
+        .modal-title { margin: 0 0 4px 0; font-size: 1.1rem; font-weight: 800; color: #0f172a; }
+        .modal-desc { font-family: monospace; color: #1D5ED0; font-weight: 700; font-size: 0.8rem; margin-bottom: 12px; }
+
+        .modal-breakdown { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 12px; margin-bottom: 16px; }
+        .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 0.75rem; border-bottom: 1px dashed #e2e8f0; gap: 8px; }
+        .modal-row:last-child { border-bottom: none; }
+        .modal-row span { color: #64748b; font-weight: 600; }
+        .modal-row strong { color: #0f172a; text-align: right; word-break: break-word; }
+
+        .form-group { margin-bottom: 12px; }
+        .form-label { display: block; font-weight: 800; font-size: 0.7rem; color: #475569; margin-bottom: 4px; text-transform: uppercase; }
+        .form-select, .form-input { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.75rem; background: #ffffff; outline: none; }
+        .form-select:focus, .form-input:focus { border-color: #1D5ED0; }
+
+        .upload-box { display: none; background: #f0f9ff; border: 1px dashed #1D5ED0; padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+        .upload-box small { color: #64748b; font-size: 0.65rem; margin-top: 4px; display: block; }
+
+        .modal-actions { display: flex; gap: 8px; margin-top: 16px; }
+        .btn-modal { padding: 10px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; border: none; cursor: pointer; flex: 1; transition: 0.2s; }
+        .btn-cancel { background: #f1f5f9; color: #475569; }
+        .btn-cancel:hover { background: #e2e8f0; }
+        .btn-save { background: #0f172a; color: #ffffff; flex: 1.5; }
+        .btn-save:hover { background: #1D5ED0; }
+
+        @media (max-width: 480px) {
+            .admin-header-row { flex-direction: column; align-items: flex-start; }
+            .search-bar-wrap { max-width: 100%; }
+            .admin-table th, .admin-table td { padding: 10px 8px; }
+            .service-col span { font-size: 0.7rem; }
+            .order-ref { font-size: 0.65rem; padding: 3px 6px; }
+            .status-badge { font-size: 0.55rem; padding: 3px 6px; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="admin-container">
+        <div class="admin-header-row">
+    <div>
+        <a href="../index.html" style="display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back to Admin
+        </a>
+        <!-- 🚀 FIX: Titles updated to NIN Desk -->
+        <h1 class="page-title">NIN Desk</h1>
+        <p class="page-desc">Process NIN orders and dispatch slips.</p>
+    </div>
+    <div class="search-bar-wrap">
+        <input type="text" id="search-orders" class="search-input" placeholder="Search Identifier or Ref...">
+    </div>
+</div>
+
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Order Ref</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="admin-orders-body">
+                <tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 20px; font-size: 0.75rem;">Loading orders...</td></tr>
+            </tbody>
+        </table>
+    </main>
+
+    <!-- Compact Modal -->
+    <div id="admin-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="modal-title">Process Order</h3>
+            <p class="modal-desc" id="modal-order-ref">---</p>
+
+            <div class="modal-breakdown">
+                <div class="modal-row"><span>Candidate:</span><strong id="modal-name">---</strong></div>
+                <div class="modal-row"><span>Reg No:</span><strong id="modal-reg" style="font-family: monospace;">---</strong></div>
+                <div class="modal-row"><span>WhatsApp:</span><strong id="modal-whatsapp">---</strong></div>
+                <div class="modal-row"><span>Email:</span><strong id="modal-email">---</strong></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Update Status</label>
+                <select id="update-status" class="form-select">
+                    <option value="PAID">PAID</option>
+                    <option value="PROCESSING">PROCESSING</option>
+                    <option value="FAILED">FAILED</option>
+                    <option value="REFUND_PENDING">REFUND PENDING</option>
+                    <option value="COMPLETED">COMPLETED</option>
+                </select>
+            </div>
+
+            <div class="upload-box" id="upload-section">
+                <label class="form-label" style="color: #1D5ED0;">Upload Document</label>
+                <input type="file" id="document-upload" class="form-input" accept=".pdf, .jpg, .jpeg, .png">
+                <small>Securely stored and emailed to user.</small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Admin Notes</label>
+                <textarea id="update-notes" class="form-input" placeholder="e.g. Dispatched to agent..." rows="2" style="resize: vertical;"></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" id="modal-cancel" class="btn-modal btn-cancel">Cancel</button>
+                <button type="button" id="modal-save" class="btn-modal btn-save">Save & Dispatch</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- 🚀 CACHE BUSTERS ADDED HERE -->
+    <script src="../../assets/js/supabase-client.js?v=2.0"></script>
+    <script src="../../assets/js/admin-nin.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My JAMB Orders — BRYT Pay</title>
+
+    <!-- STRICT APP PRIVACY DIRECTIVE: Do not index or crawl -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Branding -->
+    <meta name="theme-color" content="#1D5ED0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        .list-card { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #ffffff; border-bottom: 1px solid #f1f5f9; text-decoration: none; transition: background 0.2s; cursor: pointer; }
+        .list-card:hover { background: #f8fafc; }
+        .list-left { display: flex; gap: 12px; align-items: center; }
+        .list-icon { width: 48px; height: 48px; border-radius: 12px; background: #ffffff; border: 1px solid #e2e8f0; padding: 4px; object-fit: contain; flex-shrink: 0; }
+        .list-title { font-size: 0.85rem; font-weight: 700; color: var(--bryt-navy); margin-bottom: 4px; line-height: 1.2; max-width: 180px; }
+        .list-date { font-size: 0.75rem; color: var(--text-muted); }
+        .list-right { text-align: right; }
+        .list-amount { font-size: 0.95rem; font-weight: 800; color: var(--bryt-navy); margin-bottom: 6px; }
+        
+        .status-badge { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; }
+        .status-paid { background: #f1f5f9; color: #475569; }
+        .status-processing { background: #fef9c3; color: #a16207; }
+        .status-completed { background: #dcfce7; color: #15803d; }
+        .status-failed { background: #fee2e2; color: #b91c1c; }
+    </style>
+</head>
+<body style="background: #f8fafc;">
+
+    <main class="app-container" style="max-width: 520px; padding: 0; padding-bottom: 90px; background: #ffffff; min-height: 100vh;">
+        <header style="padding: 20px 16px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 12px; background: #ffffff;">
+            <a href="/dashboard/jamb/" style="color: var(--bryt-navy);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></a>
+            <h1 style="font-size: 1.25rem; font-weight: 700; color: var(--bryt-navy); margin: 0;">Transaction History</h1>
+        </header>
+
+        <div id="orders-container">
+            <div class="empty-state" style="padding: 40px 20px;">Loading your orders...</div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../assets/js/supabase-client.js"></script>
+    <script src="../../assets/js/jamb-orders.js"></script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Transaction Summary — BRYT Pay</title>
+
+    <!-- STRICT APP PRIVACY DIRECTIVE: Do not index or crawl -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Branding -->
+    <meta name="theme-color" content="#1D5ED0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { background: #f8fafc; margin: 0; color: var(--bryt-navy); overflow-x: hidden; }
+        
+        .header-bar { 
+            padding: 16px 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 16px; 
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .page-container {
+            padding: 24px 16px;
+            max-width: 520px;
+            margin: 0 auto;
+            padding-bottom: 40px;
+        }
+
+        .summary-card { 
+            background: #ffffff; 
+            border-radius: 16px; 
+            padding: 32px 24px; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(7, 26, 58, 0.03);
+        }
+        .summary-icon { 
+            width: 72px; 
+            height: 72px; 
+            background: #f8fafc; 
+            border-radius: 50%; 
+            padding: 12px; 
+            object-fit: contain; 
+            border: 1px solid #e2e8f0;
+            margin-bottom: 16px;
+        }
+        .summary-title { font-size: 1.15rem; font-weight: 700; color: var(--bryt-navy); margin-bottom: 6px; }
+        .summary-price { font-size: 1.6rem; font-weight: 800; color: var(--bryt-primary); }
+        
+        .details-list { 
+            background: #ffffff; 
+            padding: 8px 24px; 
+            border-radius: 16px; 
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            margin-bottom: 24px;
+        }
+        .detail-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 16px 0; 
+            border-bottom: 1px dashed #e2e8f0; 
+        }
+        .detail-item:last-child { border-bottom: none; }
+        .detail-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+        .detail-value { font-size: 0.9rem; font-weight: 700; color: var(--bryt-navy); text-align: right; }
+        
+        .status-pill { padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-completed { background: var(--success-bg); color: var(--success-text); border: 1px solid #bbf7d0; }
+        .status-processing { background: var(--pending-bg); color: var(--pending-text); border: 1px solid #fef08a; }
+        .status-failed { background: var(--failed-bg); color: var(--failed-text); border: 1px solid #fecaca; }
+        
+        .action-grid { display: flex; flex-direction: column; gap: 12px; }
+        .btn-query { 
+            background: #ffffff; 
+            border: 1px solid var(--border-color); 
+            color: var(--bryt-navy); 
+            padding: 16px; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            width: 100%; 
+            cursor: pointer; 
+            transition: all 0.2s;
+        }
+        .btn-query:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .btn-download { 
+            background: var(--bryt-primary); 
+            color: #ffffff; 
+            border: none; 
+            padding: 16px; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            width: 100%; 
+            cursor: pointer; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .btn-download:hover { background: #0369a1; }
+        .btn-download:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+        .bottom-sheet-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(7, 26, 58, 0.5); 
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            display: none; z-index: 9999; 
+            align-items: flex-end; 
+            justify-content: center;
+        }
+        
+        .bottom-sheet { 
+            background: #ffffff; 
+            width: 100%; max-width: 520px;
+            border-radius: 24px 24px 0 0; 
+            padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px)); 
+            transform: translateY(100%); 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+            max-height: 90vh; 
+            display: flex;
+            flex-direction: column; 
+        }
+        
+        .bottom-sheet.open { transform: translateY(0); }
+        .sheet-handle { width: 48px; height: 5px; background: #e2e8f0; border-radius: 5px; margin: 0 auto 16px; flex-shrink: 0; }
+        .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-shrink: 0; }
+        .sheet-scroll-area { overflow-y: auto; -webkit-overflow-scrolling: touch; flex-grow: 1; flex-shrink: 1; padding-right: 4px; }
+        .sheet-row { display: flex; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px dashed #e2e8f0; padding: 12px 0; }
+        .sheet-row:last-child { border-bottom: none; }
+        .sheet-row span { color: var(--text-muted); font-weight: 600; }
+        .sheet-row strong { color: var(--bryt-navy); font-weight: 700; text-transform: uppercase; text-align: right; }
+        .sheet-input { width: 100%; background: #f8fafc; border: 1px solid var(--border-color); color: var(--bryt-navy); padding: 14px; border-radius: 12px; margin-bottom: 8px; outline: none; font-family: inherit; font-size: 0.9rem; resize: vertical; min-height: 80px; }
+        .sheet-input:focus { border-color: var(--bryt-primary); background: #ffffff; }
+        .sheet-footer { flex-shrink: 0; padding-top: 16px; background: #ffffff; border-top: 1px solid #f1f5f9; }
+    </style>
+</head>
+<body>
+
+    <div class="header-bar">
+        <a href="orders.html" style="color: var(--bryt-navy);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></a>
+        <h2 style="margin: 0; font-size: 1.15rem; font-weight: 700;">Order Summary</h2>
+    </div>
+
+    <main class="page-container">
+        
+        <div class="summary-card">
+            <!-- 🚀 FIX: Display the correct NIN Logo -->
+            <img src="../../assets/img/nin-logo.png" class="summary-icon" onerror="this.src='../../assets/img/nimc-logo.png'">
+            <div class="summary-title" id="sum-title">---</div>
+            <div class="summary-price" id="sum-price">₦0.00</div>
+        </div>
+
+        <div class="details-list">
+            <div class="detail-item">
+                <div class="detail-label">Order Reference</div>
+                <div class="detail-value" id="sum-ref" style="font-family: monospace;">---</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Payment Method</div>
+                <div class="detail-value">BRYT Wallet</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Amount Paid</div>
+                <div class="detail-value" id="sum-amount">₦0.00</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Transaction Date</div>
+                <div class="detail-value" id="sum-date">---</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Processing Status</div>
+                <!-- 🚀 FIX: Defaults to "Processing" instead of "Loading" -->
+                <div><span id="sum-status" class="status-pill status-processing">Processing</span></div>
+            </div>
+        </div>
+
+        <div class="action-grid">
+            <button class="btn-query" id="btn-open-query">Query Order</button>
+            <button class="btn-download" id="btn-download-doc" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Document Pending
+            </button>
+        </div>
+    </main>
+
+    <!-- Query Bottom Sheet -->
+    <div class="bottom-sheet-overlay" id="query-overlay">
+        <div class="bottom-sheet" id="query-sheet">
+            <div class="sheet-handle"></div>
+            
+            <div class="sheet-header">
+                <h3 style="margin: 0; font-size: 1.25rem; color: var(--bryt-navy);">Query Order</h3>
+                <svg id="btn-close-query" style="cursor: pointer;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </div>
+            
+            <div class="sheet-scroll-area">
+                <div style="background: #f8fafc; padding: 8px 16px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border-color);">
+                    <div class="sheet-row"><span>Candidate</span><strong id="q-name">---</strong></div>
+                    
+                    <!-- 🚀 FIX: JAMB labels removed, swapped for generic NIN labels -->
+                    <div class="sheet-row"><span>Provided Info</span><strong id="q-reg">---</strong></div>
+                    <div class="sheet-row" style="border: none;"><span>Identifier Type</span><strong id="q-year">---</strong></div>
+                </div>
+
+                <textarea id="q-message" class="sheet-input" rows="3" placeholder="Please describe your issue in detail so our support team can assist you immediately..." required></textarea>
+            </div>
+
+            <div class="sheet-footer">
+                <button id="btn-submit-query" class="btn-primary" style="width: 100%; padding: 16px; font-size: 1rem;">Submit Query</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../assets/js/supabase-client.js"></script>
+    <script src="../../assets/js/nin-order-details.js"></script>
+</body>
+</html>

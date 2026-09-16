@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAMB Services — BRYT Pay</title>
+    
+    <!-- STRICT APP PRIVACY DIRECTIVE: Do not index or crawl -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Branding -->
+    <meta name="theme-color" content="#1D5ED0">
+     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../assets/css/main.css?v=2.1">
+    <style>
+        .service-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .service-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 16px; padding: 20px 12px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.02); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .service-card:hover { border-color: var(--bryt-primary); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(29, 94, 208, 0.08); }
+        .service-icon { width: 52px; height: 52px; object-fit: contain; margin-bottom: 12px; }
+        .service-title { font-size: 0.85rem; font-weight: 700; color: var(--bryt-navy); margin-bottom: 6px; line-height: 1.3; }
+        .service-price { font-size: 0.8rem; color: var(--bryt-primary); font-weight: 800; background: #F0F6FF; padding: 4px 10px; border-radius: 8px; }
+        
+        .btn-view-orders { display: inline-flex; align-items: center; gap: 8px; background: var(--bryt-navy); color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 600; padding: 10px 18px; border-radius: 10px; box-shadow: 0 4px 15px rgba(7, 26, 58, 0.15); transition: background 0.2s; }
+        .btn-view-orders:hover { background: #0f2854; }
+
+        /* 🚀 NEW: Notice Box Styles */
+        .info-notice-box { background-color: #eff6ff; border: 1px dashed #3b82f6; border-radius: 12px; padding: 14px 16px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 12px; }
+        .info-notice-icon { flex-shrink: 0; margin-top: 2px; color: #3b82f6; }
+        .info-notice-text { margin: 0; font-size: 0.75rem; color: #1e3a8a; line-height: 1.5; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+    <main class="app-container" style="max-width: 520px; padding-bottom: 90px;">
+        <!-- Header & Prominent View Orders Button -->
+        <header style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <a href="/dashboard/" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; margin-bottom: 12px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back
+                </a>
+                <h1 style="font-size: 1.4rem; color: var(--bryt-navy); margin-bottom: 4px;">JAMB Services</h1>
+                <p style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Balance: <span id="user-balance" style="color: var(--bryt-primary);">₦0.00</span></p>
+            </div>
+            <a href="orders.html" class="btn-view-orders">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                View Orders
+            </a>
+        </header>
+
+        <!-- 🚀 NEW: Important Delivery Notice -->
+        <div class="info-notice-box">
+            <svg class="info-notice-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <p class="info-notice-text">
+                <strong style="color: #1d4ed8;">Delivery Notice:</strong> Your document will be sent via <strong>Email, WhatsApp, and In-App</strong>. You can download it from any of these 3 channels. Processing takes roughly <strong>15-30 minutes</strong>, kindly be patient!
+            </p>
+        </div>
+
+        <!-- 1. The 2x2 Service Grid -->
+        <div id="service-selection-view">
+            <div class="service-grid">
+                <div class="service-card" data-service="Admission Letter" data-price="2000" data-type="standard">
+                    <img src="../../assets/img/jamb-logo.png" alt="JAMB Logo" class="service-icon" onerror="this.src='../../assets/img/brytpay-logo.png'">
+                    <div class="service-title">Admission Letter</div>
+                    <div class="service-price">₦2,000</div>
+                </div>
+                <div class="service-card" data-service="Original Result" data-price="2500" data-type="standard">
+                    <img src="../../assets/img/jamb-logo.png" alt="JAMB Logo" class="service-icon" onerror="this.src='../../assets/img/brytpay-logo.png'">
+                    <div class="service-title">Original Result</div>
+                    <div class="service-price">₦2,500</div>
+                </div>
+                <div class="service-card" data-service="JAMB Reprinting" data-price="1000" data-type="reprint">
+                    <img src="../../assets/img/jamb-logo.png" alt="JAMB Logo" class="service-icon" onerror="this.src='../../assets/img/brytpay-logo.png'">
+                    <div class="service-title">JAMB Reprinting</div>
+                    <div class="service-price">₦1,000</div>
+                </div>
+                <div class="service-card" data-service="Admission Status" data-price="1000" data-type="standard">
+                    <img src="../../assets/img/jamb-logo.png" alt="JAMB Logo" class="service-icon" onerror="this.src='../../assets/img/brytpay-logo.png'">
+                    <div class="service-title">Admission Status</div>
+                    <div class="service-price">₦1,000</div>
+                </div>
+                <div class="service-card" data-service="O-Level Result" data-price="1000" data-type="standard">
+                    <img src="../../assets/img/jamb-logo.png" alt="JAMB Logo" class="service-icon" onerror="this.src='../../assets/img/brytpay-logo.png'">
+                    <div class="service-title">O-Level Result</div>
+                    <div class="service-price">₦1,000</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Success State View (Hidden by default) -->
+        <div class="form-card" id="jamb-success-card" style="display: none; text-align: center; padding: 36px 24px;">
+            <div style="width: 56px; height: 56px; background: var(--success-bg); border-radius: 50%; color: var(--success-text); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <h2 style="font-size: 1.3rem; color: var(--bryt-navy); margin-bottom: 6px;">Order Submitted!</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px;">Your request is now being processed by our desk.</p>
+
+            <div class="modal-breakdown" style="text-align: left; margin-bottom: 28px;">
+                <div class="modal-row"><span style="color: var(--text-muted);">Order ID</span><strong id="success-ref" style="color: var(--bryt-navy); font-family: monospace;">---</strong></div>
+                <div class="modal-row"><span style="color: var(--text-muted);">Service</span><strong id="success-service" style="color: var(--bryt-navy);">---</strong></div>
+                <div class="modal-row"><span style="color: var(--text-muted);">Candidate</span><strong id="success-candidate" style="color: var(--bryt-navy);">---</strong></div>
+                <div class="modal-row"><span style="color: var(--text-muted);">Status</span><span class="tx-status status-pending">PROCESSING</span></div>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+                <a href="orders.html" class="btn-primary" style="flex: 1; text-align: center; text-decoration: none;">Track Order</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- 3. Dynamic Service Form Modal -->
+    <div id="service-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 450px;">
+            <h3 class="modal-title" id="modal-service-title">Service Request</h3>
+            <p class="modal-desc" style="margin-bottom: 20px;">Provide the candidate's exact details below.</p>
+
+            <form id="jamb-form">
+                <div class="form-group" id="reprint-group" style="display: none; background: #F8FAFC; padding: 12px; border: 1px dashed var(--bryt-primary); border-radius: 8px;">
+                    <label class="form-label" style="color: var(--bryt-primary);">Select Reprint Type</label>
+                    <select id="reprint-type" class="form-select" style="background: white;">
+                        <option value="UTME Examination Slip">UTME Examination Slip</option>
+                        <option value="UTME Registration Slip">UTME Registration Slip</option>
+                        <option value="DE Registration Slip">DE Registration Slip</option>
+                        <option value="Original Result Slip">Original Result Slip</option>
+                        <option value="Change of Course/Institution">Change of Course/Institution Slip</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Candidate Full Name</label>
+                    <input type="text" id="full-name" class="form-input" placeholder="e.g. Ibrahim Emmanuel Musa" required>
+                </div>
+                
+                <div style="display: flex; gap: 12px;">
+                    <div class="form-group" style="flex: 2;">
+                        <label class="form-label">JAMB Reg Number</label>
+                        <input type="text" id="jamb-reg" class="form-input" placeholder="e.g. 202612345678AB" style="text-transform: uppercase;" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">JAMB Year</label>
+                        <input type="number" id="jamb-year" class="form-input" placeholder="2026" min="2000" max="2030" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Active WhatsApp Number</label>
+                    <input type="tel" id="whatsapp" class="form-input" placeholder="08012345678" maxlength="11" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-input" placeholder="candidate@example.com" required>
+                </div>
+
+                <div class="modal-actions" style="margin-top: 24px;">
+                    <button type="button" id="modal-cancel" class="btn-secondary">Cancel</button>
+                    <button type="submit" id="modal-submit" class="btn-primary" style="flex: 2;">Pay <span id="modal-pay-amt">₦0</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mobile Nav -->
+    <nav class="mobile-nav">
+        <a href="/dashboard/" class="nav-item active"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+        <a href="/dashboard/history/" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>History</span></a>
+        <a href="/dashboard/fund/" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
+        <a href="/dashboard/account/" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- 🚀 Cache Busters added here -->
+    <script src="../../assets/js/supabase-client.js?v=2.1"></script>
+    <script src="../../assets/js/jamb.js?v=2.1"></script>
+</body>
+</html>

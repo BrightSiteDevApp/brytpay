@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIN Services — BRYT Pay</title>
+    
+    <!-- STRICT APP PRIVACY DIRECTIVE: Do not index or crawl -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Branding -->
+    <meta name="theme-color" content="#1D5ED0">
+     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        .tab-container { display: flex; background: var(--bg-light); border-radius: 12px; padding: 4px; margin-bottom: 24px; border: 1px solid var(--border-color); }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: all 0.2s ease; font-size: 0.9rem; }
+        .tab-btn.active { background: white; color: var(--bryt-navy); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+        .service-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .service-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.02); display: flex; flex-direction: column; align-items: center; }
+        .service-card:hover { border-color: #16a34a; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(22, 163, 74, 0.08); }
+        
+        .slip-sample-img { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; border: 1px solid #f1f5f9; background: #f8fafc; }
+        
+        .service-title { font-size: 0.85rem; font-weight: 800; color: var(--bryt-navy); margin-bottom: 4px; }
+        .service-desc { font-size: 0.65rem; color: var(--text-muted); margin-bottom: 10px; line-height: 1.3; }
+        .service-price { font-size: 0.85rem; color: #15803d; font-weight: 800; background: #dcfce7; padding: 4px 12px; border-radius: 8px; transition: all 0.2s; }
+        
+        .btn-view-orders { display: inline-flex; align-items: center; gap: 8px; background: var(--bryt-navy); color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 600; padding: 10px 18px; border-radius: 10px; box-shadow: 0 4px 15px rgba(7, 26, 58, 0.15); transition: background 0.2s; white-space: nowrap; flex-shrink: 0; }
+        .btn-view-orders:hover { background: #0f2854; }
+
+        .info-notice-box { background-color: #f0fdf4; border: 1px dashed #22c55e; border-radius: 12px; padding: 14px 16px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 12px; }
+        .info-notice-icon { flex-shrink: 0; margin-top: 2px; color: #16a34a; }
+        .info-notice-text { margin: 0; font-size: 0.75rem; color: #14532d; line-height: 1.5; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+    <main class="app-container" style="max-width: 520px; padding-bottom: 90px;">
+        <header style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <a href="/dashboard/" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; margin-bottom: 16px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back
+                </a>
+                
+                <!-- 🚀 FIX: Removed the NIMC Logo from here -->
+                <h1 style="font-size: 1.5rem; color: var(--bryt-navy); margin: 0;">NIN Services</h1>
+                <p style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 6px;">Balance: <span id="user-balance" style="color: var(--bryt-primary);">₦0.00</span></p>
+            </div>
+            
+            <a href="orders.html" class="btn-view-orders">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                My Slips
+            </a>
+        </header>
+
+        <div class="info-notice-box">
+            <svg class="info-notice-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <p class="info-notice-text">
+                <strong style="color: #166534;">Processing Time (10-15 Mins):</strong> Your NIN Slip will be sent directly to your <strong>Email & WhatsApp</strong> once processed. You can also download the PDF directly from the app.
+            </p>
+        </div>
+
+        <div id="service-selection-view">
+            <!-- Dynamic Tab Switcher -->
+            <div class="tab-container">
+                <button class="tab-btn active" id="tab-nin-num" data-type="NIN_NUMBER">Use NIN Number</button>
+                <button class="tab-btn" id="tab-phone-num" data-type="PHONE_NUMBER">Use Phone Number</button>
+            </div>
+
+            <!-- Service Grid -->
+            <div class="service-grid">
+                <div class="service-card" data-service="Information Slip" data-img="info.png" data-desc="Basic identity verification details">
+                    <img src="../../assets/img/info.png" alt="Info Slip" class="slip-sample-img" onerror="this.src='../../assets/img/brytpay-logo.png'">
+                    <div class="service-title">Information Slip</div>
+                    <div class="service-desc">Basic identity verification details</div>
+                    <div class="service-price" id="price-info">₦400</div>
+                </div>
+                <div class="service-card" data-service="Regular Slip" data-img="reg.png" data-desc="Standard verification information">
+                    <img src="../../assets/img/reg.png" alt="Regular Slip" class="slip-sample-img" onerror="this.src='../../assets/img/brytpay-logo.png'">
+                    <div class="service-title">Regular Slip</div>
+                    <div class="service-desc">Standard verification information</div>
+                    <div class="service-price" id="price-reg">₦500</div>
+                </div>
+                <div class="service-card" data-service="Standard Slip" data-img="stan.png" data-desc="Enhanced verification package">
+                    <img src="../../assets/img/stan.png" alt="Standard Slip" class="slip-sample-img" onerror="this.src='../../assets/img/brytpay-logo.png'">
+                    <div class="service-title">Standard Slip</div>
+                    <div class="service-desc">Enhanced verification package</div>
+                    <div class="service-price" id="price-stan">₦600</div>
+                </div>
+                <div class="service-card" data-service="Premium Slip" data-img="pre.png" data-desc="Comprehensive verification details">
+                    <img src="../../assets/img/pre.png" alt="Premium Slip" class="slip-sample-img" onerror="this.src='../../assets/img/brytpay-logo.png'">
+                    <div class="service-title">Premium Slip</div>
+                    <div class="service-desc">Comprehensive verification details</div>
+                    <div class="service-price" id="price-pre">₦800</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success View -->
+        <div class="form-card" id="nin-success-card" style="display: none; text-align: center; padding: 36px 24px;">
+            <div style="width: 56px; height: 56px; background: var(--success-bg); border-radius: 50%; color: var(--success-text); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <h2 style="font-size: 1.3rem; color: var(--bryt-navy); margin-bottom: 6px;">Request Submitted!</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px;">Your NIN request is securely in our processing queue.</p>
+
+            <div class="modal-breakdown" style="text-align: left; margin-bottom: 28px; background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div class="modal-row"><span style="color: var(--text-muted);">Order ID</span><strong id="success-ref" style="color: var(--bryt-navy); font-family: monospace;">---</strong></div>
+                <div class="modal-row"><span style="color: var(--text-muted);">Slip Type</span><strong id="success-service" style="color: var(--bryt-navy);">---</strong></div>
+                <div class="modal-row"><span style="color: var(--text-muted);">Customer</span><strong id="success-candidate" style="color: var(--bryt-navy);">---</strong></div>
+                <div class="modal-row" style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #cbd5e1;"><span style="color: var(--text-muted);">Status</span><span style="background: #fef9c3; color: #a16207; font-weight: 800; font-size: 0.65rem; padding: 4px 8px; border-radius: 8px;">PROCESSING</span></div>
+            </div>
+
+            <a href="orders.html" class="btn-primary" style="display: block; width: 100%; text-decoration: none; text-align: center;">Track Order & Download Slip</a>
+        </div>
+    </main>
+
+    <!-- The Checkout Modal -->
+    <div id="service-modal" class="modal-overlay">
+        <!-- 🚀 FIX: Reduced modal padding and width to fit the screen easily -->
+        <div class="modal-content" style="max-width: 400px; padding: 20px 16px; border-radius: 16px;">
+            
+            <div style="text-align: center; margin-bottom: 12px; background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid var(--border-color);">
+                <img id="modal-slip-preview" src="" style="width: 100%; max-height: 120px; border-radius: 6px; object-fit: contain; margin-bottom: 8px; background: white; border: 1px solid #e2e8f0; padding: 4px;">
+                <h3 class="modal-title" id="modal-service-title" style="margin: 0 0 2px 0; font-size: 1.05rem;">Service Name</h3>
+                <p class="modal-desc" id="modal-service-desc" style="margin: 0; font-size: 0.75rem;">Description</p>
+            </div>
+
+            <form id="nin-form">
+                <!-- 🚀 FIX: Tighter margins and smaller inputs to prevent scrolling -->
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label class="form-label" style="font-size: 0.75rem; margin-bottom: 4px;">Full Name</label>
+                    <input type="text" id="full-name" class="form-input" placeholder="e.g. Ibrahim Emmanuel Musa" style="padding: 10px; font-size: 0.85rem;" required>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label class="form-label" id="label-identifier" style="color: #16a34a; font-size: 0.75rem; margin-bottom: 4px;">National Identity Number (NIN)</label>
+                    <input type="text" id="nin-identifier" class="form-input" placeholder="Enter the 11-digit NIN" maxlength="15" style="padding: 10px; font-size: 0.85rem;" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label class="form-label" style="font-size: 0.75rem; margin-bottom: 4px;">WhatsApp Number</label>
+                    <input type="tel" id="whatsapp" class="form-input" placeholder="08012345678" maxlength="11" style="padding: 10px; font-size: 0.85rem;" required>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label class="form-label" style="font-size: 0.75rem; margin-bottom: 4px;">Email Address</label>
+                    <input type="email" id="email" class="form-input" placeholder="user@example.com" style="padding: 10px; font-size: 0.85rem;" required>
+                </div>
+
+                <div class="modal-actions" style="display: flex; align-items: center; gap: 12px;">
+                    <button type="button" id="modal-cancel" style="background: transparent; border: none; color: #64748b; font-weight: 700; cursor: pointer; padding: 10px; font-size: 0.85rem;">Cancel</button>
+                    <button type="submit" id="modal-submit" class="btn-primary" style="flex: 1; background: #16a34a; border-color: #16a34a; padding: 14px; font-size: 1rem; font-weight: 800; box-shadow: 0 4px 15px rgba(22, 163, 74, 0.2);">
+                        Pay <span id="modal-pay-amt">₦0</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mobile Nav -->
+    <nav class="mobile-nav">
+        <a href="/dashboard/" class="nav-item active"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+        <a href="/dashboard/history/" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>History</span></a>
+        <a href="/dashboard/fund/" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
+        <a href="/dashboard/account/" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../assets/js/supabase-client.js"></script>
+    <script src="../../assets/js/nin.js"></script>
+</body>
+</html>

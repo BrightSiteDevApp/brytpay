@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account — BRYT Pay</title>
+
+    <!-- STRICT APP PRIVACY DIRECTIVE: Do not index or crawl thin auth pages -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Branding -->
+    <meta name="theme-color" content="#1D5ED0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <style>
+        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; background: radial-gradient(circle at top right, rgba(21, 159, 227, 0.08), transparent 400px), var(--bg-light); }
+        .auth-card { width: 100%; max-width: 440px; padding: 40px 32px; }
+        .auth-brand { display: flex; justify-content: center; margin-bottom: 24px; }
+        .brand-logo-img { max-width: 200px; height: auto; object-fit: contain; display: block; margin: 0 auto; }
+        .auth-header { text-align: center; margin-bottom: 32px; }
+        .auth-header h1 { font-size: 1.5rem; color: var(--bryt-navy); margin-bottom: 8px; letter-spacing: -0.5px; }
+        .auth-header p { font-size: 0.9rem; color: var(--text-muted); }
+        .auth-error { background: var(--failed-bg); color: var(--failed-text); padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; margin-bottom: 24px; display: none; border: 1px solid var(--failed-border); }
+        .auth-success { background: var(--success-bg); color: var(--success-text); padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; margin-bottom: 24px; display: none; border: 1px solid var(--status-success-border); }
+        .auth-footer { text-align: center; margin-top: 28px; font-size: 0.9rem; color: var(--text-muted); }
+        .auth-footer a { color: var(--bryt-primary); font-weight: 600; text-decoration: none; transition: var(--transition); }
+        .auth-footer a:hover { text-decoration: underline; }
+        
+        /* Password Visibility & Hints */
+        .password-wrapper { position: relative; }
+        .toggle-password { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
+        .toggle-password:hover { color: var(--bryt-primary); }
+        .password-hint { font-size: 0.75rem; color: #64748b; margin-top: 6px; transition: color 0.3s ease; }
+        .password-hint.valid { color: #16a34a; }
+        .password-hint.invalid { color: #ef4444; }
+
+
+        /* ========================================= */
+        /* 🚀 COMING SOON MODE (Delete to launch!)   */
+        /* ========================================= */
+        #signup-form, #signup-header, .auth-footer {
+            display: none !important;
+        }
+        .coming-soon-box {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .coming-soon-box h1 {
+            font-size: 1.8rem;
+            color: #0f172a;
+            margin-bottom: 12px;
+            font-weight: 800;
+        }
+        .coming-soon-box p {
+            font-size: 0.95rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+        
+        /* New Button Layout for Coming Soon Mode */
+        .coming-soon-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .btn-return {
+            display: inline-block;
+            background: #1D5ED0;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .btn-return:hover {
+            background: #0f172a;
+        }
+        .btn-secondary {
+            display: inline-block;
+            background: transparent;
+            color: #475569;
+            padding: 14px 28px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+            border-color: #94a3b8;
+        }
+        /* ========================================= */
+    </style>
+</head>
+<body>
+    <div class="form-card auth-card">
+        <div class="auth-brand">
+            <img src="../assets/img/brytpay-logo.png" alt="BRYT Pay" class="brand-logo-img">
+        </div>
+
+        <!-- ========================================= -->
+        <!-- 🚀 COMING SOON UI (Delete to launch!)     -->
+        <!-- ========================================= -->
+        <div class="coming-soon-box" id="coming-soon-ui">
+            <h1>Coming Soon 🚀</h1>
+            <p>We are currently putting the finishing touches on BRYT Pay. New account registrations will open very soon!</p>
+            
+            <div class="coming-soon-actions">
+                <a href="/auth/login.html" class="btn-return">Back to Login</a>
+                <a href="/" class="btn-secondary">Back to Home</a>
+            </div>
+        </div>
+        <!-- ========================================= -->
+
+        <div class="auth-header" id="signup-header">
+            <h1>Join BRYT Pay</h1>
+            <p>Instant airtime, data, and bill settlements.</p>
+        </div>
+
+        <div id="auth-error" class="auth-error"></div>
+        <div id="auth-success" class="auth-success"></div>
+
+        <!-- FORM 1: SIGNUP -->
+        <form id="signup-form">
+            <div class="form-group">
+                <label class="form-label" for="fullname">Full Name</label>
+                <input type="text" id="fullname" class="form-input" placeholder="e.g. John Doe" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="phone">Phone Number <span style="color: #0284c7; font-size: 0.75rem; font-weight: 600;">(WhatsApp Preferred)</span></label>
+                <input type="tel" id="phone" class="form-input" placeholder="08012345678" maxlength="11" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" id="email" class="form-input" placeholder="name@example.com" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" class="form-input" placeholder="••••••••" style="padding-right: 40px;" required>
+                    <div class="toggle-password">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </div>
+                </div>
+                <div id="pwd-hint" class="password-hint">Must contain an uppercase letter, lowercase letter, and a number (min 8 chars).</div>
+            </div>
+            <button type="submit" id="signup-btn" class="btn-primary" style="margin-top: 28px;">Create Account</button>
+            <div class="auth-footer">Already have an account? <a href="/auth/login.html">Sign In</a></div>
+        </form>
+
+        <!-- FORM 2: OTP VERIFICATION -->
+        <form id="signup-otp-form" style="display: none; text-align: center;">
+            <div class="form-group" style="text-align: left; margin-top: 12px;">
+                <label class="form-label" for="signup-otp-code">8-Digit Verification Code</label>
+                <input type="text" id="signup-otp-code" class="form-input" placeholder="12345678" maxlength="8" style="text-align: center; font-size: 1.2rem; letter-spacing: 4px; font-weight: 700;" required>
+            </div>
+            <button type="submit" id="verify-signup-btn" class="btn-primary" style="margin-top: 16px; width: 100%;">Verify & Complete</button>
+        </form>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-client.js"></script>
+    <script src="../assets/js/auth.js"></script>
+</body>
+</html>

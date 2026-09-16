@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Receipt — BRYT Pay</title>
+    
+    <!-- STRICT APP PRIVACY DIRECTIVE: Do not index or crawl -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Branding -->
+    <meta name="theme-color" content="#1D5ED0">
+     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        .receipt-container { max-width: 420px; margin: 0 auto; padding: 24px 16px; }
+        
+        .receipt-card { 
+            background: #FFFFFF; 
+            border-radius: 16px; 
+            padding: 32px 24px; 
+            box-shadow: 0 10px 30px rgba(7, 26, 58, 0.08); 
+            position: relative; 
+            overflow: hidden; 
+            margin-bottom: 24px; 
+        }
+        
+        .receipt-card::before { 
+            content: ''; 
+            position: absolute; 
+            top: -10px; left: 0; right: 0; height: 20px; 
+            background: radial-gradient(circle, var(--bg-light) 10px, transparent 11px); 
+            background-size: 24px 20px; 
+            background-repeat: repeat-x; 
+            z-index: 2;
+        }
+
+        .receipt-card::after {
+            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 200px; height: 200px;
+            background-image: url('../../assets/img/brytpay-logo.png');
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+            opacity: 0.03; z-index: 0; pointer-events: none;
+        }
+        
+        .receipt-content-wrapper { position: relative; z-index: 1; }
+        .receipt-header { text-align: center; margin-bottom: 24px; }
+        
+        .receipt-provider-logo { 
+            width: 54px; height: 54px; border-radius: 12px; object-fit: contain; 
+            background: transparent; margin: 0 auto 12px; display: block;
+        }
+        
+        .receipt-title { font-size: 1.1rem; font-weight: 800; color: var(--bryt-navy); letter-spacing: -0.3px; }
+        .receipt-date { font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; opacity: 0.8; }
+
+        .receipt-amount-box { text-align: center; padding: 16px 0; border-top: 1px dashed var(--border-color); border-bottom: 1px dashed var(--border-color); margin-bottom: 20px; }
+        .receipt-amount-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 800; margin-bottom: 4px; }
+        .receipt-amount { font-size: 2rem; font-weight: 800; color: var(--bryt-primary); letter-spacing: -0.5px; }
+        
+        .receipt-status { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px; }
+
+        .receipt-details { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+        .receipt-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+        
+        .receipt-key { 
+            font-size: 0.65rem; color: var(--text-muted); font-weight: 700; 
+            text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
+        }
+        .receipt-value { 
+            font-size: 0.75rem; font-weight: 700; color: var(--bryt-navy); 
+            text-align: right; word-break: break-word; line-height: 1.3;
+        }
+
+        .receipt-footer { text-align: center; font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+        
+        .action-buttons { display: flex; flex-direction: column; gap: 10px; }
+        .btn-row { display: flex; gap: 10px; }
+
+        /* PIN Display Container */
+        .pin-container {
+            display: none; background: #f0fdf4; border: 1px dashed #4ade80; border-radius: 12px; 
+            padding: 16px; margin-bottom: 20px; text-align: center;
+        }
+        .pin-title { font-size: 0.7rem; color: #166534; text-transform: uppercase; font-weight: 800; margin-bottom: 6px; letter-spacing: 1px; }
+        .pin-data { font-size: 0.95rem; color: #15803d; font-family: monospace; font-weight: 800; line-height: 1.5; word-break: break-word; }
+    </style>
+</head>
+<body>
+
+    <main class="receipt-container">
+        <a href="/dashboard/history/" style="text-decoration:none; color:var(--text-muted); font-size:0.8rem; font-weight:700; display:inline-flex; align-items:center; gap:6px; margin-bottom: 20px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back to History
+        </a>
+
+        <div class="receipt-card" id="receipt-content">
+            <div class="receipt-content-wrapper">
+                <div class="receipt-header">
+                    <!-- Dynamic Logo -->
+                    <img src="../../assets/img/brytpay-logo.png" id="receipt-provider-logo" alt="Provider" class="receipt-provider-logo" onerror="this.style.display='none'">
+                    <div class="receipt-title">Transaction Receipt</div>
+                    <div class="receipt-date" id="rec-date">--</div>
+                </div>
+
+                <div class="receipt-amount-box">
+                    <div class="receipt-amount-label">Amount Paid</div>
+                    <div class="receipt-amount" id="rec-amount">₦0.00</div>
+                    <div class="receipt-status" id="rec-status">--</div>
+                </div>
+
+                <!-- Education PIN Dynamic Display -->
+                <div class="pin-container" id="pin-container">
+                    <div class="pin-title">Your Exam PIN(s)</div>
+                    <div class="pin-data" id="pin-display"></div>
+                </div>
+
+                <div class="receipt-details" id="receipt-details-list">
+                    <!-- Rows dynamically injected via JS -->
+                </div>
+
+                <div class="receipt-footer">
+                    <p>Generated securely by BRYT Pay</p>
+                    <p style="margin-top: 4px; opacity: 0.6;" id="rec-timestamp">--</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="jamb-action-container" style="display: none; margin-bottom: 16px;">
+            <a href="/dashboard/jamb/orders.html" class="btn-primary" style="background: var(--bryt-navy); display: flex; justify-content: center; text-decoration: none;">
+                Track JAMB Order Status &rarr;
+            </a>
+        </div>
+
+        <div class="action-buttons">
+            <div class="btn-row">
+                <button id="download-pdf-btn" class="btn-primary" style="flex: 1; padding: 0.8rem; font-size: 0.85rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Save PDF
+                </button>
+                <button id="download-img-btn" class="btn-secondary" style="flex: 1; padding: 0.8rem; font-size: 0.85rem; border-color: var(--bryt-primary); color: var(--bryt-primary);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    Save Image
+                </button>
+            </div>
+            <a href="/dashboard/" class="btn-secondary" style="text-align: center; text-decoration: none; margin-top: 4px; padding: 0.8rem; font-size: 0.85rem;">Back to Dashboard</a>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="../../assets/js/supabase-client.js"></script>
+    <script src="../../assets/js/receipt.js"></script>
+</body>
+</html>

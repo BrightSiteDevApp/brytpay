@@ -1,0 +1,189 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+
+:root {
+    /* Official BRYT Brand Colors */
+    --bryt-primary: #1D5ED0;
+    --bryt-primary-hover: #174EB0;
+    --bryt-accent: #159FE3;
+    --bryt-navy: #071A3A;
+    --bryt-black: #0B1220;
+    --bryt-white: #FFFFFF;
+    
+    /* Surfaces & Text */
+    --bg-light: #F5F8FC;
+    --surface-white: #FFFFFF;
+    --border-color: #E2E8F0;
+    --border-focus: #1D5ED0;
+    --text-main: #0B1220;
+    --text-muted: #64748B;
+    
+    /* Status Colors */
+    --success-text: #047857;
+    --success-bg: #D1FAE5;
+    --pending-text: #B45309;
+    --pending-bg: #FEF3C7;
+    --failed-text: #B91C1C;
+    --failed-bg: #FEE2E2;
+
+    /* Radius & Shadows */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 2px 8px rgba(7, 26, 58, 0.04);
+    --shadow-md: 0 10px 25px rgba(7, 26, 58, 0.08);
+    --transition: 0.2s ease;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sora', sans-serif; }
+body { background-color: var(--bg-light); color: var(--text-main); line-height: 1.5; padding-bottom: 80px; }
+
+/* =========================================
+   1. LAYOUT & NAVIGATION
+   ========================================= */
+.app-container { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
+
+.bryt-navbar { background: var(--surface-white); border-bottom: 1px solid var(--border-color); padding: 16px 20px; position: sticky; top: 0; z-index: 100; }
+.bryt-nav-inner { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+.bryt-brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+.brand-icon { width: 32px; height: 32px; background: var(--bryt-primary); border-radius: 8px; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; }
+.brand-text { font-size: 1.25rem; font-weight: 700; color: var(--bryt-navy); letter-spacing: -0.5px; }
+.brand-text span { color: var(--bryt-primary); }
+.nav-links { display: none; gap: 24px; align-items: center; }
+.nav-link { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: var(--transition); }
+.nav-link:hover { color: var(--bryt-primary); }
+.btn-logout { background: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 6px; font-family: 'Sora'; font-weight: 600; cursor: pointer; color: var(--text-main); transition: var(--transition); }
+.btn-logout:hover { border-color: var(--bryt-navy); }
+
+@media (min-width: 768px) {
+    .nav-links { display: flex; }
+    body { padding-bottom: 0; }
+}
+
+/* =========================================
+   2. DASHBOARD SPECIFIC
+   ========================================= */
+.greeting-box { margin-bottom: 24px; }
+.greeting-time { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+.greeting-name { font-size: 1.5rem; font-weight: 700; color: var(--bryt-navy); }
+
+.wallet-card { background: var(--bryt-navy); border-radius: var(--radius-lg); padding: 24px; color: var(--bryt-white); margin-bottom: 32px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
+.wallet-card::after { content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(29, 94, 208, 0.4) 0%, transparent 70%); }
+.wallet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; position: relative; z-index: 2; }
+.wallet-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #94A3B8; font-weight: 600; }
+.btn-visibility { background: rgba(255,255,255,0.1); border: none; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; cursor: pointer; font-family: 'Sora'; }
+.wallet-balance { display: flex; align-items: baseline; gap: 4px; margin-bottom: 24px; position: relative; z-index: 2; }
+.wallet-currency { font-size: 1.2rem; color: var(--bryt-accent); font-weight: 600; }
+.wallet-amount { font-size: 2.2rem; font-weight: 700; }
+.wallet-actions { display: flex; gap: 12px; position: relative; z-index: 2; }
+.btn-fund { flex: 1; background: var(--bryt-primary); color: white; text-align: center; padding: 12px; border-radius: var(--radius-sm); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: var(--transition); }
+.btn-fund:hover { background: var(--bryt-primary-hover); }
+.btn-history { flex: 1; background: rgba(255,255,255,0.1); color: white; text-align: center; padding: 12px; border-radius: var(--radius-sm); text-decoration: none; font-weight: 600; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.2); }
+
+.section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
+.section-title { font-size: 1.1rem; font-weight: 700; color: var(--bryt-navy); }
+.section-link { font-size: 0.85rem; font-weight: 600; color: var(--bryt-primary); text-decoration: none; }
+
+.service-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 32px; }
+.service-tile { background: var(--surface-white); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; text-decoration: none; display: flex; flex-direction: column; transition: var(--transition); box-shadow: var(--shadow-sm); }
+.service-tile:hover { border-color: var(--bryt-primary); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.service-icon { width: 40px; height: 40px; background: #F0F6FF; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: var(--bryt-primary); margin-bottom: 12px; }
+.service-name { font-size: 0.9rem; font-weight: 700; color: var(--bryt-navy); margin-bottom: 4px; }
+.service-desc { font-size: 0.75rem; color: var(--text-muted); }
+
+/* =========================================
+   3. FORMS, INPUTS & SERVICE PAGES
+   ========================================= */
+.form-card { background: var(--surface-white); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm); }
+.form-group { margin-bottom: 20px; }
+.form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--bryt-navy); margin-bottom: 8px; }
+.form-input, .form-select { width: 100%; padding: 14px; border: 1.5px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.95rem; font-family: 'Sora', sans-serif; color: var(--text-main); outline: none; transition: var(--transition); }
+.form-input:focus, .form-select:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(29, 94, 208, 0.1); }
+
+.input-currency-wrapper { position: relative; display: flex; align-items: center; }
+.input-currency-prefix { position: absolute; left: 16px; font-weight: 700; color: var(--bryt-navy); }
+.form-input-currency { padding-left: 36px; font-weight: 600; }
+
+/* Provider Selection Grid (Airtime, Data, TV, WAEC) */
+.provider-select-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--bryt-navy); margin-bottom: 10px; }
+
+.provider-grid { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr) !important; /* Mobile First: 2 items per row */
+    gap: 10px; 
+    margin-bottom: 24px; 
+}
+
+/* Expand columns on larger screens */
+@media (min-width: 420px) {
+    .provider-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+@media (min-width: 600px) {
+    .provider-grid { grid-template-columns: repeat(4, 1fr) !important; }
+}
+
+.provider-btn { 
+    background: var(--surface-white); 
+    border: 1.5px solid var(--border-color); 
+    border-radius: var(--radius-sm); 
+    padding: 14px 4px; 
+    display: flex; 
+    flex-direction: column !important; /* FIX: Stacks logo on top, text on bottom */
+    align-items: center; 
+    justify-content: center; 
+    text-align: center;
+    cursor: pointer; 
+    transition: var(--transition); 
+}
+.provider-btn:hover { border-color: var(--text-muted); background: var(--bg-light); }
+.provider-btn.active { border-color: var(--bryt-primary); background: #F0F6FF; box-shadow: 0 0 0 2px rgba(29, 94, 208, 0.1); }
+.provider-logo { display: flex; align-items: center; justify-content: center; margin-bottom: 4px; }
+
+/* Preset Chips */
+.preset-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+.preset-chip { background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px 4px; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); cursor: pointer; text-align: center; transition: var(--transition); }
+.preset-chip:hover, .preset-chip.active { border-color: var(--bryt-primary); color: var(--bryt-primary); background: #F0F6FF; }
+
+/* Global Buttons */
+.btn-primary { width: 100%; background: var(--bryt-primary); color: var(--bryt-white); padding: 14px; border: none; border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 700; font-family: 'Sora', sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition); }
+.btn-primary:hover { background: var(--bryt-primary-hover); }
+.btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.btn-secondary { width: 100%; background: transparent; color: var(--text-muted); padding: 14px; border: 1.5px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 600; font-family: 'Sora', sans-serif; cursor: pointer; transition: var(--transition); }
+.btn-secondary:hover { background: var(--bg-light); color: var(--bryt-navy); }
+
+/* =========================================
+   4. TRANSACTION LEDGER & HISTORY
+   ========================================= */
+.tx-card { background: var(--surface-white); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.tx-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
+.tx-row:last-child { border-bottom: none; }
+.tx-left { display: flex; align-items: center; gap: 14px; }
+.tx-brand { width: 44px; height: 44px; background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
+.tx-title { font-size: 0.95rem; font-weight: 700; color: var(--bryt-navy); margin-bottom: 2px; }
+.tx-date { font-size: 0.75rem; color: var(--text-muted); }
+.tx-right { text-align: right; }
+.tx-amount { font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+.tx-status { display: inline-block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px; }
+.status-successful { color: var(--success-text); background: var(--success-bg); }
+.status-pending { color: var(--pending-text); background: var(--pending-bg); }
+.status-failed { color: var(--failed-text); background: var(--failed-bg); }
+.empty-state { text-align: center; padding: 32px 16px; color: var(--text-muted); font-size: 0.9rem; }
+
+/* =========================================
+   5. MODALS & BOTTOM SHEETS
+   ========================================= */
+.modal-overlay { position: fixed; inset: 0; background: rgba(7, 26, 58, 0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 2000; }
+.modal-content { background: var(--surface-white); border-radius: var(--radius-lg); width: 100%; max-width: 420px; padding: 28px 24px; box-shadow: var(--shadow-md); }
+.modal-title { font-size: 1.25rem; font-weight: 700; color: var(--bryt-navy); margin-bottom: 8px; }
+.modal-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px; }
+.modal-breakdown { background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 24px; }
+.modal-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 12px; }
+.modal-actions { display: flex; gap: 12px; }
+
+/* =========================================
+   6. MOBILE BOTTOM NAV
+   ========================================= */
+.mobile-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface-white); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 12px 0 20px; z-index: 100; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: var(--text-muted); font-size: 0.7rem; font-weight: 600; }
+.nav-item.active { color: var(--bryt-primary); }
+@media (min-width: 768px) { .mobile-nav { display: none; } }

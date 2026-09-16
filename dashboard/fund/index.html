@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fund Wallet — BRYT Pay</title>
+    
+    <!-- STRICT APP PRIVACY DIRECTIVE: Do not index or crawl -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Branding -->
+    <meta name="theme-color" content="#1D5ED0">
+     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    
+    <!-- Both Payment Gateway Scripts preserved for secure processing -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="https://checkout.flutterwave.com/v3.js"></script>
+
+    <style>
+        .gateway-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .gateway-card {
+            border: 2px solid var(--border-color); border-radius: 12px; padding: 12px;
+            text-align: center; cursor: pointer; transition: all 0.2s; background: white;
+            color: var(--text-muted); font-weight: 600; font-size: 0.75rem; position: relative;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+        }
+        .gateway-card img { height: 22px; width: auto; object-fit: contain; }
+        .gateway-card:hover { border-color: #cbd5e1; }
+        .gateway-card.active { border-color: #1D5ED0; background: #F5F8FC; color: #1D5ED0; }
+        .gateway-card.active::after {
+            content: '✓'; position: absolute; top: -8px; right: -8px; background: #1D5ED0;
+            color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 12px;
+            display: flex; justify-content: center; align-items: center; border: 2px solid white;
+        }
+
+        /* Compact Preset Grid */
+        .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+        .preset-chip {
+            background: var(--bg-light); border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 8px 4px; text-align: center; font-size: 0.8rem; font-weight: 600; color: var(--bryt-navy);
+            cursor: pointer; transition: 0.2s;
+        }
+        .preset-chip:hover { border-color: #1D5ED0; color: #1D5ED0; background: #eff6ff; }
+
+        .summary-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; margin-top: 20px; }
+        .summary-row { display: flex; justify-content: space-between; font-size: 0.85rem; color: #475569; margin-bottom: 8px; }
+        .summary-row.total { font-size: 1rem; font-weight: 800; color: #0B1220; border-top: 1px dashed #cbd5e1; padding-top: 10px; margin-bottom: 0; margin-top: 10px; }
+
+        /* Animated Success Overlay */
+        .success-overlay {
+            position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 10000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .success-overlay.active { opacity: 1; pointer-events: all; }
+        .check-circle {
+            width: 80px; height: 80px; border-radius: 50%; background: #10b981; color: white;
+            display: flex; justify-content: center; align-items: center; margin-bottom: 20px;
+            transform: scale(0); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .success-overlay.active .check-circle { transform: scale(1); }
+        .check-circle svg { width: 40px; height: 40px; }
+        .status-text { font-size: 1.1rem; color: #0B1220; font-weight: 700; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+    <!-- Animated Verification & Success Overlay -->
+    <div class="success-overlay" id="success-overlay">
+        <div class="check-circle" id="check-icon" style="background: #1D5ED0;">
+            <svg id="loading-svg" style="animation: spin 1s linear infinite;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+            <svg id="success-svg" style="display: none;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+        </div>
+        <div class="status-text" id="overlay-status">Verifying secure payment...</div>
+    </div>
+    <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
+
+    <main class="app-container" style="max-width: 520px;">
+        <a href="/dashboard/" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; margin-bottom: 24px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back to Dashboard
+        </a>
+
+        <div class="form-card">
+            <header style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 style="font-size: 1.35rem; color: var(--bryt-navy); margin-bottom: 4px;">Fund Wallet</h1>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Instant, zero-delay funding.</p>
+                </div>
+                <div style="text-align: right; background: var(--bg-light); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px;">Balance</div>
+                    <strong id="user-balance" style="color: var(--bryt-navy); font-size: 0.95rem;">₦0.00</strong>
+                </div>
+            </header>
+
+            <form id="fund-form">
+                <!-- Sleek Gateway Selector -->
+                <label class="form-label" style="margin-bottom: 10px; display: block;">Select Payment Method</label>
+                <div class="gateway-grid">
+                    <div class="gateway-card active" data-gateway="PAYSTACK">
+                        <img src="../../assets/img/paystack-logo.png" alt="Paystack">
+                        <span>Card, Bank, USSD</span>
+                    </div>
+                    <div class="gateway-card" data-gateway="FLUTTERWAVE">
+                        <img src="../../assets/img/flutterwave-logo.png" alt="Flutterwave">
+                        <span>Card, Transfer</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="amount">
+                        Amount to Fund <span style="font-size: 0.75rem; font-weight: 500; color: #64748b;">(Min ₦100)</span>
+                    </label>
+                    <div class="input-currency-wrapper">
+                        <span class="input-currency-prefix">₦</span>
+                        <input type="number" id="amount" class="form-input form-input-currency" min="100" max="500000" placeholder="0.00" required>
+                    </div>
+                    
+                    <!-- Compact Preset Chips -->
+                    <div class="preset-grid">
+                        <div class="preset-chip" data-amount="100">₦100</div>
+                        <div class="preset-chip" data-amount="2000">₦2,000</div>
+                        <div class="preset-chip" data-amount="3000">₦3,000</div>
+                        <div class="preset-chip" data-amount="5000">₦5,000</div>
+                        <div class="preset-chip" data-amount="10000">₦10,000</div>
+                        <div class="preset-chip" data-amount="20000">₦20,000</div>
+                    </div>
+                </div>
+
+                <!-- Live Summary Box -->
+                <div class="summary-card">
+                    <div class="summary-row"><span>Wallet Credit</span> <span id="summary-base" style="font-weight: 600; color: #10b981;">₦0.00</span></div>
+                    <div class="summary-row"><span>Processing Fee</span> <span id="summary-fee">₦0.00</span></div>
+                    <div class="summary-row total"><span>Total to Pay</span> <span id="summary-total">₦0.00</span></div>
+                </div>
+
+                <button type="submit" id="pay-btn" class="btn-primary" style="margin-top: 24px; background: #1D5ED0;">
+                    Pay ₦0.00
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <nav class="mobile-nav">
+        <!-- Navigation remains exactly the same -->
+        <a href="/dashboard/" class="nav-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            <span>Home</span>
+        </a>
+        <a href="/dashboard/history/" class="nav-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>History</span>
+        </a>
+        <a href="/dashboard/fund/" class="nav-item active">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            <span>Wallet</span>
+        </a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../assets/js/supabase-client.js"></script>
+    <script src="../../assets/js/fund.js"></script>
+</body>
+</html>
