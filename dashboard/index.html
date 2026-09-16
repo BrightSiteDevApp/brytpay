@@ -264,5 +264,54 @@
             });
         }
     </script>
+    <script>
+    // Replace this with the PUBLIC KEY you just generated!
+    const VAPID_PUBLIC_KEY = "BLfbGDEa2tl28dIanGQ5KffDXg9rEuSdyI49VurFSGZyef8h1Gg3B-uf6-B6BuBZfYz1bCt0VPiybjqodHC5gKk";
+
+    async function subscribeToNotifications() {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+
+        const registration = await navigator.serviceWorker.ready;
+        
+        // Ask the user for permission
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') return;
+
+        try {
+            // Convert the VAPID key for the browser
+            const urlBase64ToUint8Array = (base64String) => {
+                const padding = '='.repeat((4 - base64String.length % 4) % 4);
+                const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+                const rawData = window.atob(base64);
+                const outputArray = new Uint8Array(rawData.length);
+                for (let i = 0; i < rawData.length; ++i) { outputArray[i] = rawData.charCodeAt(i); }
+                return outputArray;
+            };
+
+            // Create the subscription ticket
+            const subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+            });
+
+            // Get current user ID
+            const { data: { session } } = await window.db.auth.getSession();
+            if (!session) return;
+
+            // Save to Supabase
+            await window.db.from('push_subscriptions').insert({
+                user_id: session.user.id,
+                subscription: subscription
+            });
+
+            console.log("Push notifications enabled!");
+        } catch (err) {
+            console.error("Failed to subscribe:", err);
+        }
+    }
+
+    // Trigger the request 5 seconds after they open the dashboard
+    setTimeout(subscribeToNotifications, 5000);
+</script>
 </body>
 </html>

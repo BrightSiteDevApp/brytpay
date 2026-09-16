@@ -42,3 +42,29 @@ self.addEventListener('fetch', (event) => {
         );
     }
 });
+// Listen for incoming Push Notifications
+self.addEventListener('push', function(event) {
+    if (!event.data) return;
+    
+    const data = event.data.json();
+    
+    const options = {
+        body: data.body,
+        icon: '/assets/img/icon-192.png',
+        badge: '/assets/img/icon-192.png',
+        vibrate: [200, 100, 200],
+        data: { url: data.url || '/dashboard/' }
+    };
+
+    event.waitUntil(
+        self.registration.showNotification(data.title || 'BRYT Pay', options)
+    );
+});
+
+// Handle when a user taps the notification
+self.addEventListener('notificationclick', function(event) {
+    event.notification.close();
+    event.waitUntil(
+        clients.openWindow(event.notification.data.url)
+    );
+});
