@@ -173,6 +173,30 @@
             .steps-grid::before { content: ''; position: absolute; top: 24px; left: 10%; right: 10%; height: 2px; background: dashed 2px var(--border-color); z-index: 1; }
             .footer-bottom { flex-direction: row; justify-content: space-between; }
         }
+        /* App Download Button Styling */
+.nav-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #eff6ff;
+    color: #1D5ED0 !important;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border: 1px solid #bfdbfe;
+    transition: 0.2s;
+    text-decoration: none;
+}
+.nav-download-btn:hover {
+    background: #1D5ED0;
+    color: #ffffff !important;
+}
+
+/* Magically hide the button if they are already inside the installed App! */
+@media all and (display-mode: standalone) {
+    .nav-download-btn { display: none !important; }
+}
     </style>
 </head>
 <body>
@@ -188,6 +212,11 @@
             <a href="#how-it-works">How It Works</a>
             <a href="/doc/faq/">FAQ</a>
             <a href="/doc/about/">About</a>
+            <!-- NEW: Get App Button -->
+    <a href="/download/" class="nav-download-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Get App
+    </a>
             <a href="/auth/login.html" class="auth-login">Login</a>
             <a href="/auth/signup.html" class="btn-nav-primary auth-signup">Get Started</a>
         </nav>
@@ -202,6 +231,12 @@
         <a href="#how-it-works" class="mobile-link">How It Works</a>
         <a href="/doc/faq/" class="mobile-link">FAQ</a>
         <a href="/doc/about/" class="mobile-link">About</a>
+
+        <!-- NEW: Get App Button (Mobile) -->
+    <a href="/download/" class="nav-download-btn" style="justify-content: center; padding: 12px; margin-top: 8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download App
+    </a>
         <hr style="border: none; border-top: 1px solid var(--border-color); margin: 8px 0;">
         <a href="/auth/login.html" class="auth-login" style="color: var(--text-muted);">Log In</a>
         <a href="/auth/signup.html" class="btn-nav-primary auth-signup" style="text-align: center;">Get Started</a>
