@@ -14,7 +14,6 @@
 
     <link rel="stylesheet" href="../../assets/css/main.css">
     <style>
-        /* 🚀 FIX: Reduced padding and fonts for better mobile responsiveness */
         .tab-container { display: flex; background: var(--bg-light); border-radius: 8px; padding: 4px; margin-bottom: 20px; }
         .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 6px; transition: all 0.2s ease; font-size: 0.8rem; }
         .tab-btn.active { background: white; color: var(--bryt-navy); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
@@ -25,7 +24,6 @@
         .provider-logo { width: 40px; height: 40px; margin: 0 auto 8px; object-fit: contain; display: block; }
         .provider-btn-label { font-size: 0.75rem; font-weight: 800; color: var(--bryt-navy); display: block; }
 
-        /* Custom Dropdown - Made more compact */
         .custom-select-wrapper { position: relative; user-select: none; }
         .custom-select-trigger { background: #f8fafc; border: 1px solid var(--border-color); padding: 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: var(--bryt-navy); font-size: 0.8rem; font-weight: 600; transition: border-color 0.2s; }
         .custom-select-wrapper.open .custom-select-trigger { border-color: var(--bryt-primary); background: #fff; }
@@ -35,7 +33,6 @@
         .custom-option:last-child { border-bottom: none; }
         .custom-option:hover { background: #f0f9ff; color: var(--bryt-primary); }
 
-        /* Toast Notification */
         .bryt-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150px); background: #ffffff; padding: 14px 20px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; z-index: 9999; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); min-width: 300px; border-left: 4px solid var(--bryt-primary); }
         .bryt-toast.show { transform: translateX(-50%) translateY(0); }
         .toast-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
@@ -45,7 +42,6 @@
         .toast-error { border-left-color: #dc2626; }
         .toast-text { font-size: 0.85rem; font-weight: 600; color: var(--bryt-navy); }
 
-        /* Manual Slip - Compacted */
         .payment-slip { background: #ffffff; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
         .payment-slip-header { background: #f8fafc; padding: 14px; text-align: center; border-bottom: 1px solid var(--border-color); }
         .payment-slip-title { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 2px; }
@@ -92,21 +88,17 @@
 
             <!-- AUTOMATIC SECTION -->
             <div id="auto-section">
-                <!-- 🚀 FIX: Calm Blue Information Banner instead of scary red -->
-                <div style="background-color: #eff6ff; border: 1px dashed #3b82f6; border-radius: 12px; padding: 12px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 10px;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                    <p style="margin: 0; font-size: 0.75rem; color: #1e3a8a; line-height: 1.4; font-weight: 600;">
-                        Automated vending is temporarily under maintenance. Please click on the <strong>Manual Order</strong> tab above to get your PIN instantly.
-                    </p>
-                </div>
-
                 <form id="auto-exam-form">
                     <div class="form-group">
                         <label class="provider-select-label" style="font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; display: block;">Select Exam</label>
-                        <div class="provider-grid" style="grid-template-columns: repeat(2, 1fr);">
+                        <div class="provider-grid" style="grid-template-columns: repeat(3, 1fr);">
                             <div class="provider-btn auto-exam-btn active" data-exam="waec" data-logo="waec-logo.png">
                                 <img src="../../assets/img/waec-logo.png" class="provider-logo" alt="WAEC" onerror="this.style.display='none'">
                                 <span class="provider-btn-label">WAEC</span>
+                            </div>
+                            <div class="provider-btn auto-exam-btn" data-exam="neco" data-logo="neco-logo.png">
+                                <img src="../../assets/img/neco-logo.png" class="provider-logo" alt="NECO" onerror="this.style.display='none'">
+                                <span class="provider-btn-label">NECO</span>
                             </div>
                             <div class="provider-btn auto-exam-btn" data-exam="nabteb" data-logo="nabteb-logo.png">
                                 <img src="../../assets/img/nabteb-logo.png" class="provider-logo" alt="NABTEB" onerror="this.style.display='none'">
@@ -125,11 +117,12 @@
                             <div class="custom-options" id="custom-options-list">
                             </div>
                         </div>
-                        <input type="hidden" id="exam-quantity" required>
+                        <!-- NO 'required' attribute here to prevent invisible browser blocks -->
+                        <input type="hidden" id="exam-quantity" name="quantity">
                     </div>
 
-                    <button type="submit" id="auto-submit-btn" class="btn-primary" style="margin-top: 24px; width: 100%; padding: 14px; font-size: 0.95rem; background: #94a3b8; border-color: #94a3b8; cursor: not-allowed;">
-                        Service Unavailable
+                    <button type="submit" id="auto-submit-btn" class="btn-primary" style="margin-top: 24px; width: 100%; padding: 14px; font-size: 0.95rem;">
+                        Pay Securely
                     </button>
                 </form>
             </div>
@@ -167,7 +160,7 @@
                         </div>
                         <div class="slip-row">
                             <div class="slip-label">Account Name</div>
-                            <div class="slip-value">IKHUORIA JOSEPH</div>
+                            <div class="slip-value">JOSEPH IKHUORIA</div>
                         </div>
                         <div class="slip-row" style="align-items: flex-start;">
                             <div class="slip-label" style="padding-top: 4px;">Account Number</div>
@@ -191,7 +184,8 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../../assets/js/supabase-client.js"></script>
-    <script src="../../assets/js/education.js"></script>
+    <!-- 🚀 FORCE CACHE BUSTING HERE -->
+    <script src="../../assets/js/supabase-client.js?v=4.0"></script>
+    <script src="../../assets/js/education.js?v=4.0"></script>
 </body>
 </html>

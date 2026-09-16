@@ -6,9 +6,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentBalance = 0;
     
     // Pricing Data Model
+    // 🚀 UPDATED: New Pricing Data Model
     const PRICING = {
-        'NIN_NUMBER': { 'Information Slip': 400, 'Regular Slip': 500, 'Standard Slip': 600, 'Premium Slip': 800 },
-        'PHONE_NUMBER': { 'Information Slip': 500, 'Regular Slip': 600, 'Standard Slip': 700, 'Premium Slip': 1000 }
+        'NIN_NUMBER': { 'Information Slip': 300, 'Regular Slip': 400, 'Standard Slip': 400, 'Premium Slip': 500 },
+        'PHONE_NUMBER': { 'Information Slip': 350, 'Regular Slip': 450, 'Standard Slip': 450, 'Premium Slip': 600 }
     };
 
     let activeType = 'NIN_NUMBER'; // Default

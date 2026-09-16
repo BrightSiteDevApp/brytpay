@@ -17,65 +17,16 @@
         * { box-sizing: border-box; }
         body { background: #f8fafc; margin: 0; color: var(--bryt-navy); overflow-x: hidden; }
         
-        .header-bar { 
-            padding: 16px 20px; 
-            display: flex; 
-            align-items: center; 
-            gap: 16px; 
-            background: #ffffff;
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        
-        .page-container {
-            padding: 24px 16px;
-            max-width: 520px;
-            margin: 0 auto;
-            padding-bottom: 40px;
-        }
+        .header-bar { padding: 16px 20px; display: flex; align-items: center; gap: 16px; background: #ffffff; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; }
+        .page-container { padding: 24px 16px; max-width: 520px; margin: 0 auto; padding-bottom: 40px; }
 
-        .summary-card { 
-            background: #ffffff; 
-            border-radius: 16px; 
-            padding: 32px 24px; 
-            display: flex; 
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            margin-bottom: 24px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 10px 30px rgba(7, 26, 58, 0.03);
-        }
-        .summary-icon { 
-            width: 72px; 
-            height: 72px; 
-            background: #f8fafc; 
-            border-radius: 50%; 
-            padding: 12px; 
-            object-fit: contain; 
-            border: 1px solid #e2e8f0;
-            margin-bottom: 16px;
-        }
+        .summary-card { background: #ffffff; border-radius: 16px; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 24px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(7, 26, 58, 0.03); }
+        .summary-icon { width: 72px; height: 72px; background: #f8fafc; border-radius: 50%; padding: 12px; object-fit: contain; border: 1px solid #e2e8f0; margin-bottom: 16px; }
         .summary-title { font-size: 1.15rem; font-weight: 700; color: var(--bryt-navy); margin-bottom: 6px; }
         .summary-price { font-size: 1.6rem; font-weight: 800; color: var(--bryt-primary); }
         
-        .details-list { 
-            background: #ffffff; 
-            padding: 8px 24px; 
-            border-radius: 16px; 
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-            margin-bottom: 24px;
-        }
-        .detail-item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 16px 0; 
-            border-bottom: 1px dashed #e2e8f0; 
-        }
+        .details-list { background: #ffffff; padding: 8px 24px; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 24px; }
+        .detail-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px dashed #e2e8f0; }
         .detail-item:last-child { border-bottom: none; }
         .detail-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
         .detail-value { font-size: 0.9rem; font-weight: 700; color: var(--bryt-navy); text-align: right; }
@@ -86,58 +37,14 @@
         .status-failed { background: var(--failed-bg); color: var(--failed-text); border: 1px solid #fecaca; }
         
         .action-grid { display: flex; flex-direction: column; gap: 12px; }
-        .btn-query { 
-            background: #ffffff; 
-            border: 1px solid var(--border-color); 
-            color: var(--bryt-navy); 
-            padding: 16px; 
-            border-radius: 12px; 
-            font-weight: 700; 
-            width: 100%; 
-            cursor: pointer; 
-            transition: all 0.2s;
-        }
+        .btn-query { background: #ffffff; border: 1px solid var(--border-color); color: var(--bryt-navy); padding: 16px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; transition: all 0.2s; }
         .btn-query:hover { background: #f8fafc; border-color: #cbd5e1; }
-        .btn-download { 
-            background: var(--bryt-primary); 
-            color: #ffffff; 
-            border: none; 
-            padding: 16px; 
-            border-radius: 12px; 
-            font-weight: 700; 
-            width: 100%; 
-            cursor: pointer; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: background 0.2s;
-        }
+        .btn-download { background: var(--bryt-primary); color: #ffffff; border: none; padding: 16px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; }
         .btn-download:hover { background: #0369a1; }
         .btn-download:disabled { background: #cbd5e1; cursor: not-allowed; }
 
-        .bottom-sheet-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(7, 26, 58, 0.5); 
-            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
-            display: none; z-index: 9999; 
-            align-items: flex-end; 
-            justify-content: center;
-        }
-        
-        .bottom-sheet { 
-            background: #ffffff; 
-            width: 100%; max-width: 520px;
-            border-radius: 24px 24px 0 0; 
-            padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px)); 
-            transform: translateY(100%); 
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
-            max-height: 90vh; 
-            display: flex;
-            flex-direction: column; 
-        }
-        
+        .bottom-sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 26, 58, 0.5); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); display: none; z-index: 9999; align-items: flex-end; justify-content: center; }
+        .bottom-sheet { background: #ffffff; width: 100%; max-width: 520px; border-radius: 24px 24px 0 0; padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.15); max-height: 90vh; display: flex; flex-direction: column; }
         .bottom-sheet.open { transform: translateY(0); }
         .sheet-handle { width: 48px; height: 5px; background: #e2e8f0; border-radius: 5px; margin: 0 auto 16px; flex-shrink: 0; }
         .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-shrink: 0; }
@@ -161,8 +68,8 @@
     <main class="page-container">
         
         <div class="summary-card">
-            <!-- 🚀 FIX: Display the correct NIN Logo -->
-            <img src="../../assets/img/nin-logo.png" class="summary-icon" onerror="this.src='../../assets/img/nimc-logo.png'">
+            <!-- 🚀 FIX: Display the correct JAMB Logo -->
+            <img src="../../assets/img/jamb-logo.png" class="summary-icon" onerror="this.src='../../assets/img/brytpay-logo.png'">
             <div class="summary-title" id="sum-title">---</div>
             <div class="summary-price" id="sum-price">₦0.00</div>
         </div>
@@ -186,7 +93,7 @@
             </div>
             <div class="detail-item">
                 <div class="detail-label">Processing Status</div>
-                <!-- 🚀 FIX: Defaults to "Processing" instead of "Loading" -->
+                <!-- 🚀 FIX: Defaults to "Processing" -->
                 <div><span id="sum-status" class="status-pill status-processing">Processing</span></div>
             </div>
         </div>
@@ -214,9 +121,9 @@
                 <div style="background: #f8fafc; padding: 8px 16px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border-color);">
                     <div class="sheet-row"><span>Candidate</span><strong id="q-name">---</strong></div>
                     
-                    <!-- 🚀 FIX: JAMB labels removed, swapped for generic NIN labels -->
-                    <div class="sheet-row"><span>Provided Info</span><strong id="q-reg">---</strong></div>
-                    <div class="sheet-row" style="border: none;"><span>Identifier Type</span><strong id="q-year">---</strong></div>
+                    <!-- 🚀 FIX: Updated to JAMB specific labels -->
+                    <div class="sheet-row"><span>JAMB Reg No</span><strong id="q-reg">---</strong></div>
+                    <div class="sheet-row" style="border: none;"><span>JAMB Year</span><strong id="q-year">---</strong></div>
                 </div>
 
                 <textarea id="q-message" class="sheet-input" rows="3" placeholder="Please describe your issue in detail so our support team can assist you immediately..." required></textarea>
@@ -231,6 +138,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../assets/js/supabase-client.js"></script>
-    <script src="../../assets/js/nin-order-details.js"></script>
+    <!-- 🚀 FIX: Linking to the correct JAMB JS file! -->
+    <script src="../../assets/js/jamb-order-details.js"></script>
 </body>
 </html>

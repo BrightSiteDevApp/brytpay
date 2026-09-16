@@ -55,11 +55,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         manualSection.style.display = 'block'; autoSection.style.display = 'none';
     });
 
-    // --- AUTOMATIC SECTION (WAEC & NABTEB 5%) ---
+    // =========================================================
+    // 🚀 DYNAMIC 5% PROFIT CALCULATOR
+    // =========================================================
     let autoExamType = 'waec';
     let autoExamLogo = 'waec-logo.png';
     
-    const autoPrices = { 'waec': 5699, 'nabteb': 1003 };
+    const API_COSTS = { 'waec': 5454.00, 'neco': 2090.90, 'nabteb': 959.50 };
 
     const selectWrapper = document.getElementById('custom-select-wrapper');
     const selectTrigger = document.getElementById('custom-select-trigger');
@@ -69,7 +71,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function renderQtyDropdown() {
         optionsList.textContent = '';
-        const unitPrice = autoPrices[autoExamType];
+        
+        // Add 5% and Round Up (Mirrors the backend math perfectly)
+        const unitPrice = Math.ceil(API_COSTS[autoExamType] * 1.05);
 
         selectText.textContent = 'Select quantity...';
         selectText.style.opacity = '0.6';
@@ -114,14 +118,143 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // 🚀 FIX: Prevent Automatic Modal Submission Completely
-    document.getElementById('auto-exam-form').addEventListener('submit', (e) => {
+    // =========================================================
+    // 🎨 CUSTOM PIN IMAGE GENERATOR
+    // =========================================================
+    window.downloadReceipt = async function(examType, pinsText) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const pinLines = pinsText.split('\n').filter(l => l.trim() !== '');
+        
+        canvas.width = 600;
+        canvas.height = 200 + (pinLines.length * 80);
+        
+        // Base Background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Header Rectangle
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(0, 0, canvas.width, 120);
+        ctx.fillStyle = '#1D5ED0';
+        ctx.fillRect(0, 118, canvas.width, 4); // Blue accent line
+
+        // Helper to load images safely
+        const loadImg = (src) => new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => resolve(img);
+            img.onerror = () => resolve(null);
+            img.src = src;
+        });
+
+        const brytLogo = await loadImg('../../assets/img/brytpay-logo.png');
+        const examLogo = await loadImg(`../../assets/img/${examType.toLowerCase()}-logo.png`);
+
+        if (brytLogo) ctx.drawImage(brytLogo, 30, 30, 120, 60); 
+        // Force the exam logo to maintain a neat square aspect ratio
+        if (examLogo) ctx.drawImage(examLogo, canvas.width - 110, 20, 80, 80); 
+
+        // Title text
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 28px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${examType.toUpperCase()} Result Checker`, canvas.width / 2, 75);
+
+        // PIN Section
+        let y = 180;
+        pinLines.forEach(line => {
+            // Draw a soft grey box behind each PIN
+            ctx.fillStyle = '#f1f5f9';
+            ctx.fillRect(40, y - 30, canvas.width - 80, 50);
+            
+            // Draw the actual PIN text
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'bold 18px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(line, canvas.width / 2, y);
+            y += 70;
+        });
+
+        // Footer Text
+        ctx.fillStyle = '#64748b';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Get instant PINs and VTU services at brytpay.name.ng', canvas.width / 2, canvas.height - 30);
+
+        // Trigger the download automatically
+        const link = document.createElement('a');
+        link.download = `BRYT_${examType.toUpperCase()}_PIN.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    };
+
+    // =========================================================
+    // 🚀 EXECUTE AUTOMATIC VENDING
+    // =========================================================
+    document.getElementById('auto-exam-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        showToast("Automated service is under maintenance. Please use the Manual Order tab.", "error");
+        
+        const qty = hiddenQtyInput.value;
+        const totalAmount = parseFloat(hiddenQtyInput.dataset.total);
+        
+        if (!qty) {
+            showToast("Please select a quantity.", "error");
+            return;
+        }
+
+        const { data: currentWallet } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
+        if (currentWallet && parseFloat(currentWallet.balance) < totalAmount) {
+            showToast(`Insufficient balance. You need ₦${totalAmount.toLocaleString()} to purchase ${qty} PIN(s).`, "error");
+            return;
+        }
+
+        const submitBtn = document.getElementById('auto-submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Processing Payment...';
+
+        try {
+            const { data: resData, error } = await window.db.functions.invoke('vend-exam-swift', {
+                body: { exam_type: autoExamType, quantity: qty }
+            });
+
+            if (error) throw new Error(error.message);
+            if (resData && resData.success === false) throw new Error(resData.message);
+
+            // Escaping the pins text specifically for the onclick handler
+            const safePins = resData.pins.replace(/"/g, '&quot;').replace(/\n/g, '\\n');
+
+            // Hide form and show the generated PINs with the Download Button!
+            document.getElementById('auto-exam-form').innerHTML = `
+                <div style="text-align: center; padding: 24px 0;">
+                    <div style="width: 56px; height: 56px; background: #dcfce7; border-radius: 50%; color: #16a34a; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <h3 style="color: #0f172a; margin-bottom: 8px;">Purchase Successful!</h3>
+                    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 24px;">Here are your result checker details:</p>
+                    
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: left; font-family: monospace; font-size: 0.9rem; color: #1e293b; white-space: pre-wrap; word-break: break-all; margin-bottom: 24px;">${resData.pins}</div>
+                    
+                    <div style="display: flex; gap: 12px; flex-direction: column;">
+                        <button onclick="downloadReceipt('${autoExamType}', '${safePins}')" class="btn-secondary" style="width: 100%; padding: 14px; border: 2px solid #1D5ED0; color: #1D5ED0; background: #ffffff; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Download PIN Card
+                        </button>
+                        <button onclick="window.location.reload()" class="btn-primary" style="width: 100%; padding: 14px;">Buy Another PIN</button>
+                    </div>
+                </div>
+            `;
+            
+            showToast(resData.message, "success");
+
+        } catch (err) {
+            showToast(err.message, "error");
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Pay Securely';
+        }
     });
 
-
-    // --- MANUAL ORDER SECTION ---
+    // --- MANUAL ORDER SECTION (Unchanged) ---
     let manualExam = 'WAEC';
     let manualPrice = 6000;
     const slipAmountEl = document.getElementById('slip-amount');
@@ -136,7 +269,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // 🚀 FIX: The Ultimate Mobile Copy Hack
     document.getElementById('copy-btn').addEventListener('click', async () => {
         const btn = document.getElementById('copy-btn');
         const accNo = document.getElementById('acc-no').textContent.trim();
@@ -147,41 +279,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             setTimeout(() => { btn.innerHTML = originalText; }, 2000);
         };
 
-        // Attempt 1: Modern API (Fails on HTTP usually)
         if (navigator.clipboard && window.isSecureContext) {
             try {
                 await navigator.clipboard.writeText(accNo);
                 return successUI();
-            } catch (err) { /* silent fallback */ }
+            } catch (err) {}
         }
 
-        // Attempt 2: Bulletproof Mobile Hack for HTTP
         const textArea = document.createElement("textarea");
         textArea.value = accNo;
-        
-        // Hide element out of viewport so keyboard doesn't jump
         textArea.style.position = "fixed";
         textArea.style.left = "-999999px";
         textArea.style.top = "-999999px";
-        
         document.body.appendChild(textArea);
-        
-        // Specific fix for Android/iOS text selection
         textArea.focus();
         textArea.select();
         textArea.setSelectionRange(0, 99999); 
 
         try {
             const successful = document.execCommand('copy');
-            if (successful) {
-                successUI();
-            } else {
-                showToast("Your browser blocked copying. Please copy manually.", "error");
-            }
+            if (successful) successUI();
+            else showToast("Your browser blocked copying. Please copy manually.", "error");
         } catch (err) {
             showToast("Copy failed on this device.", "error");
         }
-        
         document.body.removeChild(textArea);
     });
     
