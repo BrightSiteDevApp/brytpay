@@ -46,50 +46,54 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../assets/js/supabase-client.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await window.db.auth.getSession();
-            if (!session) { window.location.href = '/auth/login.html'; return; }
+       document.addEventListener('DOMContentLoaded', async () => {
+    const { data: { session } } = await window.db.auth.getSession();
+    if (!session) { window.location.href = '/auth/login.html'; return; }
 
-            const container = document.getElementById('orders-container');
-            const { data, error } = await window.db
-                .from('nin_orders')
-                .select('id, service_type, identifier_value, amount, status, created_at')
-                .eq('user_id', session.user.id)
-                .order('created_at', { ascending: false });
+    const container = document.getElementById('orders-container');
+    const { data, error } = await window.db
+        .from('nin_orders')
+        .select('id, service_type, identifier_value, amount, status, created_at')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false });
 
-            if (error || !data || data.length === 0) {
-                container.innerHTML = `<div style="padding: 40px 20px; text-align: center; color: #64748b;">No NIN requests found.</div>`;
-                return;
-            }
+    if (error || !data || data.length === 0) {
+        container.innerHTML = `<div style="padding: 40px 20px; text-align: center; color: #64748b;">No NIN requests found.</div>`;
+        return;
+    }
 
-            container.innerHTML = '';
-            data.forEach(order => {
-                const dateObj = new Date(order.created_at);
-                const dateStr = dateObj.toLocaleDateString('en-NG', { month: 'short', day: 'numeric' });
-                
-                let statusClass = 'status-paid';
-                let statusText = 'Pending';
-                if (order.status === 'PROCESSING') { statusClass = 'status-processing'; statusText = 'Processing'; }
-                if (order.status === 'COMPLETED') { statusClass = 'status-completed'; statusText = 'Processed'; }
-                if (order.status === 'FAILED') { statusClass = 'status-failed'; statusText = 'Failed'; }
+    container.innerHTML = '';
+    data.forEach(order => {
+        const dateObj = new Date(order.created_at);
+        const dateStr = dateObj.toLocaleDateString('en-NG', { month: 'short', day: 'numeric' });
+        
+        let statusClass = 'status-processing';
+        let statusText = 'Pending';
+        const st = (order.status || '').toUpperCase();
 
-                container.innerHTML += `
-                    <a href="order-details.html?id=${order.id}" class="list-card">
-                        <div class="list-left">
-                            <img src="../../assets/img/nimc-logo.png" class="list-icon" alt="NIMC" onerror="this.src='../../assets/img/brytpay-logo.png'">
-                            <div>
-                                <div class="list-title">${order.service_type}</div>
-                                <div class="list-date">${dateStr} | ${order.identifier_value}</div>
-                            </div>
-                        </div>
-                        <div class="list-right">
-                            <div class="list-amount">₦${parseFloat(order.amount).toLocaleString()}</div>
-                            <span class="status-badge ${statusClass}">${statusText}</span>
-                        </div>
-                    </a>
-                `;
-            });
-        });
+        // 🚀 SMART STATUS SCANNER
+        if (st.includes('REFUND')) { statusClass = 'status-failed'; statusText = 'Refunded'; }
+        else if (st.includes('FAIL')) { statusClass = 'status-failed'; statusText = 'Failed'; }
+        else if (st.includes('COMPLETE') || st.includes('SUCCESS')) { statusClass = 'status-completed'; statusText = 'Processed'; }
+        else if (st.includes('PROCESS')) { statusClass = 'status-processing'; statusText = 'Processing'; }
+
+        container.innerHTML += `
+            <a href="order-details.html?id=${order.id}" class="list-card">
+                <div class="list-left">
+                    <img src="../../assets/img/nimc-logo.png" class="list-icon" alt="NIMC" onerror="this.src='../../assets/img/brytpay-logo.png'">
+                    <div>
+                        <div class="list-title">${order.service_type}</div>
+                        <div class="list-date">${dateStr} | ${order.identifier_value}</div>
+                    </div>
+                </div>
+                <div class="list-right">
+                    <div class="list-amount">₦${parseFloat(order.amount).toLocaleString()}</div>
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </div>
+            </a>
+        `;
+    });
+});
     </script>
 </body>
 </html>

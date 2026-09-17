@@ -21,18 +21,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const pinContainer = document.getElementById('pin-container');
     const pinDisplay = document.getElementById('pin-display');
-    const jambActionContainer = document.getElementById('jamb-action-container');
+    
+    // We will reuse this container dynamically for ALL services
+    const actionContainer = document.getElementById('jamb-action-container');
 
     const downloadPdfBtn = document.getElementById('download-pdf-btn');
     const downloadImgBtn = document.getElementById('download-img-btn');
 
-    // 🚀 Deep Cleaning Function (Removes VTPASS and formats text)
     const cleanStr = (str) => {
         if (!str) return '';
         return str.replace(/vtpass/gi, '').replace(/external_checkout/gi, '').replace(/[:\-_]/g, ' ').replace(/\s+/g, ' ').trim().toUpperCase();
     };
 
-    // 🚀 Shorten long references so they don't stretch the UI
     const formatRef = (ref) => {
         if (!ref) return 'N/A';
         if (ref.length > 20) return `${ref.substring(0, 8)}...${ref.substring(ref.length - 8)}`;
@@ -46,9 +46,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return t === 'credit' || s.includes('fund') || s.includes('deposit') || s.includes('topup') || p.includes('paystack') || p.includes('flutterwave') || p.includes('topup');
     };
 
-    // 🚀 Dynamic Logo Mapper
+    // 🚀 BULLETPROOF LOGO MAPPER
     const getLogoPath = (tx) => {
-        const raw = `${tx.service_type || ''} ${tx.recipient || ''} ${tx.provider || ''}`.toLowerCase();
+        const raw = `${tx.type || ''} ${tx.service_type || ''} ${tx.recipient || ''} ${tx.provider || ''} ${tx.reference || ''}`.toLowerCase();
+        
         if (raw.includes('cbt')) return 'brytcbtsim-logo.png';
         if (raw.includes('dgm')) return 'brytdgm-logo.png';
         if (isCreditTx(tx)) return 'brytpay-logo.png';
@@ -62,8 +63,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (raw.includes('waec')) return 'waec-logo.png';
         if (raw.includes('neco')) return 'neco-logo.png';
         if (raw.includes('nabteb')) return 'nabteb-logo.png';
-        if (raw.includes('jamb')) return 'jamb-logo.png';
-        return 'brytpay-logo.png'; // Fallback
+        if (raw.includes('jmb_') || raw.includes('jamb') || raw.includes('admission') || raw.includes('result')) return 'jamb-logo.png';
+        if (raw.includes('nin_') || raw.includes('nin') || raw.includes('slip')) return 'nimc-logo.png';
+        
+        return 'brytpay-logo.png';
     };
 
     async function fetchTransaction() {
@@ -74,26 +77,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             .eq('user_id', user.id)
             .single();
 
-        if (error || !data) {
-            alert('Transaction not found or access denied.');
-            window.location.href = '/dashboard/history/';
-            return;
-        }
+        if (error || !data) return window.location.href = '/dashboard/history/';
 
-        // Basic Info
         const txDate = new Date(data.created_at);
         recDate.textContent = txDate.toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute:'2-digit' });
         recAmount.textContent = `₦${parseFloat(data.amount).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
         recTimestamp.textContent = `Downloaded: ${new Date().toLocaleString('en-NG')}`;
         
-        // 🚀 Smart Status Mapper (Catches "completed" and "processed")
         const st = (data.status || '').toLowerCase();
-        if (['successful', 'completed', 'processed'].includes(st)) {
-            if (data.service_type === 'jamb') {
-                recStatus.textContent = 'PROCESSED';
-            } else {
-                recStatus.textContent = 'SUCCESSFUL';
-            }
+        if (['successful', 'completed', 'processed', 'refunded'].includes(st)) {
+            recStatus.textContent = st === 'refunded' ? 'REFUNDED' : 'SUCCESSFUL';
             recStatus.style.background = '#dcfce7'; 
             recStatus.style.color = '#16a34a'; 
         } else if (['pending', 'processing'].includes(st)) {
@@ -106,80 +99,89 @@ document.addEventListener('DOMContentLoaded', async () => {
             recStatus.style.color = '#dc2626'; 
         }
 
-        // Set Provider Logo
         providerLogo.src = `../../assets/img/${getLogoPath(data)}`;
 
-        // 🚀 Check for Education PINs
-        if ((data.service_type === 'education' || cleanStr(data.service_type).includes('WAEC')) && data.admin_notes && data.admin_notes.includes('PIN')) {
-            let rawPins = data.admin_notes.replace('PIN Details:', '').trim();
-            rawPins = rawPins.replace(/[\[\]"\{\}]/g, ' ').trim();
-            pinDisplay.innerHTML = rawPins.replace(/,/g, '<br>');
-            pinContainer.style.display = 'block';
-        }
-
-        // 🚀 Dynamic Data Extraction
         let displayService = '';
         let displayProvider = '';
         let displayRecipient = '';
-        let displayDetails = ''; // E.g., '1GB Data' or 'Airtime'
+        
+        // 🚀 Variables to hold dynamic tracking logic
+        let trackUrl = null;
+        let trackText = '';
 
+        const txType = (data.type || '').toLowerCase();
         const rawService = (data.service_type || '').toLowerCase();
-        const rawProvider = (data.provider || data.network_or_operator || '').toLowerCase();
-        const rawRecipient = (data.recipient || '').toLowerCase();
+        const ref = (data.reference || data.external_reference || '').toUpperCase();
 
         if (isCreditTx(data)) {
             displayService = 'WALLET FUNDING';
-            displayProvider = rawRecipient.includes('paystack') ? 'PAYSTACK' : rawRecipient.includes('flutterwave') ? 'FLUTTERWAVE' : cleanStr(data.provider || 'BRYT PAY');
+            displayProvider = 'FUNDING GATEWAY';
             displayRecipient = user.email || 'Your Wallet';
-        } else if (rawService.includes('cbt') || rawRecipient.includes('cbt')) {
-            displayService = 'BRYT CBT SIM PAYMENT';
-            displayProvider = 'BRYT PAY SECURE';
-            displayRecipient = cleanStr(data.service_type).replace('BRYT CBT', '').trim() || 'PREMIUM ACCESS';
-        } else if (rawService.includes('dgm') || rawRecipient.includes('dgm')) {
-            displayService = 'BRYT DGM PAYMENT';
-            displayProvider = 'BRYT PAY SECURE';
-            displayRecipient = 'VENDOR CHECKOUT';
-        } else if (rawService === 'jamb') {
-            displayService = cleanStr(data.recipient || 'JAMB Processing');
+        
+        // JAMB LOGIC
+        } else if (ref.startsWith('JMB_') || txType === 'jamb_order' || rawService.includes('jamb') || rawService.includes('admission') || rawService.includes('result')) {
+            displayService = data.service_type || 'JAMB SERVICE';
             displayProvider = 'BRYT PAY JAMB DESK';
             displayRecipient = 'JAMB Candidate';
-            jambActionContainer.style.display = 'block';
-        } else if (rawService.includes('data')) {
-            displayService = 'DATA BUNDLE';
-            displayProvider = cleanStr(rawProvider);
-            displayRecipient = data.recipient;
-            displayDetails = cleanStr(data.service_type); // Shows the specific plan like "MTN SME 1GB"
-        } else if (rawService.includes('airtime')) {
-            displayService = 'AIRTIME TOP-UP';
-            displayProvider = cleanStr(rawProvider);
-            displayRecipient = data.recipient;
+            trackUrl = '/dashboard/jamb/orders.html';
+            trackText = 'Track JAMB Order Status →';
+            
+        // NIN LOGIC
+        } else if (ref.startsWith('NIN_') || txType === 'nin_order' || rawService.includes('nin') || rawService.includes('slip')) {
+            displayService = data.service_type || 'NIN SERVICE';
+            displayProvider = 'BRYT PAY NIN DESK';
+            displayRecipient = 'NIN Holder';
+            trackUrl = '/dashboard/nin/orders.html';
+            trackText = 'Track NIN Order Status →';
+            
+        // EDUCATION LOGIC
+        } else if (rawService.includes('education') || rawService.includes('waec') || rawService.includes('neco') || rawService.includes('nabteb') || txType.includes('education')) {
+            displayService = cleanStr(data.service_type) || 'EXAM PIN PURCHASE';
+            displayProvider = cleanStr(data.provider || 'BRYT PAY');
+            displayRecipient = data.recipient || 'N/A';
+            trackUrl = '/dashboard/educations/orders.html';
+            trackText = 'View Education Pins →';
+            
+        // DEFAULT FALLBACK
         } else {
             displayService = cleanStr(data.service_type);
-            displayProvider = cleanStr(rawProvider);
-            displayRecipient = data.recipient;
+            displayProvider = cleanStr(data.provider || 'BRYT PAY');
+            displayRecipient = data.recipient || 'N/A';
         }
 
-        // 🚀 Inject Rows into the Receipt
         let rowsHtml = `
             <div class="receipt-row"><div class="receipt-key">Service Type</div><div class="receipt-value">${displayService}</div></div>
             <div class="receipt-row"><div class="receipt-key">Provider</div><div class="receipt-value">${displayProvider}</div></div>
-            <div class="receipt-row"><div class="receipt-key">Recipient/Account</div><div class="receipt-value">${displayRecipient}</div></div>
+            <div class="receipt-row"><div class="receipt-key">Recipient</div><div class="receipt-value">${displayRecipient}</div></div>
         `;
 
-        if (displayDetails && displayDetails !== displayService) {
-            rowsHtml += `<div class="receipt-row"><div class="receipt-key">Package / Details</div><div class="receipt-value">${displayDetails}</div></div>`;
-        }
-
-        // Handle Reference safely
         const actualRef = data.reference || data.external_reference || 'N/A';
         rowsHtml += `<div class="receipt-row"><div class="receipt-key">Transaction Ref</div><div class="receipt-value" title="${actualRef}">${formatRef(actualRef)}</div></div>`;
 
         receiptDetailsList.innerHTML = rowsHtml;
+
+        // 🚀 DYNAMIC BUTTON INJECTION
+        if (actionContainer) {
+            if (trackUrl) {
+                // Grab the anchor tag inside the container, or overwrite the container HTML securely to match UI
+                const btnLink = actionContainer.querySelector('a');
+                if (btnLink) {
+                    btnLink.href = trackUrl;
+                    btnLink.textContent = trackText;
+                } else {
+                    // Fallback to inject a nicely styled button if no <a> tag exists
+                    actionContainer.innerHTML = `<a href="${trackUrl}" style="display:flex; justify-content:center; align-items:center; background:#0B1220; color:#fff; padding:14px; border-radius:10px; font-weight:700; text-decoration:none; margin-bottom:15px; width:100%; font-size:15px;">${trackText}</a>`;
+                }
+                actionContainer.style.display = 'block';
+            } else {
+                // If it's a generic payment (Airtime/Data/Wallet), hide the tracking button entirely
+                actionContainer.style.display = 'none';
+            }
+        }
     }
 
     await fetchTransaction();
 
-    // Export Logic
     downloadPdfBtn.addEventListener('click', () => {
         downloadPdfBtn.disabled = true;
         const originalText = downloadPdfBtn.innerHTML;

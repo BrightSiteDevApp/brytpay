@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Route Protection
     const { data: { session }, error: sessionError } = await window.db.auth.getSession();
     
     if (!session) {
@@ -10,7 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const user = session.user;
     let currentBalance = 0;
 
-    // 2. Set Dynamic Time Greeting
     const hour = new Date().getHours();
     const greetingTime = document.getElementById('greeting-time');
     if (greetingTime) {
@@ -19,7 +17,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         else greetingTime.textContent = 'Good evening,';
     }
 
-    // 3. Fetch Profile Name
     async function loadProfile() {
         const { data } = await window.db.from('profiles').select('full_name').eq('id', user.id).single();
         const greetingEl = document.getElementById('user-greeting');
@@ -28,7 +25,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // 4. Fetch Wallet Balance
     async function loadWallet() {
         const { data } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
         if (data) {
@@ -37,12 +33,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // 5. Format Currency securely
     function formatCurrency(amount) {
         return amount.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    // 6. Handle Balance Visibility Toggle
     let isBalanceHidden = false;
     const toggleBtn = document.getElementById('toggle-balance');
     const balanceAmount = document.getElementById('balance-amount');
@@ -72,7 +66,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const s = (tx.service_type || '').toLowerCase();
         const p = (tx.provider || tx.recipient || '').toLowerCase();
         const t = (tx.type || '').toLowerCase();
-
         return t === 'credit' || 
                s.includes('fund') || s.includes('deposit') || s.includes('topup') ||
                p.includes('paystack') || p.includes('flutterwave') || p.includes('topup');
@@ -84,35 +77,53 @@ document.addEventListener('DOMContentLoaded', async () => {
         return ref;
     };
 
+    // 🚀 BULLETPROOF TITLE EXTRACTOR 
     const getCleanTitle = (tx) => {
         if (isCreditTx(tx)) return 'WALLET FUNDING';
-        const raw = `${tx.service_type || ''} ${tx.recipient || ''} ${tx.provider || ''}`.toUpperCase();
 
-        if (raw.includes('CBT') || raw.includes('BRYT_CBT')) return 'BRYT CBT SIM PAYMENT';
-        if (raw.includes('DGM') || raw.includes('BRYT_DGM')) return 'BRYT DGM PAYMENT';
-        if (raw.includes('JAMB')) return 'JAMB SERVICE';
-        if (raw.includes('WAEC') || raw.includes('NECO') || raw.includes('NABTEB')) return 'EXAM PIN PURCHASE';
-        if (raw.includes('AIRTIME')) {
-            const net = (tx.network_or_operator || tx.provider || '').replace(/vtpass/gi, '').trim().toUpperCase();
-            return net ? `${net} AIRTIME` : 'AIRTIME TOPUP';
+        const txType = (tx.type || '').toLowerCase();
+        const srvType = (tx.service_type || '').toLowerCase();
+        const provider = (tx.provider || tx.network_or_operator || '').toUpperCase();
+        const notes = (tx.admin_notes || '').toLowerCase();
+        const ref = (tx.reference || tx.external_reference || '').toUpperCase();
+
+        if (srvType.includes('education') || srvType.includes('waec') || srvType.includes('neco') || srvType.includes('nabteb') || txType.includes('education')) {
+            let examName = provider;
+            if (!examName || examName === 'SELF' || examName.includes('VTPASS')) {
+                if (notes.includes('waec')) examName = 'WAEC';
+                else if (notes.includes('neco')) examName = 'NECO';
+                else if (notes.includes('nabteb')) examName = 'NABTEB';
+                else examName = 'EXAM';
+            }
+            return `${examName} PIN PURCHASE`;
         }
-        if (raw.includes('DATA')) {
-            const net = (tx.network_or_operator || tx.provider || '').replace(/vtpass/gi, '').replace('-sme', ' SME').trim().toUpperCase();
-            return net ? `${net} DATA` : 'DATA BUNDLE';
+
+        if (ref.startsWith('JMB_') || txType === 'jamb_order' || srvType.includes('jamb') || srvType.includes('admission')) {
+            return tx.service_type ? tx.service_type.toUpperCase() : 'JAMB SERVICE';
+        }
+        if (ref.startsWith('NIN_') || txType === 'nin_order' || srvType.includes('nin') || srvType.includes('slip')) {
+            return tx.service_type ? tx.service_type.toUpperCase() : 'NIN SERVICE';
         }
 
-        let clean = (tx.recipient || tx.service_type || 'PAYMENT')
-            .replace(/vtpass/gi, '')
-            .replace(/external_checkout/gi, '')
-            .replace(/[:\-_]/g, ' ')
-            .trim()
-            .toUpperCase();
+        if (srvType.includes('airtime') || txType.includes('airtime')) {
+            let net = provider.replace(/VTPASS/gi, '').trim();
+            if (!net || net === 'SELF') net = (tx.network_or_operator || '').toUpperCase();
+            return net ? `${net} AIRTIME` : 'AIRTIME TOP-UP';
+        }
+        if (srvType.includes('data') || txType.includes('data')) {
+            let net = provider.replace(/VTPASS/gi, '').replace('-SME', ' SME').trim();
+            if (!net || net === 'SELF') net = (tx.network_or_operator || '').toUpperCase();
+            return net ? `${net} DATA BUNDLE` : 'DATA BUNDLE';
+        }
 
-        return clean || 'PAYMENT';
+        let clean = (tx.service_type || tx.recipient || 'PAYMENT').replace(/vtpass/gi, '').replace(/external_checkout/gi, '').replace(/[:\-_]/g, ' ').trim().toUpperCase();
+        if (clean === 'SELF') clean = (tx.provider || 'PAYMENT').toUpperCase();
+        return clean;
     };
 
+    // 🚀 BULLETPROOF LOGO MATCHER
     const getTransactionIcon = (tx) => {
-        const raw = `${tx.service_type || ''} ${tx.recipient || ''} ${tx.provider || ''}`.toLowerCase();
+        const raw = `${tx.type || ''} ${tx.service_type || ''} ${tx.recipient || ''} ${tx.provider || ''} ${tx.admin_notes || ''} ${tx.reference || ''}`.toLowerCase();
 
         let logoFile = null;
         if (raw.includes('cbt')) logoFile = 'brytcbtsim-logo.png';
@@ -120,14 +131,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         else if (raw.includes('mtn')) logoFile = 'mtn-logo.png';
         else if (raw.includes('airtel')) logoFile = 'airtel-logo.png';
         else if (raw.includes('glo')) logoFile = 'glo-logo.png';
-        else if (raw.includes('9mobile')) logoFile = '9mob-logo.png';
+        else if (raw.includes('9mobile') || raw.includes('etisalat')) logoFile = '9mob-logo.png';
         else if (raw.includes('dstv')) logoFile = 'dstv-logo.png';
         else if (raw.includes('gotv')) logoFile = 'gotv-logo.png';
-        else if (raw.includes('jamb')) logoFile = 'jamb-logo.png';
+        else if (raw.includes('jmb_') || raw.includes('jamb') || raw.includes('admission') || raw.includes('result')) logoFile = 'jamb-logo.png';
+        else if (raw.includes('nin_') || raw.includes('nin') || raw.includes('slip')) logoFile = 'nimc-logo.png';
         else if (raw.includes('waec')) logoFile = 'waec-logo.png';
+        else if (raw.includes('neco')) logoFile = 'neco-logo.png';
+        else if (raw.includes('nabteb')) logoFile = 'nabteb-logo.png';
 
         if (logoFile) {
-            // Note: Dashboard is in /dashboard/index.html, so logo path is ../assets/img/
             return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 50%; background: #ffffff; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; padding: 4px;"><img src="../assets/img/${logoFile}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" onerror="this.parentElement.innerHTML='💼'"></div>`;
         }
 
@@ -142,7 +155,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>`;
     };
 
-    // 7. Load Recent Transactions on Dashboard
     async function loadTransactions() {
         const container = document.getElementById('transactions-container');
         if (!container) return; 
@@ -165,7 +177,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const date = new Date(tx.created_at).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
             const brandLogo = getTransactionIcon(tx);
             const serviceName = getCleanTitle(tx);
-            const isCredit = isCreditTx(tx);
+            const isCredit = isCreditTx(tx) || (tx.status || '').toLowerCase() === 'refunded';
 
             const st = (tx.status || '').toLowerCase();
             let displayStatus = 'Successful';
@@ -177,6 +189,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else if (st === 'failed' || st === 'reversed' || st === 'cancelled') {
                 displayStatus = 'Failed';
                 statusStyle = 'background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;';
+            } else if (st === 'refunded') {
+                displayStatus = 'Refunded'; 
+                statusStyle = 'background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;'; 
             }
 
             const sign = isCredit ? '+' : '-';
@@ -199,7 +214,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
         });
     }
-    // 8. Secure Logout
+
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {

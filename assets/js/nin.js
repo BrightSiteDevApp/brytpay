@@ -5,24 +5,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const user = session.user;
     let currentBalance = 0;
     
-    // Pricing Data Model
-    // 🚀 UPDATED: New Pricing Data Model
+    // 🚀 DYNAMIC PRICING MODEL
     const PRICING = {
         'NIN_NUMBER': { 'Information Slip': 300, 'Regular Slip': 400, 'Standard Slip': 400, 'Premium Slip': 500 },
         'PHONE_NUMBER': { 'Information Slip': 350, 'Regular Slip': 450, 'Standard Slip': 450, 'Premium Slip': 600 }
     };
 
-    let activeType = 'NIN_NUMBER'; // Default
+    let activeType = 'NIN_NUMBER'; 
     let selectedService = '';
     let selectedPrice = 0;
 
-    // Elements
     const userBalanceEl = document.getElementById('user-balance');
     const serviceModal = document.getElementById('service-modal');
     const labelIdentifier = document.getElementById('label-identifier');
     const inputIdentifier = document.getElementById('nin-identifier');
     
-    // Load Balance
     async function loadBalance() {
         const { data } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
         if (data) {
@@ -32,7 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     await loadBalance();
 
-    // Handle Tab Switching & Dynamic Pricing
     const tabNin = document.getElementById('tab-nin-num');
     const tabPhone = document.getElementById('tab-phone-num');
 
@@ -59,7 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateCardPrices();
     });
 
-    // Handle Card Clicks (Open Modal)
     document.querySelectorAll('.service-card').forEach(card => {
         card.addEventListener('click', () => {
             selectedService = card.getAttribute('data-service');
@@ -77,7 +72,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('modal-cancel').addEventListener('click', () => serviceModal.style.display = 'none');
 
-    // Submit Order
     document.getElementById('nin-form').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -98,7 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnSubmit.textContent = 'Processing...';
 
         try {
-            // Call the NIN RPC Function
+            // Call the NIN RPC Function directly (Manual Workflow)
             const { data, error } = await window.db.rpc('process_nin_order', {
                 p_customer_name: fullName,
                 p_identifier_type: activeType,
@@ -111,7 +105,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error) throw error;
 
-            // Success UI
             serviceModal.style.display = 'none';
             document.getElementById('service-selection-view').style.display = 'none';
             document.querySelector('.info-notice-box').style.display = 'none';

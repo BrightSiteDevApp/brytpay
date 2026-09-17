@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Education PINs — BRYT Pay</title>
+
+    <!-- STRICT APP PRIVACY DIRECTIVE: Do not index or crawl -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Branding -->
+    <meta name="theme-color" content="#1D5ED0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { background: #f8fafc; margin: 0; color: var(--bryt-navy); }
+        
+        .header-bar { padding: 16px 20px; display: flex; align-items: center; gap: 16px; background: #ffffff; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; }
+        .page-container { padding: 24px 16px; max-width: 520px; margin: 0 auto; padding-bottom: 90px; }
+
+        .empty-state { text-align: center; padding: 40px 20px; }
+        .empty-state svg { width: 64px; height: 64px; color: #cbd5e1; margin-bottom: 16px; }
+        .empty-state h3 { font-size: 1.2rem; color: var(--bryt-navy); margin-bottom: 8px; }
+        .empty-state p { font-size: 0.85rem; color: var(--text-muted); }
+
+        .order-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 12px; }
+        .order-header { display: flex; align-items: center; gap: 12px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 12px; }
+        .order-icon { width: 42px; height: 42px; background: #f8fafc; border-radius: 50%; padding: 6px; border: 1px solid #e2e8f0; object-fit: contain; }
+        .order-title { font-size: 0.95rem; font-weight: 700; color: var(--bryt-navy); margin: 0 0 4px 0; }
+        .order-date { font-size: 0.75rem; color: var(--text-muted); margin: 0; font-weight: 600; }
+        
+        .order-footer { display: flex; justify-content: space-between; align-items: center; }
+        .order-price { font-size: 1.1rem; font-weight: 800; color: var(--bryt-primary); }
+        .btn-view { background: #f0f9ff; color: #0284c7; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+        .btn-view:hover { background: #e0f2fe; }
+
+        /* Bottom Sheet Modal */
+        .bottom-sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 26, 58, 0.5); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); display: none; z-index: 9999; align-items: flex-end; justify-content: center; }
+        .bottom-sheet { background: #ffffff; width: 100%; max-width: 520px; border-radius: 24px 24px 0 0; padding: 20px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.15); max-height: 90vh; display: flex; flex-direction: column; }
+        .bottom-sheet.open { transform: translateY(0); }
+        .sheet-handle { width: 48px; height: 5px; background: #e2e8f0; border-radius: 5px; margin: 0 auto 16px; flex-shrink: 0; }
+        .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-shrink: 0; }
+        
+        .pin-box { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 20px; font-family: monospace; font-size: 0.85rem; color: #1e293b; white-space: pre-wrap; word-break: break-all; max-height: 250px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+
+    <div class="header-bar">
+        <a href="index.html" style="color: var(--bryt-navy);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></a>
+        <h2 style="margin: 0; font-size: 1.15rem; font-weight: 700;">My Education PINs</h2>
+    </div>
+
+    <main class="page-container" id="orders-container">
+        <!-- Skeleton Loader -->
+        <div style="text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 0.9rem; font-weight: 600;" id="loading-state">
+            Loading your PINs...
+        </div>
+    </main>
+
+    <!-- PIN Viewer Bottom Sheet -->
+    <div class="bottom-sheet-overlay" id="pin-overlay">
+        <div class="bottom-sheet" id="pin-sheet">
+            <div class="sheet-handle"></div>
+            
+            <div class="sheet-header">
+                <h3 style="margin: 0; font-size: 1.25rem; color: var(--bryt-navy);" id="modal-title">PIN Details</h3>
+                <svg id="btn-close-modal" style="cursor: pointer;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </div>
+            
+            <div class="pin-box" id="modal-pin-text">
+                Loading...
+            </div>
+
+            <button type="button" id="btn-download-card" class="btn-primary" style="width: 100%; padding: 16px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Download PIN Card
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Nav -->
+    <nav class="mobile-nav">
+        <a href="/dashboard/" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+        <a href="/dashboard/history/" class="nav-item active"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>History</span></a>
+        <a href="/dashboard/fund/" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
+        <a href="/dashboard/account/" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../assets/js/supabase-client.js"></script>
+    <script src="../../assets/js/education-orders.js"></script>
+</body>
+</html>

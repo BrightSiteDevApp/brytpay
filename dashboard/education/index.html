@@ -54,6 +54,13 @@
         .slip-acc-num { font-size: 1.15rem; color: var(--bryt-primary); font-family: monospace; letter-spacing: 1px; font-weight: 800; }
         .copy-btn { display: inline-flex; align-items: center; gap: 6px; background: #e0f2fe; color: #0284c7; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: background 0.2s; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
         .copy-btn:hover { background: #bae6fd; }
+
+        .btn-view-orders { display: inline-flex; align-items: center; gap: 8px; background: var(--bryt-navy); color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 600; padding: 10px 18px; border-radius: 10px; box-shadow: 0 4px 15px rgba(7, 26, 58, 0.15); transition: background 0.2s; }
+        .btn-view-orders:hover { background: #0f2854; }
+
+        .info-notice-box { background-color: #f0fdf4; border: 1px dashed #22c55e; border-radius: 12px; padding: 14px 16px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 12px; }
+        .info-notice-icon { flex-shrink: 0; margin-top: 2px; color: #16a34a; }
+        .info-notice-text { margin: 0; font-size: 0.75rem; color: #14532d; line-height: 1.5; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -64,23 +71,21 @@
     </div>
 
     <main class="app-container" style="max-width: 520px; padding-bottom: 80px;">
-        <a href="/dashboard/" class="no-print" style="text-decoration:none; color:var(--text-muted); font-size:0.8rem; font-weight:700; display:inline-flex; align-items:center; gap:6px; margin-bottom: 20px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            Back to Dashboard
-        </a>
+        <header style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <a href="/dashboard/" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; margin-bottom: 12px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back
+                </a>
+                <h1 style="font-size: 1.4rem; color: var(--bryt-navy); margin-bottom: 4px;">Education PINs</h1>
+                <p style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Balance: <span id="user-balance" style="color: var(--bryt-primary);">₦0.00</span></p>
+            </div>
+            <a href="orders.html" class="btn-view-orders">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                My PINs
+            </a>
+        </header>
 
         <div class="form-card" style="padding: 20px 16px;">
-            <header style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                    <h1 style="font-size: 1.2rem; color: var(--bryt-navy); margin-bottom: 4px;">Education PINs</h1>
-                    <p style="font-size: 0.8rem; color: var(--text-muted);">Instant Result Checkers & Tokens</p>
-                </div>
-                <div style="text-align: right; background: var(--bg-light); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
-                    <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px;">Balance</div>
-                    <strong id="user-balance" style="color: var(--bryt-navy); font-size: 0.9rem;">₦0.00</strong>
-                </div>
-            </header>
-
             <div class="tab-container">
                 <button class="tab-btn active" id="tab-auto">Automatic (Instant)</button>
                 <button class="tab-btn" id="tab-manual">Manual Order</button>
@@ -88,6 +93,14 @@
 
             <!-- AUTOMATIC SECTION -->
             <div id="auto-section">
+                <!-- 🚀 Instant Delivery Notice -->
+                <div class="info-notice-box">
+                    <svg class="info-notice-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    <p class="info-notice-text">
+                        <strong style="color: #166534;">Instant Delivery:</strong> You will get your card and Serial Number instantly on your screen, ready for download as a branded image!
+                    </p>
+                </div>
+
                 <form id="auto-exam-form">
                     <div class="form-group">
                         <label class="provider-select-label" style="font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; display: block;">Select Exam</label>
@@ -114,26 +127,24 @@
                                 <span id="custom-select-text" style="opacity: 0.6;">Select quantity...</span>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </div>
-                            <div class="custom-options" id="custom-options-list">
-                            </div>
+                            <div class="custom-options" id="custom-options-list"></div>
                         </div>
-                        <!-- NO 'required' attribute here to prevent invisible browser blocks -->
                         <input type="hidden" id="exam-quantity" name="quantity">
                     </div>
 
                     <button type="submit" id="auto-submit-btn" class="btn-primary" style="margin-top: 24px; width: 100%; padding: 14px; font-size: 0.95rem;">
-                        Pay Securely
+                        Review Order
                     </button>
                 </form>
             </div>
 
             <!-- MANUAL SECTION -->
             <div id="manual-section" style="display: none;">
-                
                 <div class="form-group">
                     <label class="provider-select-label" style="font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; display: block;">Select Exam</label>
                     <div class="provider-grid" style="grid-template-columns: repeat(3, 1fr);">
-                        <div class="provider-btn manual-exam-btn active" data-exam="WAEC" data-price="6000">
+                        <!-- 🚀 Updated Manual Prices -->
+                        <div class="provider-btn manual-exam-btn active" data-exam="WAEC" data-price="5500">
                             <img src="../../assets/img/waec-logo.png" class="provider-logo" alt="WAEC" onerror="this.style.display='none'">
                             <span class="provider-btn-label">WAEC</span>
                         </div>
@@ -141,7 +152,7 @@
                             <img src="../../assets/img/neco-logo.png" class="provider-logo" alt="NECO" onerror="this.style.display='none'">
                             <span class="provider-btn-label">NECO</span>
                         </div>
-                        <div class="provider-btn manual-exam-btn" data-exam="NABTEB" data-price="1500">
+                        <div class="provider-btn manual-exam-btn" data-exam="NABTEB" data-price="1200">
                             <img src="../../assets/img/nabteb-logo.png" class="provider-logo" alt="NABTEB" onerror="this.style.display='none'">
                             <span class="provider-btn-label">NABTEB</span>
                         </div>
@@ -151,7 +162,7 @@
                 <div class="payment-slip">
                     <div class="payment-slip-header">
                         <div class="payment-slip-title">Amount to Pay</div>
-                        <div class="payment-slip-amount" id="slip-amount">₦6,000</div>
+                        <div class="payment-slip-amount" id="slip-amount">₦5,500</div>
                     </div>
                     <div class="payment-slip-body">
                         <div class="slip-row">
@@ -168,7 +179,7 @@
                                 <div class="slip-acc-num" id="acc-no">4568970719</div>
                                 <button type="button" class="copy-btn" id="copy-btn">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                    Copy Number
+                                    Copy
                                 </button>
                             </div>
                         </div>
@@ -183,9 +194,37 @@
         </div>
     </main>
 
+    <!-- 🚀 Confirmation Modal -->
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-content" style="padding: 32px 24px; text-align: center;">
+            <img id="modal-network-logo" src="../../assets/img/waec-logo.png" alt="Network" style="width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 16px; object-fit: contain; background: #f8fafc; padding: 8px; border: 1px solid var(--border-color);">
+            <h3 class="modal-title" style="font-size: 1.4rem; margin-bottom: 8px;">Confirm Purchase</h3>
+            <p class="modal-desc" style="margin-bottom: 24px;">Review your selection before paying.</p>
+
+            <div class="modal-breakdown" style="background: #f8fafc; border-radius: 16px; padding: 16px 20px; text-align: left; margin-bottom: 32px; border: 1px solid var(--border-color);">
+                <div class="modal-row" style="margin-bottom: 12px; display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Exam Type</span>
+                    <strong id="modal-plan" style="color: var(--bryt-navy); font-size: 0.9rem; text-transform: uppercase;">---</strong>
+                </div>
+                <div class="modal-row" style="margin-bottom: 16px; display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Quantity</span>
+                    <strong id="modal-qty" style="color: var(--bryt-navy); font-size: 1rem;">---</strong>
+                </div>
+                <div class="modal-row" style="padding-top: 16px; border-top: 1px dashed #cbd5e1; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Total Debit</span>
+                    <strong id="modal-amount" style="color: var(--bryt-primary); font-size: 1.4rem; font-weight: 800;">₦0.00</strong>
+                </div>
+            </div>
+
+            <div class="modal-actions" style="display: flex; gap: 12px;">
+                <button type="button" id="modal-cancel" class="btn-secondary" style="flex: 1; padding: 16px; font-weight: 700; color: #64748b; border-color: #cbd5e1;">Cancel</button>
+                <button type="button" id="modal-confirm" class="btn-primary" style="flex: 2.2; padding: 16px; font-weight: 800; font-size: 1.05rem;">Confirm & Pay</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- 🚀 FORCE CACHE BUSTING HERE -->
-    <script src="../../assets/js/supabase-client.js?v=4.0"></script>
-    <script src="../../assets/js/education.js?v=4.0"></script>
+    <script src="../../assets/js/supabase-client.js?v=5.0"></script>
+    <script src="../../assets/js/education.js?v=5.0"></script>
 </body>
 </html>

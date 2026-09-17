@@ -22,16 +22,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const dateStr = dateObj.toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' });
         const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase();
         
-        let statusClass = 'status-paid';
+        let statusClass = 'status-processing';
         let statusText = 'Pending';
-        if (order.status === 'PROCESSING') { statusClass = 'status-processing'; statusText = 'Processing'; }
-        if (order.status === 'COMPLETED') { statusClass = 'status-completed'; statusText = 'Processed'; }
-        if (order.status === 'FAILED' || order.status === 'REFUNDED') { statusClass = 'status-failed'; statusText = 'Failed'; }
+        const st = (order.status || '').toUpperCase();
+
+        // 🚀 SMART STATUS SCANNER
+        if (st.includes('REFUND')) { statusClass = 'status-failed'; statusText = 'Refunded'; }
+        else if (st.includes('FAIL')) { statusClass = 'status-failed'; statusText = 'Failed'; }
+        else if (st.includes('COMPLETE') || st.includes('SUCCESS')) { statusClass = 'status-completed'; statusText = 'Processed'; }
+        else if (st.includes('PROCESS')) { statusClass = 'status-processing'; statusText = 'Processing'; }
 
         const title = `${order.service_type} (${order.jamb_registration_number})`;
         const amount = `₦${parseFloat(order.amount).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
 
-        // The card links directly to the new order details page
         container.innerHTML += `
             <a href="order-details.html?id=${order.id}" class="list-card">
                 <div class="list-left">

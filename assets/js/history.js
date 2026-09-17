@@ -1,77 +1,73 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session } } = await window.db.auth.getSession();
-    if (!session) {
-        window.location.href = '/auth/login.html'; 
-        return;
-    }
+    if (!session) { window.location.href = '/auth/login.html'; return; }
 
     const user = session.user;
     let allTransactions = [];
     const container = document.getElementById('history-container');
 
-    const formatCurrency = (amount) => {
-        return parseFloat(amount).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    };
+    const formatCurrency = (amount) => parseFloat(amount).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     const isCreditTx = (tx) => {
         const s = (tx.service_type || '').toLowerCase();
         const p = (tx.provider || tx.recipient || '').toLowerCase();
         const t = (tx.type || '').toLowerCase();
-
-        return t === 'credit' || 
-               s.includes('fund') || s.includes('deposit') || s.includes('topup') ||
-               p.includes('paystack') || p.includes('flutterwave') || p.includes('topup');
+        return t === 'credit' || s.includes('fund') || s.includes('deposit') || p.includes('paystack') || p.includes('flutterwave');
     };
 
-    // 🚀 Shorten long references so they don't break mobile layout
     const formatRef = (ref) => {
         if (!ref) return 'N/A';
-        if (ref.length > 18) {
-            return `${ref.slice(0, 7)}...${ref.slice(-6)}`;
-        }
-        return ref;
+        return ref.length > 18 ? `${ref.slice(0, 7)}...${ref.slice(-6)}` : ref;
     };
 
-    // 🚀 Clean up service names (strips VTPASS, cleans CBT & DGM)
+    // 🚀 BULLETPROOF TITLE EXTRACTOR (Uses JMB_ and NIN_ refs)
     const getCleanTitle = (tx) => {
         if (isCreditTx(tx)) return 'WALLET FUNDING';
 
-        const raw = `${tx.service_type || ''} ${tx.recipient || ''} ${tx.provider || ''}`.toUpperCase();
+        const txType = (tx.type || '').toLowerCase();
+        const srvType = (tx.service_type || '').toLowerCase();
+        const provider = (tx.provider || tx.network_or_operator || '').toUpperCase();
+        const notes = (tx.admin_notes || '').toLowerCase();
+        const ref = (tx.reference || tx.external_reference || '').toUpperCase();
 
-        if (raw.includes('CBT') || raw.includes('BRYT_CBT')) {
-            return 'BRYT CBT SIM PAYMENT';
-        }
-        if (raw.includes('DGM') || raw.includes('BRYT_DGM')) {
-            return 'BRYT DGM PAYMENT';
-        }
-        if (raw.includes('JAMB')) {
-            return 'JAMB SERVICE';
-        }
-        if (raw.includes('WAEC') || raw.includes('NECO') || raw.includes('NABTEB')) {
-            return 'EXAM PIN PURCHASE';
-        }
-        if (raw.includes('AIRTIME')) {
-            const net = (tx.network_or_operator || tx.provider || '').replace(/vtpass/gi, '').trim().toUpperCase();
-            return net ? `${net} AIRTIME` : 'AIRTIME TOPUP';
-        }
-        if (raw.includes('DATA')) {
-            const net = (tx.network_or_operator || tx.provider || '').replace(/vtpass/gi, '').replace('-sme', ' SME').trim().toUpperCase();
-            return net ? `${net} DATA` : 'DATA BUNDLE';
+        if (srvType.includes('education') || srvType.includes('waec') || srvType.includes('neco') || srvType.includes('nabteb') || txType.includes('education')) {
+            let examName = provider;
+            if (!examName || examName === 'SELF' || examName.includes('VTPASS')) {
+                if (notes.includes('waec')) examName = 'WAEC';
+                else if (notes.includes('neco')) examName = 'NECO';
+                else if (notes.includes('nabteb')) examName = 'NABTEB';
+                else examName = 'EXAM';
+            }
+            return `${examName} PIN PURCHASE`;
         }
 
-        let clean = (tx.recipient || tx.service_type || 'PAYMENT')
-            .replace(/vtpass/gi, '')
-            .replace(/external_checkout/gi, '')
-            .replace(/[:\-_]/g, ' ')
-            .trim()
-            .toUpperCase();
+        // 🚀 If reference starts with JMB_ or NIN_, it instantly knows what it is!
+        if (ref.startsWith('JMB_') || txType === 'jamb_order' || srvType.includes('jamb') || srvType.includes('admission')) {
+            return tx.service_type ? tx.service_type.toUpperCase() : 'JAMB SERVICE';
+        }
+        if (ref.startsWith('NIN_') || txType === 'nin_order' || srvType.includes('nin') || srvType.includes('slip')) {
+            return tx.service_type ? tx.service_type.toUpperCase() : 'NIN SERVICE';
+        }
 
-        return clean || 'PAYMENT';
+        if (srvType.includes('airtime') || txType.includes('airtime')) {
+            let net = provider.replace(/VTPASS/gi, '').trim();
+            if (!net || net === 'SELF') net = (tx.network_or_operator || '').toUpperCase();
+            return net ? `${net} AIRTIME` : 'AIRTIME TOP-UP';
+        }
+        if (srvType.includes('data') || txType.includes('data')) {
+            let net = provider.replace(/VTPASS/gi, '').replace('-SME', ' SME').trim();
+            if (!net || net === 'SELF') net = (tx.network_or_operator || '').toUpperCase();
+            return net ? `${net} DATA BUNDLE` : 'DATA BUNDLE';
+        }
+
+        let clean = (tx.service_type || tx.recipient || 'PAYMENT').replace(/vtpass/gi, '').replace(/external_checkout/gi, '').replace(/[:\-_]/g, ' ').trim().toUpperCase();
+        if (clean === 'SELF') clean = (tx.provider || 'PAYMENT').toUpperCase();
+        return clean;
     };
 
-    // 🚀 Dynamic Brand / Custom App Icon Generator
+    // 🚀 BULLETPROOF LOGO MATCHER
     const getTransactionIcon = (tx) => {
-        const raw = `${tx.service_type || ''} ${tx.recipient || ''} ${tx.provider || ''}`.toLowerCase();
+        const raw = `${tx.type || ''} ${tx.service_type || ''} ${tx.recipient || ''} ${tx.provider || ''} ${tx.admin_notes || ''} ${tx.reference || ''}`.toLowerCase();
 
         let logoFile = null;
         if (raw.includes('cbt')) logoFile = 'brytcbtsim-logo.png';
@@ -79,27 +75,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         else if (raw.includes('mtn')) logoFile = 'mtn-logo.png';
         else if (raw.includes('airtel')) logoFile = 'airtel-logo.png';
         else if (raw.includes('glo')) logoFile = 'glo-logo.png';
-        else if (raw.includes('9mobile')) logoFile = '9mob-logo.png';
+        else if (raw.includes('9mobile') || raw.includes('etisalat')) logoFile = '9mob-logo.png';
         else if (raw.includes('dstv')) logoFile = 'dstv-logo.png';
         else if (raw.includes('gotv')) logoFile = 'gotv-logo.png';
-        else if (raw.includes('jamb')) logoFile = 'jamb-logo.png';
+        else if (raw.includes('jmb_') || raw.includes('jamb') || raw.includes('admission') || raw.includes('result')) logoFile = 'jamb-logo.png';
+        else if (raw.includes('nin_') || raw.includes('nin') || raw.includes('slip')) logoFile = 'nimc-logo.png';
         else if (raw.includes('waec')) logoFile = 'waec-logo.png';
+        else if (raw.includes('neco')) logoFile = 'neco-logo.png';
+        else if (raw.includes('nabteb')) logoFile = 'nabteb-logo.png';
 
-        if (logoFile) {
-            return `<div class="tx-brand"><img src="../../assets/img/${logoFile}" alt="Logo" onerror="this.parentElement.innerHTML='💼'"></div>`;
-        }
+        if (logoFile) return `<div class="tx-brand"><img src="../../assets/img/${logoFile}" alt="Logo" onerror="this.parentElement.innerHTML='💼'"></div>`;
 
-        // Wallet Funding icon
-        if (isCreditTx(tx)) {
-            return `<div class="tx-brand" style="background: #ecfdf5; color: #10b981; border-color: #bbf7d0;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </div>`;
-        }
-
-        // Generic Payment icon
-        return `<div class="tx-brand" style="background: #f1f5f9; color: #64748b;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-        </div>`;
+        if (isCreditTx(tx)) return `<div class="tx-brand" style="background: #ecfdf5; color: #10b981; border-color: #bbf7d0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>`;
+        return `<div class="tx-brand" style="background: #f1f5f9; color: #64748b;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>`;
     };
 
     const renderTransactions = (filterStatus = 'all') => {
@@ -108,15 +96,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const filteredTx = allTransactions.filter(tx => {
             if (filterStatus === 'all') return true;
             const st = (tx.status || '').toLowerCase();
-            if (filterStatus === 'successful') {
-                return st === 'successful' || st === 'completed' || st === 'processed';
-            }
-            if (filterStatus === 'pending') {
-                return st === 'pending' || st === 'processing';
-            }
-            if (filterStatus === 'failed') {
-                return st === 'failed' || st === 'reversed' || st === 'cancelled';
-            }
+            if (filterStatus === 'successful') return st === 'successful' || st === 'completed' || st === 'processed';
+            if (filterStatus === 'pending') return st === 'pending' || st === 'processing';
+            if (filterStatus === 'failed') return st === 'failed' || st === 'reversed' || st === 'cancelled' || st === 'refunded';
             return true;
         });
 
@@ -129,19 +111,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             const date = new Date(tx.created_at).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
             const brandLogo = getTransactionIcon(tx);
             const serviceName = getCleanTitle(tx);
-            const isCredit = isCreditTx(tx);
+            const isCredit = isCreditTx(tx) || (tx.status || '').toLowerCase() === 'refunded';
             
-            // 🚀 Force 'Successful' label & green status for completed/processed rows
             const st = (tx.status || '').toLowerCase();
             let displayStatus = 'Successful';
             let statusClass = 'status-successful';
 
             if (st === 'pending' || st === 'processing') {
-                displayStatus = 'Pending';
-                statusClass = 'status-pending';
+                displayStatus = 'Pending'; statusClass = 'status-pending';
             } else if (st === 'failed' || st === 'reversed' || st === 'cancelled') {
-                displayStatus = 'Failed';
-                statusClass = 'status-failed';
+                displayStatus = 'Failed'; statusClass = 'status-failed';
+            } else if (st === 'refunded') {
+                displayStatus = 'Refunded'; statusClass = 'status-successful'; 
             }
 
             const sign = isCredit ? '+' : '-';
@@ -166,17 +147,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const fetchHistory = async () => {
-        const { data, error } = await window.db
-            .from('transactions')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            container.innerHTML = '<div class="empty-state" style="padding: 2.5rem; text-align: center; color: #ef4444; font-size: 0.85rem;">Failed to load transactions.</div>';
-            return;
-        }
-
+        const { data, error } = await window.db.from('transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+        if (error) return;
         allTransactions = data || [];
         renderTransactions('all');
     };
