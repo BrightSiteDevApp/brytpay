@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login — BRYT Pay</title>
 
-    <!-- STRICT APP PRIVACY DIRECTIVE: Do not index or crawl thin auth pages -->
     <meta name="robots" content="noindex, nofollow">
     
-    <!-- Branding -->
     <meta name="theme-color" content="#1D5ED0">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
@@ -73,8 +71,8 @@
         <!-- FORM 2: TWO-STEP LOGIN OTP -->
         <form id="login-otp-form" style="display: none; text-align: center;">
             <div class="form-group" style="text-align: left;">
-                <label class="form-label" for="login-otp-code">8-Digit Security Code</label>
-                <input type="text" id="login-otp-code" class="form-input" placeholder="12345678" maxlength="8" style="letter-spacing: 2px; font-weight: 700; text-align: center;" required>
+                <label class="form-label" for="login-otp-code">6-Digit Security Code</label>
+                <input type="text" id="login-otp-code" class="form-input" placeholder="123456" maxlength="6" style="letter-spacing: 4px; font-weight: 700; text-align: center; font-size: 1.2rem;" required>
             </div>
             <button type="submit" id="verify-login-btn" class="btn-primary" style="margin-top: 16px; width: 100%;">Verify & Sign In</button>
             <div class="auth-footer"><a href="#" id="cancel-login-otp" style="color: var(--text-muted);">&larr; Cancel Login</a></div>
@@ -87,14 +85,14 @@
                 <label class="form-label" for="reset-email">Enter your Email</label>
                 <input type="email" id="reset-email" class="form-input" placeholder="name@example.com" required>
             </div>
-            <button type="submit" id="send-otp-btn" class="btn-primary" style="margin-top: 16px; width: 100%;">Send 8-Digit Code</button>
+            <button type="submit" id="send-otp-btn" class="btn-primary" style="margin-top: 16px; width: 100%;">Send 6-Digit Code</button>
         </form>
 
         <!-- FORM 4: FORGOT PASSWORD (OTP + NEW PWD) -->
         <form id="reset-pwd-form" style="display: none;">
             <div class="form-group">
-                <label class="form-label" for="reset-otp">8-Digit Recovery Code</label>
-                <input type="text" id="reset-otp" class="form-input" placeholder="12345678" maxlength="8" style="letter-spacing: 2px; font-weight: 700; text-align: center;" required>
+                <label class="form-label" for="reset-otp">6-Digit Recovery Code</label>
+                <input type="text" id="reset-otp" class="form-input" placeholder="123456" maxlength="6" style="letter-spacing: 4px; font-weight: 700; text-align: center; font-size: 1.2rem;" required>
             </div>
             <div class="form-group">
                 <label class="form-label" for="new-password">New Password</label>

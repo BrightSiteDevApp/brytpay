@@ -6,8 +6,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const urlParams = new URLSearchParams(window.location.search);
         const redirectUrl = urlParams.get('redirect');
         
-        // Ensure redirectUrl exists, starts with exactly ONE slash (local path), 
-        // and does NOT start with TWO slashes (which browsers interpret as an external domain).
         if (redirectUrl && redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
             window.location.href = decodeURIComponent(redirectUrl);
         } else {
@@ -82,7 +80,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             regEmail = document.getElementById('email').value.trim();
             const pwd = pwdInput.value;
 
-            // 🛡️ SECURITY FIX: Ensure phone contains exactly 11 numeric digits only
             if (!/^\d{11}$/.test(regPhone)) return showError('Enter a valid 11-digit phone number (numbers only).');
             if (!pwdRegex.test(pwd)) return showError('Password must contain at least one uppercase letter, one lowercase letter, and one number.');
 
@@ -103,10 +100,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            // 🛡️ SECURITY FIX: Safe DOM insertion to prevent XSS
+            // 🚀 UPDATED TO 6-DIGIT TEXT
             const signupHeader = document.getElementById('signup-header');
-            signupHeader.innerHTML = `<h1>Check your email</h1><p>We sent an 8-digit code to <strong id="safe-reg-email"></strong></p>`;
-            document.getElementById('safe-reg-email').textContent = regEmail; // .textContent neutralizes any malicious code
+            signupHeader.innerHTML = `<h1>Check your email</h1><p>We sent a 6-digit code to <strong id="safe-reg-email"></strong></p>`;
+            document.getElementById('safe-reg-email').textContent = regEmail; 
 
             signupForm.style.display = 'none';
             document.getElementById('signup-otp-form').style.display = 'block';
@@ -166,7 +163,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('forgot-pwd-trigger').addEventListener('click', () => {
             loginForm.style.display = 'none';
             resetEmailForm.style.display = 'block';
-            authTitle.innerHTML = `<h1>Reset Password</h1><p>We'll send you an 8-digit code.</p>`;
+            // 🚀 UPDATED TO 6-DIGIT TEXT
+            authTitle.innerHTML = `<h1>Reset Password</h1><p>We'll send you a 6-digit code.</p>`;
             if (errorEl) errorEl.style.display = 'none';
         });
 
@@ -247,6 +245,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const btn = document.getElementById('send-otp-btn');
 
             btn.disabled = true;
+            // 🚀 UPDATED TO 6-DIGIT TEXT
             btn.textContent = 'Sending...';
 
             const { error } = await window.db.auth.resetPasswordForEmail(recoveryEmail);
@@ -254,16 +253,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (error) {
                 showError(error.message);
                 btn.disabled = false;
-                btn.textContent = 'Send 8-Digit Code';
+                btn.textContent = 'Send 6-Digit Code';
                 return;
             }
 
             resetEmailForm.style.display = 'none';
             resetPwdForm.style.display = 'block';
             
-            // 🛡️ SECURITY FIX: Safe DOM insertion to prevent XSS
             authTitle.innerHTML = `<h1>Enter Code</h1><p>Sent to <strong id="safe-recovery-email"></strong></p>`;
-            document.getElementById('safe-recovery-email').textContent = recoveryEmail; // .textContent neutralizes attacks
+            document.getElementById('safe-recovery-email').textContent = recoveryEmail; 
             
             showSuccess('Reset code sent to your email.');
         });

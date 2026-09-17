@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return ref;
     };
 
-    // 🚀 BULLETPROOF TITLE EXTRACTOR 
+    // 🚀 BULLETPROOF TITLE EXTRACTOR (Fixed CheapDataHub Bug)
     const getCleanTitle = (tx) => {
         if (isCreditTx(tx)) return 'WALLET FUNDING';
 
@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (srvType.includes('education') || srvType.includes('waec') || srvType.includes('neco') || srvType.includes('nabteb') || txType.includes('education')) {
             let examName = provider;
-            if (!examName || examName === 'SELF' || examName.includes('VTPASS')) {
+            if (!examName || examName === 'SELF' || examName.includes('VTPASS') || examName.includes('CHEAPDATAHUB')) {
                 if (notes.includes('waec')) examName = 'WAEC';
                 else if (notes.includes('neco')) examName = 'NECO';
                 else if (notes.includes('nabteb')) examName = 'NABTEB';
@@ -106,13 +106,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (srvType.includes('airtime') || txType.includes('airtime')) {
-            let net = provider.replace(/VTPASS/gi, '').trim();
+            let net = srvType.replace(/airtime/gi, '').trim().toUpperCase();
             if (!net || net === 'SELF') net = (tx.network_or_operator || '').toUpperCase();
+            if (!net && !provider.includes('CHEAPDATAHUB') && !provider.includes('VTPASS')) net = provider;
             return net ? `${net} AIRTIME` : 'AIRTIME TOP-UP';
         }
         if (srvType.includes('data') || txType.includes('data')) {
-            let net = provider.replace(/VTPASS/gi, '').replace('-SME', ' SME').trim();
+            let net = srvType.replace(/data/gi, '').replace(/-/g, ' ').trim().toUpperCase();
             if (!net || net === 'SELF') net = (tx.network_or_operator || '').toUpperCase();
+            if (!net && !provider.includes('CHEAPDATAHUB') && !provider.includes('VTPASS')) net = provider;
             return net ? `${net} DATA BUNDLE` : 'DATA BUNDLE';
         }
 
@@ -121,7 +123,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return clean;
     };
 
-    // 🚀 BULLETPROOF LOGO MATCHER
     const getTransactionIcon = (tx) => {
         const raw = `${tx.type || ''} ${tx.service_type || ''} ${tx.recipient || ''} ${tx.provider || ''} ${tx.admin_notes || ''} ${tx.reference || ''}`.toLowerCase();
 

@@ -21,16 +21,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const pinContainer = document.getElementById('pin-container');
     const pinDisplay = document.getElementById('pin-display');
-    
-    // We will reuse this container dynamically for ALL services
     const actionContainer = document.getElementById('jamb-action-container');
 
     const downloadPdfBtn = document.getElementById('download-pdf-btn');
     const downloadImgBtn = document.getElementById('download-img-btn');
 
+    // 🚀 UPDATED CLEANER: Completely scrubs out API vendor names
     const cleanStr = (str) => {
         if (!str) return '';
-        return str.replace(/vtpass/gi, '').replace(/external_checkout/gi, '').replace(/[:\-_]/g, ' ').replace(/\s+/g, ' ').trim().toUpperCase();
+        return str.replace(/vtpass/gi, '')
+                  .replace(/cheapdatahub/gi, '')
+                  .replace(/external_checkout/gi, '')
+                  .replace(/[:\-_]/g, ' ')
+                  .replace(/\s+/g, ' ')
+                  .trim()
+                  .toUpperCase();
     };
 
     const formatRef = (ref) => {
@@ -46,7 +51,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return t === 'credit' || s.includes('fund') || s.includes('deposit') || s.includes('topup') || p.includes('paystack') || p.includes('flutterwave') || p.includes('topup');
     };
 
-    // 🚀 BULLETPROOF LOGO MAPPER
     const getLogoPath = (tx) => {
         const raw = `${tx.type || ''} ${tx.service_type || ''} ${tx.recipient || ''} ${tx.provider || ''} ${tx.reference || ''}`.toLowerCase();
         
@@ -105,7 +109,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         let displayProvider = '';
         let displayRecipient = '';
         
-        // 🚀 Variables to hold dynamic tracking logic
         let trackUrl = null;
         let trackText = '';
 
@@ -118,7 +121,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             displayProvider = 'FUNDING GATEWAY';
             displayRecipient = user.email || 'Your Wallet';
         
-        // JAMB LOGIC
         } else if (ref.startsWith('JMB_') || txType === 'jamb_order' || rawService.includes('jamb') || rawService.includes('admission') || rawService.includes('result')) {
             displayService = data.service_type || 'JAMB SERVICE';
             displayProvider = 'BRYT PAY JAMB DESK';
@@ -126,7 +128,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             trackUrl = '/dashboard/jamb/orders.html';
             trackText = 'Track JAMB Order Status →';
             
-        // NIN LOGIC
         } else if (ref.startsWith('NIN_') || txType === 'nin_order' || rawService.includes('nin') || rawService.includes('slip')) {
             displayService = data.service_type || 'NIN SERVICE';
             displayProvider = 'BRYT PAY NIN DESK';
@@ -134,18 +135,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             trackUrl = '/dashboard/nin/orders.html';
             trackText = 'Track NIN Order Status →';
             
-        // EDUCATION LOGIC
         } else if (rawService.includes('education') || rawService.includes('waec') || rawService.includes('neco') || rawService.includes('nabteb') || txType.includes('education')) {
             displayService = cleanStr(data.service_type) || 'EXAM PIN PURCHASE';
-            displayProvider = cleanStr(data.provider || 'BRYT PAY');
+            displayProvider = 'BRYT PAY EXAMS';
             displayRecipient = data.recipient || 'N/A';
             trackUrl = '/dashboard/educations/orders.html';
             trackText = 'View Education Pins →';
             
-        // DEFAULT FALLBACK
+        // 🚀 SMART PROVIDER MASKING FOR DATA & AIRTIME
+        } else if (rawService.includes('data')) {
+            let net = rawService.replace(/data/gi, '').replace(/-/g, ' ').trim().toUpperCase();
+            displayService = net ? `${net} DATA BUNDLE` : 'DATA BUNDLE';
+            displayProvider = net || 'BRYT PAY'; // E.g., Sets provider to "GLO" instead of "CheapDataHub"
+            displayRecipient = data.recipient;
+        } else if (rawService.includes('airtime')) {
+            let net = rawService.replace(/airtime/gi, '').trim().toUpperCase();
+            displayService = net ? `${net} AIRTIME TOP-UP` : 'AIRTIME TOP-UP';
+            displayProvider = net || 'BRYT PAY'; // Sets provider to "MTN", "AIRTEL", etc.
+            displayRecipient = data.recipient;
         } else {
             displayService = cleanStr(data.service_type);
-            displayProvider = cleanStr(data.provider || 'BRYT PAY');
+            // Universal fallback to mask CheapDataHub if it leaks anywhere else
+            let prov = cleanStr(data.provider);
+            displayProvider = prov || 'BRYT PAY';
             displayRecipient = data.recipient || 'N/A';
         }
 
@@ -160,21 +172,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         receiptDetailsList.innerHTML = rowsHtml;
 
-        // 🚀 DYNAMIC BUTTON INJECTION
         if (actionContainer) {
             if (trackUrl) {
-                // Grab the anchor tag inside the container, or overwrite the container HTML securely to match UI
                 const btnLink = actionContainer.querySelector('a');
                 if (btnLink) {
                     btnLink.href = trackUrl;
                     btnLink.textContent = trackText;
                 } else {
-                    // Fallback to inject a nicely styled button if no <a> tag exists
                     actionContainer.innerHTML = `<a href="${trackUrl}" style="display:flex; justify-content:center; align-items:center; background:#0B1220; color:#fff; padding:14px; border-radius:10px; font-weight:700; text-decoration:none; margin-bottom:15px; width:100%; font-size:15px;">${trackText}</a>`;
                 }
                 actionContainer.style.display = 'block';
             } else {
-                // If it's a generic payment (Airtime/Data/Wallet), hide the tracking button entirely
                 actionContainer.style.display = 'none';
             }
         }

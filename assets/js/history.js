@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return ref.length > 18 ? `${ref.slice(0, 7)}...${ref.slice(-6)}` : ref;
     };
 
-    // 🚀 BULLETPROOF TITLE EXTRACTOR (Uses JMB_ and NIN_ refs)
+    // 🚀 BULLETPROOF TITLE EXTRACTOR (Fixed CheapDataHub Bug)
     const getCleanTitle = (tx) => {
         if (isCreditTx(tx)) return 'WALLET FUNDING';
 
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (srvType.includes('education') || srvType.includes('waec') || srvType.includes('neco') || srvType.includes('nabteb') || txType.includes('education')) {
             let examName = provider;
-            if (!examName || examName === 'SELF' || examName.includes('VTPASS')) {
+            if (!examName || examName === 'SELF' || examName.includes('VTPASS') || examName.includes('CHEAPDATAHUB')) {
                 if (notes.includes('waec')) examName = 'WAEC';
                 else if (notes.includes('neco')) examName = 'NECO';
                 else if (notes.includes('nabteb')) examName = 'NABTEB';
@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             return `${examName} PIN PURCHASE`;
         }
 
-        // 🚀 If reference starts with JMB_ or NIN_, it instantly knows what it is!
         if (ref.startsWith('JMB_') || txType === 'jamb_order' || srvType.includes('jamb') || srvType.includes('admission')) {
             return tx.service_type ? tx.service_type.toUpperCase() : 'JAMB SERVICE';
         }
@@ -50,13 +49,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (srvType.includes('airtime') || txType.includes('airtime')) {
-            let net = provider.replace(/VTPASS/gi, '').trim();
+            // Extracts MTN/GLO directly from "MTN Airtime"
+            let net = srvType.replace(/airtime/gi, '').trim().toUpperCase();
             if (!net || net === 'SELF') net = (tx.network_or_operator || '').toUpperCase();
+            if (!net && !provider.includes('CHEAPDATAHUB') && !provider.includes('VTPASS')) net = provider;
             return net ? `${net} AIRTIME` : 'AIRTIME TOP-UP';
         }
         if (srvType.includes('data') || txType.includes('data')) {
-            let net = provider.replace(/VTPASS/gi, '').replace('-SME', ' SME').trim();
+            // Extracts MTN/GLO directly from "MTN Data"
+            let net = srvType.replace(/data/gi, '').replace(/-/g, ' ').trim().toUpperCase();
             if (!net || net === 'SELF') net = (tx.network_or_operator || '').toUpperCase();
+            if (!net && !provider.includes('CHEAPDATAHUB') && !provider.includes('VTPASS')) net = provider;
             return net ? `${net} DATA BUNDLE` : 'DATA BUNDLE';
         }
 
@@ -65,7 +68,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return clean;
     };
 
-    // 🚀 BULLETPROOF LOGO MATCHER
     const getTransactionIcon = (tx) => {
         const raw = `${tx.type || ''} ${tx.service_type || ''} ${tx.recipient || ''} ${tx.provider || ''} ${tx.admin_notes || ''} ${tx.reference || ''}`.toLowerCase();
 
