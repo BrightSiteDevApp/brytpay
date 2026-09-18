@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!notifDot) return;
 
         try {
-            // Fetch unread notifications
             const { data, error } = await window.db
                 .from('user_notifications')
                 .select('id, user_id')
@@ -24,15 +23,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error || !data) return;
 
-            // Grab the user's dismissed broadcasts from local cache
             const localRead = JSON.parse(localStorage.getItem('bryt_read_notifs') || '[]');
             
-            // Check if there is at least ONE notification that hasn't been dismissed
             const hasUnread = data.some(notif => {
                 if (notif.user_id === null) {
-                    return !localRead.includes(notif.id); // Broadcasts: check local cache
+                    return !localRead.includes(notif.id);
                 }
-                return true; // Personal notifications: strictly rely on database is_read
+                return true; 
             });
 
             if (hasUnread) {
@@ -113,7 +110,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return ref;
     };
 
-    // 🚀 BULLETPROOF TITLE EXTRACTOR (Fixed CheapDataHub Bug)
     const getCleanTitle = (tx) => {
         if (isCreditTx(tx)) return 'WALLET FUNDING';
 
@@ -267,25 +263,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         const btnAllow = document.getElementById('btn-allow-push');
         const btnDeny = document.getElementById('btn-deny-push');
 
-        if (!consentUI || !('serviceWorker' in navigator) || !('PushManager' in window)) return;
+        if (!consentUI) {
+            console.warn("Push Modal: The HTML element #push-consent-ui is missing.");
+            return;
+        }
 
-        // Check if user already dismissed it recently (Stored for 7 days)
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+            console.warn("Push Modal: Browser blocked Push API.");
+            return;
+        }
+
         const dismissedUntil = localStorage.getItem('bryt_push_dismissed_until');
-        if (dismissedUntil && Date.now() < parseInt(dismissedUntil)) return;
+        if (dismissedUntil && Date.now() < parseInt(dismissedUntil)) {
+            console.log("Push Modal: Hidden because user clicked 'Maybe Later' recently.");
+            return;
+        }
 
-        // Check if the browser permission is already granted or permanently blocked
-        if (Notification.permission === 'granted' || Notification.permission === 'denied') return;
+        if (Notification.permission === 'granted' || Notification.permission === 'denied') {
+            console.log("Push Modal: Hidden because permissions are already set.");
+            return;
+        }
 
-        // If neither, pop up the overlay!
+        // Show modal after 1.5 seconds
+        console.log("Push Modal: Triggering modal display in 1.5s...");
         setTimeout(() => {
             consentUI.classList.add('active');
-        }, 1500); // 1.5 second delay so it doesn't fight with the page load
+        }, 1500);
 
-        // Handle "Maybe Later"
+        // Handle "Maybe Later" (🚀 Set to 2 Days)
         btnDeny.addEventListener('click', () => {
             consentUI.classList.remove('active');
-            // Hide for 7 days (7 * 24 * 60 * 60 * 1000 = 604800000 ms)
-            localStorage.setItem('bryt_push_dismissed_until', (Date.now() + 604800000).toString());
+            // Hide for 2 days (2 * 24 * 60 * 60 * 1000 = 172800000 ms)
+            localStorage.setItem('bryt_push_dismissed_until', (Date.now() + 172800000).toString()); 
         });
 
         // Handle "Enable Notifications"
@@ -294,18 +303,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             btnAllow.disabled = true;
 
             try {
-                // 1. Ask Browser Permission IMMEDIATELY upon button click
                 const permission = await Notification.requestPermission();
                 
                 if (permission !== 'granted') {
                     consentUI.classList.remove('active');
-                    return; // They clicked block in the browser prompt
+                    return; 
                 }
 
-                // 2. Fetch the service worker
                 const registration = await navigator.serviceWorker.ready;
                 
-                // 3. Convert VAPID key
                 const VAPID_PUBLIC_KEY = "BLfbGDEa2tl28dIanGQ5KffDXg9rEuSdyI49VurFSGZyef8h1Gg3B-uf6-B6BuBZfYz1bCt0VPiybjqodHC5gKk";
                 const urlBase64ToUint8Array = (base64String) => {
                     const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -316,17 +322,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return outputArray;
                 };
 
-                // 4. Create the subscription ticket
                 const subscription = await registration.pushManager.subscribe({
                     userVisibleOnly: true,
                     applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
                 });
 
-                // 5. Save to Supabase
-                await window.db.from('push_subscriptions').upsert({
+                // 🚀 FIXED: Securely Insert to DB and handle duplicates gracefully
+                const { error: insertError } = await window.db.from('push_subscriptions').insert({
                     user_id: user.id,
                     subscription: subscription
-                }, { onConflict: '(subscription->>endpoint)' }); // Prevents duplicates!
+                });
+
+                if (insertError && !insertError.message.includes('duplicate key')) {
+                    throw new Error(insertError.message);
+                }
 
                 btnAllow.textContent = "Connected! ✓";
                 btnAllow.style.background = "#10b981";
@@ -339,6 +348,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.error("Push setup failed:", err);
                 btnAllow.textContent = "Failed. Try again.";
                 btnAllow.disabled = false;
+                alert(`Setup failed: ${err.message}`);
             }
         });
     }

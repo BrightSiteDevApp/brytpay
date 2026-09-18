@@ -30,7 +30,8 @@
 </head>
 <body>
     <main class="admin-container">
-        <a href="../index.html" class="back-link">
+        <!-- 🚀 BACK BUTTON -->
+        <a href="/admin/" class="back-link">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             Back to Admin Hub
         </a>
@@ -74,7 +75,7 @@
             document.body.style.display = 'block';
         });
 
-        // Dispatch Logic
+        // 🚀 DISPATCH LOGIC (Connected to send-push)
         document.getElementById('btn-send').addEventListener('click', async () => {
             const title = document.getElementById('push-title').value.trim();
             const body = document.getElementById('push-body').value.trim();
@@ -94,15 +95,17 @@
             statusBox.style.display = 'none';
 
             try {
+                // Ensure this targets your new 'send-push' edge function
                 const { data, error } = await window.db.functions.invoke('send-push', {
-                    body: { title, body, clickUrl }
+                    body: { title, body, url: clickUrl }
                 });
 
                 if (error) throw new Error(error.message);
                 if (data && data.error) throw new Error(data.error);
 
+                // Display success payload from the Edge Function
                 statusBox.className = 'status-banner status-success';
-                statusBox.textContent = `Success! Sent to ${data.sent} devices. (${data.failed} failed/uninstalled)`;
+                statusBox.innerHTML = `Success! Sent to ${data.sent} devices.<br>(${data.failed} failed/uninstalled)`;
                 statusBox.style.display = 'block';
                 
                 document.getElementById('push-title').value = '';

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'brytpay-pwa-v1';
+const CACHE_NAME = 'brytpay-pwa-v3';
 const OFFLINE_URL = '/offline.html';
 
 const ASSETS_TO_CACHE = [
@@ -32,26 +32,30 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-    // Only intercept HTML navigation requests
     if (event.request.mode === 'navigate') {
         event.respondWith(
             fetch(event.request).catch(() => {
-                // If network fails, serve the offline page
                 return caches.match(OFFLINE_URL);
             })
         );
     }
 });
-// Listen for incoming Push Notifications
+
+// 🚀 Listen for incoming Push Notifications from Supabase
 self.addEventListener('push', function(event) {
     if (!event.data) return;
     
-    const data = event.data.json();
+    let data = {};
+    try {
+        data = event.data.json();
+    } catch (e) {
+        data = { body: event.data.text() };
+    }
     
     const options = {
-        body: data.body,
-        icon: '/assets/img/icon-192.png',
-        badge: '/assets/img/icon-192.png',
+        body: data.body || 'You have a new notification from BRYT Pay.',
+        icon: data.icon || '/assets/img/brytpay-logo.png',
+        badge: '/assets/img/brytpay-logo.png', // Small icon for Android status bar
         vibrate: [200, 100, 200],
         data: { url: data.url || '/dashboard/' }
     };
@@ -61,10 +65,23 @@ self.addEventListener('push', function(event) {
     );
 });
 
-// Handle when a user taps the notification
+// 🚀 Handle when a user taps the notification
 self.addEventListener('notificationclick', function(event) {
     event.notification.close();
     event.waitUntil(
-        clients.openWindow(event.notification.data.url)
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
+            // If the app is already open, just focus it and navigate
+            for (let i = 0; i < clientList.length; i++) {
+                let client = clientList[i];
+                if (client.url && 'focus' in client) {
+                    client.navigate(event.notification.data.url);
+                    return client.focus();
+                }
+            }
+            // If the app is closed, open a new window
+            if (clients.openWindow) {
+                return clients.openWindow(event.notification.data.url);
+            }
+        })
     );
 });
