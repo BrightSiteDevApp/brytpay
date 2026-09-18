@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications — BRYT Pay</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#1D5ED0">
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        .notif-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 14px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .notif-card.unread {
+            background: #f8fafc;
+            border-left: 4px solid var(--bryt-primary);
+            box-shadow: 0 8px 20px rgba(29, 94, 208, 0.06);
+        }
+        .notif-card:hover { border-color: #cbd5e1; }
+        
+        .notif-icon {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .icon-info { background: #e0f2fe; color: #0284c7; }
+        .icon-alert { background: #fee2e2; color: #ef4444; }
+        .icon-success { background: #dcfce7; color: #16a34a; }
+        
+        .notif-content { flex: 1; min-width: 0; }
+        .notif-title { font-size: 0.95rem; font-weight: 800; color: var(--bryt-navy); margin-bottom: 6px; }
+        .notif-message { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
+        .notif-meta { display: flex; justify-content: space-between; align-items: center; }
+        .notif-time { font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
+        
+        .btn-mark-read {
+            background: #e2e8f0;
+            border: none;
+            color: #475569;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-mark-read:hover { background: var(--bryt-primary); color: white; }
+    </style>
+</head>
+<body>
+    <main class="app-container" style="max-width: 600px; padding-bottom: 90px;">
+        <header style="margin-bottom: 28px;">
+            <a href="/dashboard/" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:700; display:inline-flex; align-items:center; gap:6px; margin-bottom: 16px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back
+            </a>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1 style="font-size: 1.6rem; color: var(--bryt-navy); margin: 0; font-weight: 800; letter-spacing: -0.5px;">Notifications</h1>
+                <button id="mark-all-read" style="background:none; border:none; color:var(--bryt-primary); font-size:0.85rem; font-weight:700; cursor:pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.2s;">Mark all read</button>
+            </div>
+        </header>
+
+        <div id="notifications-container">
+            <!-- Loading state -->
+            <div style="text-align: center; padding: 40px; color: #94a3b8;">Loading...</div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../assets/js/supabase-client.js"></script>
+    <script src="../../assets/js/notifications.js"></script>
+</body>
+</html>

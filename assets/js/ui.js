@@ -9,6 +9,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     const user = session.user;
     let currentBalance = 0;
 
+    // 🚀 SMART NOTIFICATION CHECKER
+    async function checkUnreadNotifications() {
+        const notifDot = document.getElementById('notif-dot');
+        if (!notifDot) return;
+
+        try {
+            // Fetch unread notifications
+            const { data, error } = await window.db
+                .from('user_notifications')
+                .select('id, user_id')
+                .or(`user_id.eq.${user.id},user_id.is.null`)
+                .eq('is_read', false);
+
+            if (error || !data) return;
+
+            // Grab the user's dismissed broadcasts from local cache
+            const localRead = JSON.parse(localStorage.getItem('bryt_read_notifs') || '[]');
+            
+            // Check if there is at least ONE notification that hasn't been dismissed
+            const hasUnread = data.some(notif => {
+                if (notif.user_id === null) {
+                    return !localRead.includes(notif.id); // Broadcasts: check local cache
+                }
+                return true; // Personal notifications: strictly rely on database is_read
+            });
+
+            if (hasUnread) {
+                notifDot.classList.add('active');
+            } else {
+                notifDot.classList.remove('active');
+            }
+        } catch (err) {
+            console.error("Error checking notifications:", err);
+        }
+    }
+
     const hour = new Date().getHours();
     const greetingTime = document.getElementById('greeting-time');
     if (greetingTime) {
@@ -224,7 +260,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = '/auth/login.html'; 
         });
     }
-
+    
+    checkUnreadNotifications();
     loadProfile();
     loadWallet();
     loadTransactions();
