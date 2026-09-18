@@ -1,10 +1,10 @@
-const CACHE_NAME = 'brytpay-pwa-v3';
+const CACHE_NAME = 'brytpay-pwa-v4';
 const OFFLINE_URL = '/offline.html';
 
 const ASSETS_TO_CACHE = [
     OFFLINE_URL,
     '/favicon.ico',
-    '/assets/img/brytpay-logo.png'
+    '/assets/img/icon-192.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -54,8 +54,8 @@ self.addEventListener('push', function(event) {
     
     const options = {
         body: data.body || 'You have a new notification from BRYT Pay.',
-        icon: data.icon || '/assets/img/brytpay-logo.png',
-        badge: '/assets/img/brytpay-logo.png', // Small icon for Android status bar
+        icon: data.icon || '/assets/img/icon-192.png', // 🚀 FIXED: Pointing back to square B Logo
+        badge: '/assets/img/icon-192.png',           // 🚀 FIXED: Pointing back to square B Logo
         vibrate: [200, 100, 200],
         data: { url: data.url || '/dashboard/' }
     };
@@ -70,7 +70,6 @@ self.addEventListener('notificationclick', function(event) {
     event.notification.close();
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
-            // If the app is already open, just focus it and navigate
             for (let i = 0; i < clientList.length; i++) {
                 let client = clientList[i];
                 if (client.url && 'focus' in client) {
@@ -78,7 +77,6 @@ self.addEventListener('notificationclick', function(event) {
                     return client.focus();
                 }
             }
-            // If the app is closed, open a new window
             if (clients.openWindow) {
                 return clients.openWindow(event.notification.data.url);
             }
