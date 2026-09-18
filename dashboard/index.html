@@ -19,14 +19,12 @@
             display: block;
         }
 
-        /* Nav Icon Container */
         .nav-icons-container {
             display: flex;
             align-items: center;
             gap: 16px;
         }
 
-        /* Notification Bell Styles */
         .nav-icon-btn {
             background: none;
             border: none;
@@ -45,38 +43,51 @@
             color: var(--bryt-navy);
         }
 
-        /* The Red Dot */
         .notification-dot {
             position: absolute;
             top: 6px;
             right: 8px;
             width: 8px;
             height: 8px;
-            background-color: #ef4444; /* Tailwind red-500 */
+            background-color: #ef4444; 
             border-radius: 50%;
             border: 2px solid white;
-            display: none; /* Hidden by default */
+            display: none; 
         }
         
         .notification-dot.active {
             display: block;
         }
 
-        /* Desktop Nav Overrides */
         @media (min-width: 768px) {
             .nav-links {
-                display: flex !important; /* Ensure nav links show on desktop */
+                display: flex !important; 
                 align-items: center;
             }
             .mobile-nav {
-                display: none !important; /* Hide mobile bottom nav on desktop */
+                display: none !important; 
             }
+        }
+
+        /* 🚀 NEW: Persistent Push Consent Modal Styles */
+        .push-consent-overlay {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+            z-index: 99999; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .push-consent-overlay.active { display: flex; opacity: 1; }
+        .push-consent-card {
+            background: #ffffff; border-radius: 20px; width: 90%; max-width: 380px; padding: 32px 24px;
+            text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.1); transform: translateY(20px); transition: transform 0.3s ease;
+        }
+        .push-consent-overlay.active .push-consent-card { transform: translateY(0); }
+        .push-icon-circle {
+            width: 64px; height: 64px; background: #e0f2fe; color: #0ea5e9; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 4px solid #f0f9ff;
         }
     </style>
 </head>
 <body>
 
-    <!-- Top Navigation -->
     <nav class="bryt-navbar">
         <div class="bryt-nav-inner">
             <a href="/dashboard/" class="bryt-brand">
@@ -84,14 +95,13 @@
             </a>
             
             <div class="nav-icons-container">
-                 <div class="nav-links" style="display: none;"> <!-- Hidden on mobile by default -->
+                 <div class="nav-links" style="display: none;"> 
                     <a href="/dashboard/" class="nav-link" style="color: var(--bryt-primary);">Home</a>
                     <a href="/dashboard/history/" class="nav-link">History</a>
                     <a href="/dashboard/fund/" class="nav-link">Fund</a>
                     <a href="/dashboard/account/" class="nav-link">Account</a>
                 </div>
 
-                <!-- Notification Bell -->
                 <a href="/dashboard/notifications/" class="nav-icon-btn" id="notif-bell" aria-label="Notifications">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -204,7 +214,100 @@
         </a>
     </nav>
 
-    <!-- Smart App Install Popup UI ... (Keep your existing script here) ... -->
+    <!-- 🚀 NEW: Persistent Push Consent UI -->
+    <div id="push-consent-ui" class="push-consent-overlay">
+        <div class="push-consent-card">
+            <div class="push-icon-circle">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            </div>
+            <h3 style="color: #0f172a; font-size: 1.25rem; font-weight: 800; margin-bottom: 8px;">Stay Updated!</h3>
+            <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5; margin-bottom: 24px;">Turn on notifications to receive instant alerts when your wallet is funded or your documents are ready.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button id="btn-allow-push" class="btn-primary" style="padding: 14px; font-size: 1rem;">Enable Notifications</button>
+                <button id="btn-deny-push" style="background: transparent; border: none; color: #94a3b8; font-weight: 700; font-size: 0.9rem; padding: 10px; cursor: pointer;">Maybe Later</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Smart App Install / Download Popup UI -->
+    <div id="pwa-install-prompt" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #ffffff; padding: 16px 20px; border-radius: 16px; box-shadow: 0 10px 40px rgba(7, 26, 58, 0.2); z-index: 10000; width: 90%; max-width: 360px; border: 1px solid #e2e8f0; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="/assets/img/brytpay-logo.png" style="width: 40px; height: 40px; object-fit: contain; background: #f8fafc; border-radius: 8px; padding: 4px;" alt="BRYT Pay">
+            <div>
+                <div style="font-weight: 800; color: #071A3A; font-size: 0.9rem; font-family: 'Sora', system-ui, sans-serif;">Install BRYT Pay</div>
+                <div style="font-size: 0.75rem; color: #64748B; font-family: 'Sora', system-ui, sans-serif;">Fast, easy access on your screen</div>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <button id="pwa-close" aria-label="Close" style="background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer; padding: 4px; line-height: 1;">&times;</button>
+            <button id="pwa-install-btn" style="background: #1D5ED0; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-family: 'Sora', system-ui, sans-serif; cursor: pointer; font-size: 0.85rem;">Install</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. Maintain Service Worker for Android TWA App & Caching
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(err => {
+                    console.log('PWA Service worker registration failed:', err);
+                });
+            });
+        }
+
+        // 2. Check if already inside the native Android App or standalone PWA
+        const isRunningInApp = window.matchMedia('(display-mode: standalone)').matches 
+            || window.navigator.standalone 
+            || document.referrer.includes('android-app://');
+
+        const installPromptUI = document.getElementById('pwa-install-prompt');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const closeBtn = document.getElementById('pwa-close');
+
+        let deferredPrompt = null;
+        const isDismissed = sessionStorage.getItem('brytpay_prompt_dismissed');
+
+        // Only listen and display if NOT already running in the installed app
+        if (!isRunningInApp && !isDismissed && installPromptUI) {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                showInstallUI();
+            });
+
+            setTimeout(() => {
+                showInstallUI();
+            }, 3000);
+        }
+
+        function showInstallUI() {
+            if (!isRunningInApp && !sessionStorage.getItem('brytpay_prompt_dismissed') && installPromptUI) {
+                installPromptUI.style.display = 'flex';
+            }
+        }
+
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                installPromptUI.style.display = 'none';
+
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`User ${outcome} installation`);
+                    deferredPrompt = null;
+                } else {
+                    window.location.href = '/app/brytpay.apk';
+                }
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                installPromptUI.style.display = 'none';
+                sessionStorage.setItem('brytpay_prompt_dismissed', 'true');
+            });
+        }
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../assets/js/supabase-client.js"></script>

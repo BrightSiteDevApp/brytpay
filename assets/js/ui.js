@@ -260,9 +260,92 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = '/auth/login.html'; 
         });
     }
-    
+
+    // 🚀 MASTER PUSH CONSENT CONTROLLER
+    async function managePushConsent() {
+        const consentUI = document.getElementById('push-consent-ui');
+        const btnAllow = document.getElementById('btn-allow-push');
+        const btnDeny = document.getElementById('btn-deny-push');
+
+        if (!consentUI || !('serviceWorker' in navigator) || !('PushManager' in window)) return;
+
+        // Check if user already dismissed it recently (Stored for 7 days)
+        const dismissedUntil = localStorage.getItem('bryt_push_dismissed_until');
+        if (dismissedUntil && Date.now() < parseInt(dismissedUntil)) return;
+
+        // Check if the browser permission is already granted or permanently blocked
+        if (Notification.permission === 'granted' || Notification.permission === 'denied') return;
+
+        // If neither, pop up the overlay!
+        setTimeout(() => {
+            consentUI.classList.add('active');
+        }, 1500); // 1.5 second delay so it doesn't fight with the page load
+
+        // Handle "Maybe Later"
+        btnDeny.addEventListener('click', () => {
+            consentUI.classList.remove('active');
+            // Hide for 7 days (7 * 24 * 60 * 60 * 1000 = 604800000 ms)
+            localStorage.setItem('bryt_push_dismissed_until', (Date.now() + 604800000).toString());
+        });
+
+        // Handle "Enable Notifications"
+        btnAllow.addEventListener('click', async () => {
+            btnAllow.textContent = "Connecting...";
+            btnAllow.disabled = true;
+
+            try {
+                // 1. Ask Browser Permission IMMEDIATELY upon button click
+                const permission = await Notification.requestPermission();
+                
+                if (permission !== 'granted') {
+                    consentUI.classList.remove('active');
+                    return; // They clicked block in the browser prompt
+                }
+
+                // 2. Fetch the service worker
+                const registration = await navigator.serviceWorker.ready;
+                
+                // 3. Convert VAPID key
+                const VAPID_PUBLIC_KEY = "BLfbGDEa2tl28dIanGQ5KffDXg9rEuSdyI49VurFSGZyef8h1Gg3B-uf6-B6BuBZfYz1bCt0VPiybjqodHC5gKk";
+                const urlBase64ToUint8Array = (base64String) => {
+                    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+                    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+                    const rawData = window.atob(base64);
+                    const outputArray = new Uint8Array(rawData.length);
+                    for (let i = 0; i < rawData.length; ++i) { outputArray[i] = rawData.charCodeAt(i); }
+                    return outputArray;
+                };
+
+                // 4. Create the subscription ticket
+                const subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+                });
+
+                // 5. Save to Supabase
+                await window.db.from('push_subscriptions').upsert({
+                    user_id: user.id,
+                    subscription: subscription
+                }, { onConflict: '(subscription->>endpoint)' }); // Prevents duplicates!
+
+                btnAllow.textContent = "Connected! ✓";
+                btnAllow.style.background = "#10b981";
+                
+                setTimeout(() => {
+                    consentUI.classList.remove('active');
+                }, 1000);
+
+            } catch (err) {
+                console.error("Push setup failed:", err);
+                btnAllow.textContent = "Failed. Try again.";
+                btnAllow.disabled = false;
+            }
+        });
+    }
+
     checkUnreadNotifications();
     loadProfile();
     loadWallet();
     loadTransactions();
+    managePushConsent();
 });
