@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Certifications — BRYT Pay</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#1D5ED0">
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        .service-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .service-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 16px; padding: 20px 12px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.02); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        .service-card:not(.disabled):hover { border-color: var(--bryt-primary); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(29, 94, 208, 0.08); }
+        .service-icon { width: 52px; height: 52px; object-fit: contain; margin-bottom: 12px; }
+        .service-title { font-size: 0.85rem; font-weight: 700; color: var(--bryt-navy); margin-bottom: 6px; line-height: 1.3; }
+        .service-price { font-size: 0.8rem; color: var(--bryt-primary); font-weight: 800; background: #F0F6FF; padding: 4px 10px; border-radius: 8px; }
+        
+        .disabled { opacity: 0.6; cursor: not-allowed; filter: grayscale(100%); }
+        .coming-soon-badge { position: absolute; top: 10px; right: -24px; background: #ef4444; color: white; font-size: 0.6rem; font-weight: 800; padding: 4px 24px; transform: rotate(45deg); letter-spacing: 0.5px; }
+
+        .btn-view-orders { display: inline-flex; align-items: center; gap: 8px; background: var(--bryt-navy); color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 600; padding: 10px 18px; border-radius: 10px; box-shadow: 0 4px 15px rgba(7, 26, 58, 0.15); transition: background 0.2s; }
+        
+        /* Delivery Notice Styles */
+        .info-notice-box { background-color: #eff6ff; border: 1px dashed #3b82f6; border-radius: 12px; padding: 14px 16px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 12px; }
+        .info-notice-icon { flex-shrink: 0; margin-top: 2px; color: #3b82f6; }
+        .info-notice-text { margin: 0; font-size: 0.75rem; color: #1e3a8a; line-height: 1.5; font-weight: 500; }
+
+        .bryt-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150px); background: #ffffff; padding: 14px 20px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; z-index: 9999; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); min-width: 300px; border-left: 4px solid var(--bryt-primary); }
+        .bryt-toast.show { transform: translateX(-50%) translateY(0); }
+        .toast-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+        .toast-success .toast-icon { background: #16a34a; }
+        .toast-error .toast-icon { background: #dc2626; }
+        .toast-text { font-size: 0.85rem; font-weight: 600; color: var(--bryt-navy); }
+
+        /* Multi-step Modal Styles */
+        .modal-step { display: none; animation: fadeIn 0.3s ease; }
+        .modal-step.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .step-indicators { display: flex; justify-content: center; gap: 6px; margin-bottom: 20px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #e2e8f0; transition: 0.3s; }
+        .dot.active { background: #1D5ED0; width: 16px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div id="bryt-toast" class="bryt-toast"><div id="toast-icon-wrap" class="toast-icon"></div><div id="toast-text" class="toast-text">Message</div></div>
+
+    <main class="app-container" style="max-width: 520px; padding-bottom: 90px;">
+        <header style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <a href="/dashboard/" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; margin-bottom: 12px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back
+                </a>
+                <h1 style="font-size: 1.4rem; color: var(--bryt-navy); margin-bottom: 4px;">Exam Certifications</h1>
+                <p style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Balance: <span id="user-balance" style="color: var(--bryt-primary);">₦0.00</span></p>
+            </div>
+            <a href="orders.html" class="btn-view-orders">My Certs</a>
+        </header>
+
+        <!-- Delivery Notice -->
+        <div class="info-notice-box">
+            <svg class="info-notice-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <p class="info-notice-text">
+                <strong style="color: #1d4ed8;">Delivery Notice:</strong> Processing takes roughly <strong>15-30 minutes</strong>. Your document will be sent via <strong>Email & WhatsApp</strong>, and will also be available on this platform for download.
+            </p>
+        </div>
+
+        <div id="service-selection-view">
+            <div class="service-grid">
+                <div class="service-card" data-service="WAEC" data-price="10000">
+                    <img src="../../assets/img/waec-logo.png" alt="WAEC Logo" class="service-icon" onerror="this.src='../../assets/img/brytpay-logo.png'">
+                    <div class="service-title">WAEC Certificate</div>
+                    <div class="service-price">₦10,000</div>
+                </div>
+                <div class="service-card disabled">
+                    <div class="coming-soon-badge">SOON</div>
+                    <img src="../../assets/img/neco-logo.png" alt="NECO Logo" class="service-icon" onerror="this.src='../../assets/img/brytpay-logo.png'">
+                    <div class="service-title">NECO Certificate</div>
+                    <div class="service-price">₦10,000</div>
+                </div>
+                <div class="service-card disabled">
+                    <div class="coming-soon-badge">SOON</div>
+                    <img src="../../assets/img/nabteb-logo.png" alt="NABTEB Logo" class="service-icon" onerror="this.src='../../assets/img/brytpay-logo.png'">
+                    <div class="service-title">NABTEB Certificate</div>
+                    <div class="service-price">₦10,000</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card" id="cert-success-card" style="display: none; text-align: center; padding: 36px 24px;">
+            <div style="width: 56px; height: 56px; background: var(--success-bg); border-radius: 50%; color: var(--success-text); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <h2 style="font-size: 1.3rem; color: var(--bryt-navy); margin-bottom: 6px;">Order Submitted!</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px;">Your digital certificate request is being processed.</p>
+            <a href="orders.html" class="btn-primary" style="display: block; width: 100%; text-decoration: none;">Track Order</a>
+        </div>
+    </main>
+
+    <!-- 🚀 3-PHASE MODAL -->
+    <div id="service-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 450px;">
+            <h3 class="modal-title" id="modal-service-title" style="text-align: center; margin-bottom: 12px;">Access Your Certificate</h3>
+            
+            <div class="step-indicators">
+                <div class="dot active" id="dot-1"></div>
+                <div class="dot" id="dot-2"></div>
+                <div class="dot" id="dot-3"></div>
+            </div>
+
+            <form id="cert-form">
+                
+                <!-- PHASE 1: IMAGE PREVIEW -->
+                <div id="step-1" class="modal-step active">
+                    <img src="../../assets/img/waec-cer.png" alt="Sample WAEC Certificate" style="width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 16px; object-fit: contain; background: #f8fafc;" onerror="this.style.display='none'">
+                    <p style="font-size: 0.85rem; color: #475569; text-align: center; margin-bottom: 20px; line-height: 1.5;">This service retrieves the official digital copy of your Original WAEC Certificate securely.</p>
+                    
+                    <div class="modal-actions" style="display: flex; gap: 12px;">
+                        <button type="button" class="btn-secondary btn-cancel-modal" style="flex: 1; padding: 16px; font-weight: 700;">Cancel</button>
+                        <button type="button" class="btn-primary" onclick="goToStep(2)" style="flex: 2; padding: 16px; font-weight: 800;">Get Started</button>
+                    </div>
+                </div>
+
+                <!-- PHASE 2: FORM PART 1 -->
+                <div id="step-2" class="modal-step">
+                    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">Step 1: Exam Details</p>
+                    <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                        <div class="form-group" style="flex: 1; margin: 0;">
+                            <label class="form-label">Country *</label>
+                            <select id="cert-country" class="form-select" required>
+                                <option value="Nigeria">🇳🇬 Nigeria</option>
+                                <option value="Ghana">🇬🇭 Ghana</option>
+                                <option value="Gambia">🇬🇲 Gambia</option>
+                                <option value="Sierra Leone">🇸🇱 Sierra Leone</option>
+                                <option value="Liberia">🇱🇷 Liberia</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1; margin: 0;">
+                            <label class="form-label">Exam Year *</label>
+                            <input type="number" id="cert-year" class="form-input" placeholder="e.g. 2023" min="1990" max="2026" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Exam Type *</label>
+                        <select id="cert-type" class="form-select" required>
+                            <option value="WASSCE FOR SCHOOL CANDIDATES">WASSCE FOR SCHOOL CANDIDATES</option>
+                            <option value="WASSCE FOR PRIVATE CANDIDATES (FIRST SERIES)">WASSCE FOR PRIVATE CANDIDATES (FIRST SERIES)</option>
+                            <option value="WASSCE FOR PRIVATE CANDIDATES (SECOND SERIES)">WASSCE FOR PRIVATE CANDIDATES (SECOND SERIES)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 24px;">
+                        <label class="form-label">Date of Birth *</label>
+                        <input type="date" id="cert-dob" class="form-input" required>
+                    </div>
+
+                    <div class="modal-actions" style="display: flex; gap: 12px;">
+                        <button type="button" class="btn-secondary" onclick="goToStep(1)" style="flex: 1; padding: 16px; font-weight: 700;">Back</button>
+                        <button type="button" class="btn-primary" onclick="validateAndGoToStep(2, 3)" style="flex: 1; padding: 16px; font-weight: 800;">Next</button>
+                    </div>
+                </div>
+
+                <!-- PHASE 3: FORM PART 2 -->
+                <div id="step-3" class="modal-step">
+                    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">Step 2: Candidate Details</p>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Confirm Candidate Number *</label>
+                        <input type="text" id="cert-candidate-no" class="form-input" placeholder="e.g. 4251103045" style="text-transform: uppercase; font-weight: 700; letter-spacing: 1px;" required>
+                        <a href="https://wa.me/2349153375488?text=I%20need%20help%20recovering%20my%20WAEC%20registration%20number" target="_blank" style="display: inline-block; font-size: 0.7rem; color: #1D5ED0; font-weight: 700; margin-top: 6px; text-decoration: none;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 2px;"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            I need help recovering my WAEC registration number
+                        </a>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Candidate Full Name *</label>
+                        <input type="text" id="cert-name" class="form-input" placeholder="e.g. Ibrahim Emmanuel Musa" required>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+                        <div class="form-group" style="flex: 1; margin: 0;">
+                            <label class="form-label">WhatsApp *</label>
+                            <input type="tel" id="cert-whatsapp" class="form-input" placeholder="08012345678" maxlength="11" required>
+                        </div>
+                        <div class="form-group" style="flex: 1.5; margin: 0;">
+                            <label class="form-label">Email *</label>
+                            <input type="email" id="cert-email" class="form-input" placeholder="user@example.com" required>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions" style="display: flex; gap: 12px;">
+                        <button type="button" class="btn-secondary" onclick="goToStep(2)" style="flex: 1; padding: 16px; font-weight: 700;">Back</button>
+                        <button type="submit" id="modal-submit" class="btn-primary" style="flex: 2; padding: 16px; font-weight: 800;">Pay ₦10,000</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <nav class="mobile-nav">
+        <a href="/dashboard/" class="nav-item active"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+        <a href="/dashboard/history/" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>History</span></a>
+        <a href="/dashboard/fund/" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
+        <a href="/dashboard/account/" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../assets/js/supabase-client.js"></script>
+    <script src="../../assets/js/exam-certs.js"></script>
+</body>
+</html>

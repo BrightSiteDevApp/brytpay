@@ -1,172 +1,520 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Admin Hub — BRYT Pay</title>
 
     <!-- STRICT APP PRIVACY DIRECTIVE: Do not index or crawl admin routes -->
-    <meta name="robots" content="noindex, nofollow">
-    
+    <meta name="robots" content="noindex, nofollow" />
+
     <!-- Branding -->
-    <meta name="theme-color" content="#1D5ED0">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <meta name="theme-color" content="#1D5ED0" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
 
-    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/main.css" />
     <!-- Hides the page instantly until Admin Guard verifies identity -->
-    <style> body { display: none; background: #f8fafc; color: var(--bryt-navy); } </style>
     <style>
-        .admin-container { max-width: 1040px; margin: 0 auto; padding: 32px 16px; }
-        
-        .admin-header { margin-bottom: 32px; }
-        .admin-header h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
-        .admin-header p { color: var(--text-muted); font-size: 0.95rem; }
-        
-        .admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        
-        .admin-card { background: #ffffff; border-radius: 16px; padding: 24px; border: 1px solid var(--border-color); text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        .admin-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-color: #cbd5e1; }
-        
-        .card-icon { width: 48px; height: 48px; border-radius: 12px; background: #f0f9ff; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--bryt-primary); }
-        .card-title { font-size: 1.15rem; font-weight: 700; color: var(--bryt-navy); margin-bottom: 6px; }
-        .card-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; flex-grow: 1; margin-bottom: 20px; }
-        .card-action { font-size: 0.85rem; font-weight: 700; color: var(--bryt-primary); display: flex; align-items: center; gap: 6px; }
-        
-        /* Disabled Card Style for Future Modules */
-        .admin-card.locked { opacity: 0.6; cursor: not-allowed; }
-        .admin-card.locked:hover { transform: none; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border-color: var(--border-color); }
-        .admin-card.locked .card-icon { background: #f1f5f9; color: #94a3b8; }
-        .admin-card.locked .card-action { color: #94a3b8; }
-
-        /* 🚀 NEW: Back Link Styling */
-        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 16px; letter-spacing: 0.5px; transition: 0.2s; }
-        .back-link:hover { color: var(--bryt-primary); }
+      body {
+        display: none;
+        background: #f8fafc;
+        color: var(--bryt-navy);
+      }
     </style>
-</head>
-<body>
+    <style>
+      .admin-container {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 32px 16px;
+      }
 
+      .admin-header {
+        margin-bottom: 32px;
+      }
+      .admin-header h1 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+      }
+      .admin-header p {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+      }
+
+      .admin-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+      }
+
+      .admin-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        border: 1px solid var(--border-color);
+        text-decoration: none;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+      }
+      .admin-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+        border-color: #cbd5e1;
+      }
+
+      .card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: #f0f9ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        color: var(--bryt-primary);
+      }
+      .card-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--bryt-navy);
+        margin-bottom: 6px;
+      }
+      .card-desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        flex-grow: 1;
+        margin-bottom: 20px;
+      }
+      .card-action {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--bryt-primary);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* Disabled Card Style for Future Modules */
+      .admin-card.locked {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .admin-card.locked:hover {
+        transform: none;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        border-color: var(--border-color);
+      }
+      .admin-card.locked .card-icon {
+        background: #f1f5f9;
+        color: #94a3b8;
+      }
+      .admin-card.locked .card-action {
+        color: #94a3b8;
+      }
+
+      /* 🚀 NEW: Back Link Styling */
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+        letter-spacing: 0.5px;
+        transition: 0.2s;
+      }
+      .back-link:hover {
+        color: var(--bryt-primary);
+      }
+    </style>
+  </head>
+  <body>
     <!-- Admin Topbar -->
     <nav class="bryt-navbar">
-        <div class="bryt-nav-inner" style="max-width: 1040px;">
-            <div class="bryt-brand" style="display: flex; align-items: center; gap: 8px;">
-                <img src="../assets/img/brytpay-logo.png" alt="BRYT Pay" style="max-height: 28px;">
-                <span style="font-weight: 800; color: var(--bryt-navy); font-size: 1rem; border-left: 2px solid var(--border-color); padding-left: 8px;">Admin Hub</span>
-            </div>
-            <div class="nav-links">
-                <button id="logout-btn" class="btn-logout">Sign Out</button>
-            </div>
+      <div class="bryt-nav-inner" style="max-width: 1040px">
+        <div
+          class="bryt-brand"
+          style="display: flex; align-items: center; gap: 8px"
+        >
+          <img
+            src="../assets/img/brytpay-logo.png"
+            alt="BRYT Pay"
+            style="max-height: 28px"
+          />
+          <span
+            style="
+              font-weight: 800;
+              color: var(--bryt-navy);
+              font-size: 1rem;
+              border-left: 2px solid var(--border-color);
+              padding-left: 8px;
+            "
+            >Admin Hub</span
+          >
         </div>
+        <div class="nav-links">
+          <button id="logout-btn" class="btn-logout">Sign Out</button>
+        </div>
+      </div>
     </nav>
 
     <main class="admin-container">
-        <!-- 🚀 NEW: Back to Dashboard Button -->
-        <a href="../dashboard/index.html" class="back-link">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            Back to Dashboard
+      <!-- 🚀 NEW: Back to Dashboard Button -->
+      <a href="../dashboard/index.html" class="back-link">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Dashboard
+      </a>
+
+      <header class="admin-header">
+        <h1>Command Center</h1>
+        <p>
+          Manage BRYT Pay operations, fulfill orders, and monitor system health.
+        </p>
+      </header>
+
+      <div class="admin-grid">
+        <!-- Active Module: JAMB Processing -->
+        <a href="jamb/index.html" class="admin-card">
+          <div class="card-icon">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              ></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <div class="card-title">JAMB Processing Desk</div>
+          <div class="card-desc">
+            Fulfill manual JAMB admission letters, view order details, upload
+            documents, and dispatch automated emails.
+          </div>
+          <div class="card-action">Open Desk &rarr;</div>
         </a>
 
-        <header class="admin-header">
-            <h1>Command Center</h1>
-            <p>Manage BRYT Pay operations, fulfill orders, and monitor system health.</p>
-        </header>
+        <!-- Active Module: NIN Processing -->
+        <a href="nin/index.html" class="admin-card">
+          <div class="card-icon" style="background: #f0fdf4; color: #16a34a">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              ></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <circle cx="10" cy="13" r="2"></circle>
+              <line x1="14" y1="13" x2="16" y2="13"></line>
+              <line x1="10" y1="17" x2="16" y2="17"></line>
+            </svg>
+          </div>
+          <div class="card-title">NIN Processing Desk</div>
+          <div class="card-desc">
+            Process NIN slip requests, upload PDF documents, and dispatch
+            automated emails to users.
+          </div>
+          <div class="card-action" style="color: #16a34a">Open Desk &rarr;</div>
+        </a>
 
-        <div class="admin-grid">
-            
-            <!-- Active Module: JAMB Processing -->
-            <a href="jamb/index.html" class="admin-card">
-                <div class="card-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                </div>
-                <div class="card-title">JAMB Processing Desk</div>
-                <div class="card-desc">Fulfill manual JAMB admission letters, view order details, upload documents, and dispatch automated emails.</div>
-                <div class="card-action">Open Desk &rarr;</div>
-            </a>
+        <a href="exam-certs/index.html" class="admin-card">
+          <div class="card-icon" style="background: #fef3c7; color: #d97706">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="8" r="7"></circle>
+              <polyline
+                points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"
+              ></polyline>
+            </svg>
+          </div>
+          <div class="card-title">Exam Certifications</div>
+          <div class="card-desc">
+            Process WAEC, NECO & NABTEB digital certificate requests, update
+            statuses, and dispatch PDF documents.
+          </div>
+          <div class="card-action" style="color: #d97706">
+            Manage Certificates &rarr;
+          </div>
+        </a>
 
-            <!-- Active Module: User Management -->
-            <a href="users/index.html" class="admin-card">
-                <div class="card-icon" style="background: #f0fdf4; color: #16a34a;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                </div>
-                <div class="card-title">User Management</div>
-                <div class="card-desc">View customer profiles, monitor wallet balances, fund or deduct accounts, and suspend fraudulent users.</div>
-                <div class="card-action" style="color: #16a34a;">Open Module &rarr;</div>
-            </a>
+        <!-- Active Module: User Management -->
+        <a href="users/index.html" class="admin-card">
+          <div class="card-icon" style="background: #f0fdf4; color: #16a34a">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <div class="card-title">User Management</div>
+          <div class="card-desc">
+            View customer profiles, monitor wallet balances, fund or deduct
+            accounts, and suspend fraudulent users.
+          </div>
+          <div class="card-action" style="color: #16a34a">
+            Open Module &rarr;
+          </div>
+        </a>
 
-            <!-- Active Module: NIN Processing -->
-            <a href="nin/index.html" class="admin-card">
-                <div class="card-icon" style="background: #f0fdf4; color: #16a34a;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><circle cx="10" cy="13" r="2"></circle><line x1="14" y1="13" x2="16" y2="13"></line><line x1="10" y1="17" x2="16" y2="17"></line></svg>
-                </div>
-                <div class="card-title">NIN Processing Desk</div>
-                <div class="card-desc">Process NIN slip requests, upload PDF documents, and dispatch automated emails to users.</div>
-                <div class="card-action" style="color: #16a34a;">Open Desk &rarr;</div>
-            </a>
+        <!-- 🚀 NEW MODULE: Broadcast Studio -->
+        <a href="broadcast/index.html" class="admin-card">
+          <div class="card-icon" style="background: #eff6ff; color: #1d5ed0">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+              ></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+          </div>
+          <div class="card-title">Broadcast Studio</div>
+          <div class="card-desc">
+            Design and dispatch promotional emails, newsletters, and flyers via
+            the Brevo API integration.
+          </div>
+          <div class="card-action" style="color: #1d5ed0">
+            Open Studio &rarr;
+          </div>
+        </a>
 
-            <!-- 🚀 NEW MODULE: Broadcast Studio -->
-            <a href="broadcast/index.html" class="admin-card">
-                <div class="card-icon" style="background: #eff6ff; color: #1D5ED0;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                </div>
-                <div class="card-title">Broadcast Studio</div>
-                <div class="card-desc">Design and dispatch promotional emails, newsletters, and flyers via the Brevo API integration.</div>
-                <div class="card-action" style="color: #1D5ED0;">Open Studio &rarr;</div>
-            </a>
+        <!-- 🚀 NEW MODULE: Audience Exporter -->
+        <a href="extractor/index.html" class="admin-card">
+          <div class="card-icon" style="background: #fdf2f8; color: #db2777">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <polyline points="16 11 18 13 22 9"></polyline>
+            </svg>
+          </div>
+          <div class="card-title">Audience Exporter</div>
+          <div class="card-desc">
+            Instantly extract user emails and phone numbers in batches of 100
+            for broadcasts and SMS campaigns.
+          </div>
+          <div class="card-action" style="color: #db2777">
+            Open Exporter &rarr;
+          </div>
+        </a>
 
-            <!-- 🚀 NEW MODULE: Audience Exporter -->
-<a href="extractor/index.html" class="admin-card">
-    <div class="card-icon" style="background: #fdf2f8; color: #db2777;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline></svg>
-    </div>
-    <div class="card-title">Audience Exporter</div>
-    <div class="card-desc">Instantly extract user emails and phone numbers in batches of 100 for broadcasts and SMS campaigns.</div>
-    <div class="card-action" style="color: #db2777;">Open Exporter &rarr;</div>
-</a>
+        <a href="notifications/index.html" class="admin-card">
+          <div class="card-icon" style="background: #eef2ff; color: #4f46e5">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </div>
+          <div class="card-title">Broadcast & Notifications</div>
+          <div class="card-desc">
+            Send global alerts or specific messages directly to users'
+            dashboards and devices.
+          </div>
+          <div class="card-action" style="color: #4f46e5">
+            Open Messenger &rarr;
+          </div>
+        </a>
 
-<a href="notifications/index.html" class="admin-card">
-    <div class="card-icon" style="background: #eef2ff; color: #4f46e5;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-    </div>
-    <div class="card-title">Broadcast & Notifications</div>
-    <div class="card-desc">Send global alerts or specific messages directly to users' dashboards and devices.</div>
-    <div class="card-action" style="color: #4f46e5;">Open Messenger &rarr;</div>
-</a>
+        <!-- 🚀 NEW MODULE: Push Studio -->
+        <a href="push/index.html" class="admin-card">
+          <div class="card-icon" style="background: #fffbeb; color: #d97706">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </div>
+          <div class="card-title">Push Notifications</div>
+          <div class="card-desc">
+            Send instant alerts and updates directly to your users' phones and
+            devices.
+          </div>
+          <div class="card-action" style="color: #d97706">
+            Open Studio &rarr;
+          </div>
+        </a>
 
-<!-- 🚀 NEW MODULE: Push Studio -->
-<a href="push/index.html" class="admin-card">
-    <div class="card-icon" style="background: #fffbeb; color: #d97706;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-    </div>
-    <div class="card-title">Push Notifications</div>
-    <div class="card-desc">Send instant alerts and updates directly to your users' phones and devices.</div>
-    <div class="card-action" style="color: #d97706;">Open Studio &rarr;</div>
-</a>
-
-
-            <!-- Future Module Placeholder -->
-            <div class="admin-card locked" title="Coming Soon">
-                <div class="card-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                </div>
-                <div class="card-title">Financial Ledger</div>
-                <div class="card-desc">Audit all wallet funding, monitor API vending balances, and review daily transaction volume.</div>
-                <div class="card-action">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    Locked
-                </div>
-            </div>
-
+        <!-- Future Module Placeholder -->
+        <div class="admin-card locked" title="Coming Soon">
+          <div class="card-icon">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path
+                d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+              ></path>
+            </svg>
+          </div>
+          <div class="card-title">Financial Ledger</div>
+          <div class="card-desc">
+            Audit all wallet funding, monitor API vending balances, and review
+            daily transaction volume.
+          </div>
+          <div class="card-action">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            Locked
+          </div>
         </div>
+      </div>
     </main>
+    <nav class="mobile-nav">
+      <a href="/dashboard/" class="nav-item active"
+        ><svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg
+        ><span>Home</span></a
+      >
+      <a href="/dashboard/history/" class="nav-item"
+        ><svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" /></svg
+        ><span>History</span></a
+      >
+      <a href="/dashboard/fund/" class="nav-item"
+        ><svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <rect x="2" y="5" width="20" height="14" rx="2" />
+          <line x1="2" y1="10" x2="22" y2="10" /></svg
+        ><span>Wallet</span></a
+      >
+      <a href="/dashboard/account/" class="nav-item"
+        ><svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle></svg
+        ><span>Account</span></a
+      >
+    </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../assets/js/supabase-client.js"></script>
     <script src="../assets/js/admin-guard.js"></script>
-    
+
     <script>
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-            await window.db.auth.signOut();
-            window.location.href = '/auth/login.html';
+      document
+        .getElementById("logout-btn")
+        .addEventListener("click", async () => {
+          await window.db.auth.signOut();
+          window.location.href = "/auth/login.html";
         });
     </script>
-</body>
+  </body>
 </html>

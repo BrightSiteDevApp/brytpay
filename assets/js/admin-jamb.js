@@ -36,6 +36,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('modal-order-ref').textContent = order.order_reference;
                 document.getElementById('modal-name').textContent = order.customer_full_name;
                 document.getElementById('modal-reg').textContent = order.jamb_registration_number || 'N/A';
+                
+                // 🚀 FIXED: Added WhatsApp and Email injection
+                document.getElementById('modal-whatsapp').textContent = order.whatsapp_number || 'N/A';
+                document.getElementById('modal-email').textContent = order.email || 'N/A';
+
                 statusSelect.value = order.status;
                 notesInput.value = order.admin_notes || '';
                 uploadSection.style.display = order.status === 'COMPLETED' ? 'block' : 'none';
@@ -58,7 +63,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const newStatus = statusSelect.value;
         let documentPath = null;
 
-        // Block if trying to complete without a file
         if (newStatus === 'COMPLETED' && !currentOrder.document_path && fileInput.files.length === 0) {
             return alert('You must upload the document to mark this order as COMPLETED.');
         }
@@ -66,7 +70,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         saveBtn.disabled = true; saveBtn.textContent = 'Saving...';
 
         try {
-            // 🚀 RESTORED UPLOAD LOGIC
             if (newStatus === 'COMPLETED' && fileInput.files.length > 0) {
                 saveBtn.textContent = 'Uploading Document...';
                 const file = fileInput.files[0];

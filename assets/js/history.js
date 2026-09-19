@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return ref.length > 18 ? `${ref.slice(0, 7)}...${ref.slice(-6)}` : ref;
     };
 
-    // 🚀 BULLETPROOF TITLE EXTRACTOR (Fixed CheapDataHub Bug)
     const getCleanTitle = (tx) => {
         if (isCreditTx(tx)) return 'WALLET FUNDING';
 
@@ -29,6 +28,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const provider = (tx.provider || tx.network_or_operator || '').toUpperCase();
         const notes = (tx.admin_notes || '').toLowerCase();
         const ref = (tx.reference || tx.external_reference || '').toUpperCase();
+
+        // 🚀 THE FIX: Catch Certificates before Education PINs
+        if (srvType.includes('certificate')) {
+            return srvType.toUpperCase();
+        }
 
         if (srvType.includes('education') || srvType.includes('waec') || srvType.includes('neco') || srvType.includes('nabteb') || txType.includes('education')) {
             let examName = provider;
@@ -49,14 +53,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (srvType.includes('airtime') || txType.includes('airtime')) {
-            // Extracts MTN/GLO directly from "MTN Airtime"
             let net = srvType.replace(/airtime/gi, '').trim().toUpperCase();
             if (!net || net === 'SELF') net = (tx.network_or_operator || '').toUpperCase();
             if (!net && !provider.includes('CHEAPDATAHUB') && !provider.includes('VTPASS')) net = provider;
             return net ? `${net} AIRTIME` : 'AIRTIME TOP-UP';
         }
         if (srvType.includes('data') || txType.includes('data')) {
-            // Extracts MTN/GLO directly from "MTN Data"
             let net = srvType.replace(/data/gi, '').replace(/-/g, ' ').trim().toUpperCase();
             if (!net || net === 'SELF') net = (tx.network_or_operator || '').toUpperCase();
             if (!net && !provider.includes('CHEAPDATAHUB') && !provider.includes('VTPASS')) net = provider;
@@ -80,6 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         else if (raw.includes('9mobile') || raw.includes('etisalat')) logoFile = '9mob-logo.png';
         else if (raw.includes('dstv')) logoFile = 'dstv-logo.png';
         else if (raw.includes('gotv')) logoFile = 'gotv-logo.png';
+        else if (raw.includes('startimes')) logoFile = 'startimes-logo.png'; // 🚀 THE FIX: Added StarTimes trigger
         else if (raw.includes('jmb_') || raw.includes('jamb') || raw.includes('admission') || raw.includes('result')) logoFile = 'jamb-logo.png';
         else if (raw.includes('nin_') || raw.includes('nin') || raw.includes('slip')) logoFile = 'nimc-logo.png';
         else if (raw.includes('waec')) logoFile = 'waec-logo.png';
@@ -98,9 +101,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const filteredTx = allTransactions.filter(tx => {
             if (filterStatus === 'all') return true;
             const st = (tx.status || '').toLowerCase();
-            if (filterStatus === 'successful') return st === 'successful' || st === 'completed' || st === 'processed';
+            if (filterStatus === 'successful') return st === 'successful' || st === 'completed' || st === 'processed' || st === 'refunded';
             if (filterStatus === 'pending') return st === 'pending' || st === 'processing';
-            if (filterStatus === 'failed') return st === 'failed' || st === 'reversed' || st === 'cancelled' || st === 'refunded';
+            if (filterStatus === 'failed') return st === 'failed' || st === 'reversed' || st === 'cancelled';
             return true;
         });
 

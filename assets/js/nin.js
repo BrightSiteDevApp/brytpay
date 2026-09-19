@@ -5,7 +5,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     const user = session.user;
     let currentBalance = 0;
     
-    // 🚀 DYNAMIC PRICING MODEL
+    // 🚀 Injecting the Toast function
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('bryt-toast');
+        const toastText = document.getElementById('toast-text');
+        const iconWrap = document.getElementById('toast-icon-wrap');
+        
+        toast.className = `bryt-toast toast-${type}`;
+        iconWrap.textContent = '';
+        
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, "svg");
+        svg.setAttribute("width", "14"); svg.setAttribute("height", "14");
+        svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("fill", "none");
+        svg.setAttribute("stroke", "currentColor"); svg.setAttribute("stroke-width", "3");
+
+        if (type === 'success') {
+            const poly = document.createElementNS(svgNS, "polyline");
+            poly.setAttribute("points", "20 6 9 17 4 12"); svg.appendChild(poly);
+        } else {
+            const l1 = document.createElementNS(svgNS, "line");
+            l1.setAttribute("x1", "18"); l1.setAttribute("y1", "6"); l1.setAttribute("x2", "6"); l1.setAttribute("y2", "18");
+            const l2 = document.createElementNS(svgNS, "line");
+            l2.setAttribute("x1", "6"); l2.setAttribute("y1", "6"); l2.setAttribute("x2", "18"); l2.setAttribute("y2", "18");
+            svg.appendChild(l1); svg.appendChild(l2);
+        }
+        iconWrap.appendChild(svg);
+        
+        toastText.textContent = message; 
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
     const PRICING = {
         'NIN_NUMBER': { 'Information Slip': 300, 'Regular Slip': 400, 'Standard Slip': 400, 'Premium Slip': 500 },
         'PHONE_NUMBER': { 'Information Slip': 350, 'Regular Slip': 450, 'Standard Slip': 450, 'Premium Slip': 600 }
@@ -81,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const email = document.getElementById('email').value.trim();
         
         if (currentBalance < selectedPrice) {
-            alert(`Insufficient balance. You need at least ₦${selectedPrice.toLocaleString()} to process this request.`);
+            showToast(`Insufficient balance. You need at least ₦${selectedPrice.toLocaleString()} to process this request.`, 'error');
             return;
         }
 
@@ -92,7 +123,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnSubmit.textContent = 'Processing...';
 
         try {
-            // Call the NIN RPC Function directly (Manual Workflow)
             const { data, error } = await window.db.rpc('process_nin_order', {
                 p_customer_name: fullName,
                 p_identifier_type: activeType,
@@ -118,7 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             await loadBalance(); 
 
         } catch (err) {
-            alert(`Order could not be completed: ${err.message || 'Server error'}`);
+            showToast(`Order could not be completed: ${err.message || 'Server error'}`, 'error');
         } finally {
             btnSubmit.disabled = false; btnCancel.disabled = false;
             btnSubmit.innerHTML = `Pay ₦${selectedPrice.toLocaleString()}`;

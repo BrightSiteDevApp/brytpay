@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- 🚀 FIXED: Added maximum-scale and user-scalable to prevent zooming layout breaks -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin: Exam Certs — BRYT Pay</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        /* 🚀 FIXED: Global box sizing prevents padding from breaking the width */
+        * { box-sizing: border-box; }
+        
+        body { background: #f8fafc; margin: 0; font-family: system-ui, sans-serif; overflow-x: hidden; }
+        .admin-container { max-width: 900px; margin: 0 auto; padding: 16px 12px 60px; width: 100%; }
+        .admin-header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+        .page-title { font-size: 1.2rem; color: #0f172a; margin: 0 0 4px 0; font-weight: 800; }
+        
+        /* 🚀 FIXED: Responsive Table Wrapper */
+        .table-responsive-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff; }
+        
+        .admin-table { width: 100%; border-collapse: collapse; min-width: 320px; }
+        .admin-table th { background: #f8fafc; padding: 10px 12px; text-align: left; font-size: 0.65rem; font-weight: 800; color: #64748b; text-transform: uppercase; }
+        .admin-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.75rem; color: #1e293b; vertical-align: middle; }
+        .admin-table tr:hover { background: #f8fafc; cursor: pointer; }
+
+        .service-col { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+        .exam-logo { width: 24px; height: 24px; border-radius: 6px; object-fit: contain; background: #f1f5f9; padding: 2px; flex-shrink: 0; }
+        
+        /* 🚀 FIXED: Truncates long order refs in the table to prevent stretching */
+        .order-ref { font-family: monospace; font-weight: 700; color: #1D5ED0; background: #eff6ff; padding: 4px 8px; border-radius: 6px; display: inline-block; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
+
+        .status-badge { font-size: 0.6rem; font-weight: 800; padding: 4px 8px; border-radius: 12px; }
+        .badge-processing { background: #fef9c3; color: #a16207; }
+        .badge-completed { background: #dcfce7; color: #15803d; }
+        .badge-failed { background: #fee2e2; color: #b91c1c; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(7, 26, 58, 0.7); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 16px; }
+        .modal-content { background: #ffffff; width: 100%; max-width: 360px; max-height: 90vh; overflow-y: auto; border-radius: 16px; padding: 20px; }
+        
+        .modal-breakdown { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; margin-bottom: 16px; }
+        /* 🚀 FIXED: Allows long text (like WASSCE FOR PRIVATE CANDIDATES) to wrap to the next line smoothly */
+        .modal-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; font-size: 0.75rem; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; }
+        .modal-row:last-child { border-bottom: none; }
+        .modal-row span { color: #64748b; flex-shrink: 0; }
+        .modal-row strong { text-align: right; word-break: break-word; color: #0f172a; flex: 1; }
+
+        .form-group { margin-bottom: 12px; }
+        .form-label { font-weight: 800; font-size: 0.7rem; color: #475569; display: block; margin-bottom: 4px; }
+        .form-select, .form-input { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.75rem; outline: none; }
+        .form-select:focus, .form-input:focus { border-color: #1D5ED0; }
+
+        .upload-box { display: none; background: #f0f9ff; border: 1px dashed #1D5ED0; padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+        .modal-actions { display: flex; gap: 8px; margin-top: 16px; }
+        .btn-modal { padding: 10px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; border: none; cursor: pointer; flex: 1; transition: background 0.2s; }
+        .btn-cancel { background: #f1f5f9; color: #475569; }
+        .btn-save { background: #0f172a; color: #ffffff; }
+
+        /* 🚀 FIXED: Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .admin-table th, .admin-table td { padding: 10px 8px; }
+            .service-col span { font-size: 0.7rem; }
+            .order-ref { max-width: 80px; font-size: 0.65rem; }
+            .status-badge { font-size: 0.55rem; }
+            .modal-content { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="admin-container">
+        <div class="admin-header-row">
+            <div>
+                <a href="../index.html" style="display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-size: 0.7rem; font-weight: 800; margin-bottom: 12px; text-transform: uppercase;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to Admin
+                </a>
+                <h1 class="page-title">Exam Certifications Desk</h1>
+            </div>
+        </div>
+
+        <div class="table-responsive-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr><th>Service</th><th>Order Ref</th><th>Status</th></tr>
+                </thead>
+                <tbody id="admin-orders-body">
+                    <tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 20px;">Loading orders...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="admin-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin: 0 0 4px 0; font-size: 1.1rem; font-weight: 800;">Process Order</h3>
+            <!-- 🚀 FIXED: Forces the long reference to wrap properly inside the modal -->
+            <p id="modal-order-ref" style="font-family: monospace; color: #1D5ED0; font-weight: 700; font-size: 0.8rem; margin-bottom: 12px; word-break: break-all;"></p>
+
+            <div class="modal-breakdown">
+                <div class="modal-row"><span>Candidate:</span><strong id="modal-name">---</strong></div>
+                <div class="modal-row"><span>Candidate No:</span><strong id="modal-candidate-no" style="font-family: monospace;">---</strong></div>
+                <div class="modal-row"><span>Exam Year:</span><strong id="modal-year">---</strong></div>
+                <div class="modal-row"><span>Exam Type:</span><strong id="modal-type">---</strong></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Update Status</label>
+                <select id="update-status" class="form-select">
+                    <option value="PROCESSING">PROCESSING</option>
+                    <option value="FAILED">FAILED</option>
+                    <option value="COMPLETED">COMPLETED</option>
+                </select>
+            </div>
+
+            <div class="upload-box" id="upload-section">
+                <label class="form-label" style="color: #1D5ED0;">Upload Certificate</label>
+                <input type="file" id="document-upload" class="form-input" accept=".pdf, .jpg, .jpeg, .png">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Admin Notes</label>
+                <textarea id="update-notes" class="form-input" rows="2" style="resize: vertical;"></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" id="modal-cancel" class="btn-modal btn-cancel">Cancel</button>
+                <button type="button" id="modal-save" class="btn-modal btn-save">Save & Dispatch</button>
+            </div>
+        </div>
+    </div>
+    <nav class="mobile-nav">
+        <a href="/dashboard/" class="nav-item active"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+        <a href="/dashboard/history/" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>History</span></a>
+        <a href="/dashboard/fund/" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
+        <a href="/dashboard/account/" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../assets/js/supabase-client.js"></script>
+    <script src="../../assets/js/admin-exam-certs.js"></script>
+</body>
+</html>

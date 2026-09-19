@@ -11,12 +11,11 @@
     <link rel="canonical" href="https://brytpay.name.ng/">
     <link rel="manifest" href="manifest.json">
     
-    
     <!-- Branding & PWA -->
     <meta name="theme-color" content="#1D5ED0">
      <link rel="icon" href="favicon.ico" type="image/x-icon">
     
-    <!-- Open Graph / Social Media (Facebook, WhatsApp, LinkedIn) -->
+    <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://brytpay.name.ng/">
     <meta property="og:title" content="BRYT Pay | Airtime, Data & Digital Services in Nigeria">
@@ -31,49 +30,6 @@
     <meta name="twitter:title" content="BRYT Pay | Digital Services in Nigeria">
     <meta name="twitter:description" content="Purchase Airtime, Data, TV subscriptions, and access manual JAMB & NIN processing securely online with BRYT Pay.">
     <meta name="twitter:image" content="https://brytpay.name.ng/assets/img/brytpay-logo.png">
-
-    <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "WebSite",
-          "@id": "https://brytpay.name.ng/#website",
-          "url": "https://brytpay.name.ng/",
-          "name": "BRYT Pay",
-          "description": "Nigerian digital-services and payment platform offering Airtime, Mobile data, Educational PINs, and utility services.",
-          "inLanguage": "en-NG"
-        },
-        {
-          "@type": "Organization",
-          "@id": "https://brytpay.name.ng/#organization",
-          "name": "BRYT Technologies",
-          "url": "https://brytpay.name.ng/",
-          "logo": "https://brytpay.name.ng/assets/img/brytpay-logo.png",
-          "brand": {
-            "@type": "Brand",
-            "name": "BRYT Pay"
-          },
-          "location": {
-            "@type": "Place",
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": "Kaduna",
-              "addressCountry": "NG"
-            }
-          },
-          "contactPoint": {
-            "@type": "ContactPoint",
-            "telephone": "+23409153375488",
-            "contactType": "customer support",
-            "areaServed": "NG",
-            "availableLanguage": "English"
-          }
-        }
-      ]
-    }
-    </script>
 
     <link rel="stylesheet" href="assets/css/main.css">
     <style>
@@ -137,10 +93,13 @@
         .step-num { width: 48px; height: 48px; background: var(--bryt-navy); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 800; margin: 0 auto 20px; box-shadow: 0 0 0 8px var(--surface-white); }
         .step-card h3 { font-size: 1.2rem; font-weight: 700; color: var(--bryt-navy); margin-bottom: 12px; }
         .step-card p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; }
-        .jamb-banner { background: linear-gradient(135deg, var(--bryt-navy), #0a2554); border-radius: 24px; padding: 48px 32px; text-align: center; color: white; position: relative; overflow: hidden; margin: 40px auto; max-width: 1100px; box-shadow: var(--shadow-md); }
-        .jamb-banner h2 { font-size: 2rem; font-weight: 800; margin-bottom: 16px; }
-        .jamb-banner p { font-size: 1.1rem; color: #94a3b8; max-width: 700px; margin: 0 auto 32px; line-height: 1.6; }
-        .jamb-disclaimer { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 24px; }
+        
+        /* 🚀 FIXED: JAMB Banner perfectly scaled for mobile readability */
+        .jamb-banner { background: linear-gradient(135deg, var(--bryt-navy), #0a2554); border-radius: 20px; padding: 32px 20px; text-align: center; color: white; position: relative; overflow: hidden; margin: 24px 16px; max-width: 1100px; box-shadow: var(--shadow-md); }
+        .jamb-banner h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 12px; line-height: 1.2; }
+        .jamb-banner p { font-size: 0.9rem; color: #94a3b8; max-width: 700px; margin: 0 auto 24px; line-height: 1.5; }
+        .jamb-disclaimer { font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: 20px; }
+        
         .final-cta { text-align: center; padding: 100px 20px; background: var(--bg-light); }
         .final-cta h2 { font-size: 2.5rem; font-weight: 800; color: var(--bryt-navy); margin-bottom: 24px; letter-spacing: -0.5px; }
         .final-cta p { font-size: 1.15rem; color: var(--text-muted); margin-bottom: 40px; }
@@ -172,36 +131,42 @@
             .steps-grid { grid-template-columns: repeat(3, 1fr); }
             .steps-grid::before { content: ''; position: absolute; top: 24px; left: 10%; right: 10%; height: 2px; background: dashed 2px var(--border-color); z-index: 1; }
             .footer-bottom { flex-direction: row; justify-content: space-between; }
+            
+            /* Desktop styles for JAMB Banner */
+            .jamb-banner { padding: 48px 32px; margin: 40px auto; border-radius: 24px; }
+            .jamb-banner h2 { font-size: 2rem; margin-bottom: 16px; }
+            .jamb-banner p { font-size: 1.1rem; margin-bottom: 32px; line-height: 1.6; }
+            .jamb-disclaimer { font-size: 0.75rem; margin-top: 24px; }
         }
-        /* App Download Button Styling */
-.nav-download-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #eff6ff;
-    color: #1D5ED0 !important;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    border: 1px solid #bfdbfe;
-    transition: 0.2s;
-    text-decoration: none;
-}
-.nav-download-btn:hover {
-    background: #1D5ED0;
-    color: #ffffff !important;
-}
 
-/* Magically hide the button if they are already inside the installed App! */
-@media all and (display-mode: standalone) {
-    .nav-download-btn { display: none !important; }
-}
+        /* App Download Button Styling */
+        .nav-download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eff6ff;
+            color: #1D5ED0 !important;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: 1px solid #bfdbfe;
+            transition: 0.2s;
+            text-decoration: none;
+        }
+        .nav-download-btn:hover {
+            background: #1D5ED0;
+            color: #ffffff !important;
+        }
+
+        /* Hide the button if they are already inside the installed App! */
+        @media all and (display-mode: standalone) {
+            .nav-download-btn { display: none !important; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- 🚀 NEW: Navigation Header from About Page -->
     <header class="bryt-header" id="navbar">
         <a href="/" class="bryt-logo">
             <img src="assets/img/brytpay-logo.png" alt="BRYT Pay" onerror="this.src=''; this.alt='BRYT Pay';">
@@ -212,11 +177,10 @@
             <a href="#how-it-works">How It Works</a>
             <a href="/doc/faq/">FAQ</a>
             <a href="/doc/about/">About</a>
-            <!-- NEW: Get App Button -->
-    <a href="/download/" class="nav-download-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Get App
-    </a>
+            <a href="/download/" class="nav-download-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Get App
+            </a>
             <a href="/auth/login.html" class="auth-login">Login</a>
             <a href="/auth/signup.html" class="btn-nav-primary auth-signup">Get Started</a>
         </nav>
@@ -225,18 +189,16 @@
         </button>
     </header>
 
-    <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobile-menu">
         <a href="#services" class="mobile-link">Services</a>
         <a href="#how-it-works" class="mobile-link">How It Works</a>
         <a href="/doc/faq/" class="mobile-link">FAQ</a>
         <a href="/doc/about/" class="mobile-link">About</a>
 
-        <!-- NEW: Get App Button (Mobile) -->
-    <a href="/download/" class="nav-download-btn" style="justify-content: center; padding: 12px; margin-top: 8px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Download App
-    </a>
+        <a href="/download/" class="nav-download-btn" style="justify-content: center; padding: 12px; margin-top: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download App
+        </a>
         <hr style="border: none; border-top: 1px solid var(--border-color); margin: 8px 0;">
         <a href="/auth/login.html" class="auth-login" style="color: var(--text-muted);">Log In</a>
         <a href="/auth/signup.html" class="btn-nav-primary auth-signup" style="text-align: center;">Get Started</a>
@@ -327,11 +289,17 @@
                     <p>Pay for supported television packages including DStv, GOtv, and StarTimes without leaving your couch.</p>
                 </div>
 
-                <!-- 🚀 FIX: Changed to Education PINs -->
                 <div class="srv-card">
                     <div class="srv-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
                     <h3>Education PINs</h3>
                     <p>Purchase digital WAEC, NECO, and NABTEB Result Checker PINs securely and have them delivered instantly to your dashboard.</p>
+                </div>
+
+                <!-- 🚀 NEW: Added Exam Certifications -->
+                <div class="srv-card">
+                    <div class="srv-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg></div>
+                    <h3>Exam Certifications</h3>
+                    <p>Process WAEC, NECO & NABTEB digital certificate requests and download official PDF documents straight from your dashboard.</p>
                 </div>
                 
                 <div class="srv-card">
@@ -340,7 +308,6 @@
                     <p>Access available JAMB processing services. Request your Admission Letters and track fulfillment securely.</p>
                 </div>
                 
-                <!-- 🚀 FIX: Added NIN Services -->
                 <div class="srv-card">
                     <div class="srv-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><circle cx="10" cy="13" r="2"></circle><line x1="14" y1="13" x2="16" y2="13"></line><line x1="10" y1="17" x2="16" y2="17"></line></svg></div>
                     <h3>NIN Services</h3>
@@ -382,14 +349,13 @@
     <section class="container" id="jamb" style="padding-top: 0; padding-bottom: 0;">
         <div class="jamb-banner">
             <h2>Need JAMB Services?</h2>
-            <!-- 🚀 FIX: Expanded Text for all JAMB Services -->
             <p>Get access to available JAMB processing services directly through BRYT Pay. Submit your details securely and download your processed Admission Letters, Original Result Slips, UTME Registration Slips, Exam Slips, Change of Course Slips, DE Registration Slips, and check your Admission Status straight from your dashboard.</p>
             <a href="/auth/signup.html" class="btn-primary auth-signup" style="width: auto; display: inline-flex; background: white; color: var(--bryt-navy);">Access JAMB Desk</a>
             <p class="jamb-disclaimer">BRYT Pay acts as an independent processing platform. Services are fulfilled based on availability.</p>
         </div>
     </section>
 
-    <!-- Final CTA (Left completely untouched!) -->
+    <!-- Final CTA -->
     <section class="final-cta">
         <div class="container">
             <h2>Your everyday digital services,<br>made simpler.</h2>
@@ -401,7 +367,6 @@
         </div>
     </section>
 
-    <!-- 🚀 NEW: Footer from the About Page -->
     <footer class="bryt-footer" id="contact">
         <div class="footer-grid">
             <div class="footer-col">
@@ -490,21 +455,6 @@
     </script>
 
     <!-- PWA Install Popup UI -->
-<div id="pwa-install-prompt" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #ffffff; padding: 16px 20px; border-radius: 16px; box-shadow: 0 10px 40px rgba(7, 26, 58, 0.2); z-index: 10000; width: 90%; max-width: 360px; border: 1px solid #e2e8f0; align-items: center; justify-content: space-between;">
-    <div style="display: flex; align-items: center; gap: 12px;">
-        <img src="/assets/img/brytpay-logo.png" style="width: 40px; height: 40px; object-fit: contain; background: #f8fafc; border-radius: 8px; padding: 4px;" alt="Icon">
-        <div>
-            <div style="font-weight: 800; color: #071A3A; font-size: 0.9rem; font-family: 'Sora', sans-serif;">Install BRYT Pay</div>
-            <div style="font-size: 0.75rem; color: #64748B; font-family: 'Sora', sans-serif;">Fast, easy access on your screen</div>
-        </div>
-    </div>
-    <div style="display: flex; align-items: center; gap: 8px;">
-        <button id="pwa-close" style="background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer; padding: 4px;">&times;</button>
-        <button id="pwa-install-btn" style="background: #1D5ED0; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-family: 'Sora', sans-serif; cursor: pointer;">Install</button>
-    </div>
-</div>
-
-<!-- Smart App Install / Download Popup UI -->
     <div id="pwa-install-prompt" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #ffffff; padding: 16px 20px; border-radius: 16px; box-shadow: 0 10px 40px rgba(7, 26, 58, 0.2); z-index: 10000; width: 90%; max-width: 360px; border: 1px solid #e2e8f0; align-items: center; justify-content: space-between;">
         <div style="display: flex; align-items: center; gap: 12px;">
             <img src="/assets/img/brytpay-logo.png" style="width: 40px; height: 40px; object-fit: contain; background: #f8fafc; border-radius: 8px; padding: 4px;" alt="BRYT Pay">
@@ -550,7 +500,6 @@
                 showInstallUI();
             });
 
-            // If the browser does not fire beforeinstallprompt within 3 seconds, show fallback
             setTimeout(() => {
                 showInstallUI();
             }, 3000);
@@ -567,13 +516,11 @@
                 installPromptUI.style.display = 'none';
 
                 if (deferredPrompt) {
-                    // Browser supports direct WebAPK prompt
                     deferredPrompt.prompt();
                     const { outcome } = await deferredPrompt.userChoice;
                     console.log(`User ${outcome} installation`);
                     deferredPrompt = null;
                 } else {
-                    // Direct APK download fallback
                     window.location.href = '/app/brytpay.apk';
                 }
             });

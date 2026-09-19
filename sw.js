@@ -1,4 +1,4 @@
-const CACHE_NAME = 'brytpay-pwa-v4';
+const CACHE_NAME = 'brytpay-pwa-v5';
 const OFFLINE_URL = '/offline.html';
 
 const ASSETS_TO_CACHE = [

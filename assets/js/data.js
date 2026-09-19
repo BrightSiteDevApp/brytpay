@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             { code: '21', price: 4274, label: 'Airtel 10GB Gifting (30 Days)' }
         ],
         'glo_sme-data': [ // The "Glo SME" button
+            { code: '84', price: 263,  label: 'Glo 1GB (1 Day)' }, // 🚀 NEW GLO PLAN
             { code: '35', price: 237,  label: 'Glo 500MB CG (30 Days)' },
             { code: '36', price: 447,  label: 'Glo 1GB CG (30 Days)' },
             { code: '40', price: 893,  label: 'Glo 2GB CG (30 Days)' },
@@ -67,6 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             { code: '39', price: 4610, label: 'Glo 10GB CG (30 Days)' }
         ],
         'glo_cg-data': [ // The "Glo CG / GIFT" button (We mirror the same list here so it is not empty)
+            { code: '84', price: 263,  label: 'Glo 1GB (1 Day)' }, // 🚀 NEW GLO PLAN
             { code: '35', price: 237,  label: 'Glo 500MB CG (30 Days)' },
             { code: '36', price: 447,  label: 'Glo 1GB CG (30 Days)' },
             { code: '40', price: 893,  label: 'Glo 2GB CG (30 Days)' },

@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const user = session.user;
     let currentBalance = 0;
 
-    // 🚀 SMART NOTIFICATION CHECKER
     async function checkUnreadNotifications() {
         const notifDot = document.getElementById('notif-dot');
         if (!notifDot) return;
@@ -119,6 +118,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const notes = (tx.admin_notes || '').toLowerCase();
         const ref = (tx.reference || tx.external_reference || '').toUpperCase();
 
+        // 🚀 THE FIX: Catch Certificates before Education PINs
+        if (srvType.includes('certificate')) {
+            return srvType.toUpperCase();
+        }
+
         if (srvType.includes('education') || srvType.includes('waec') || srvType.includes('neco') || srvType.includes('nabteb') || txType.includes('education')) {
             let examName = provider;
             if (!examName || examName === 'SELF' || examName.includes('VTPASS') || examName.includes('CHEAPDATAHUB')) {
@@ -167,6 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         else if (raw.includes('9mobile') || raw.includes('etisalat')) logoFile = '9mob-logo.png';
         else if (raw.includes('dstv')) logoFile = 'dstv-logo.png';
         else if (raw.includes('gotv')) logoFile = 'gotv-logo.png';
+        else if (raw.includes('startimes')) logoFile = 'startimes-logo.png'; // 🚀 THE FIX: Added StarTimes trigger
         else if (raw.includes('jmb_') || raw.includes('jamb') || raw.includes('admission') || raw.includes('result')) logoFile = 'jamb-logo.png';
         else if (raw.includes('nin_') || raw.includes('nin') || raw.includes('slip')) logoFile = 'nimc-logo.png';
         else if (raw.includes('waec')) logoFile = 'waec-logo.png';
@@ -290,10 +295,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             consentUI.classList.add('active');
         }, 1500);
 
-        // Handle "Maybe Later" (🚀 Set to 2 Days)
+        // Handle "Maybe Later"
         btnDeny.addEventListener('click', () => {
             consentUI.classList.remove('active');
-            // Hide for 2 days (2 * 24 * 60 * 60 * 1000 = 172800000 ms)
             localStorage.setItem('bryt_push_dismissed_until', (Date.now() + 172800000).toString()); 
         });
 
@@ -327,7 +331,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
                 });
 
-                // 🚀 FIXED: Securely Insert to DB and handle duplicates gracefully
                 const { error: insertError } = await window.db.from('push_subscriptions').insert({
                     user_id: user.id,
                     subscription: subscription
