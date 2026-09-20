@@ -54,6 +54,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const greetingEl = document.getElementById('user-greeting');
         if (greetingEl) {
             greetingEl.textContent = (data && data.full_name) ? data.full_name.split(' ')[0] : "User";
+            // 🚀 SKELETON TRIGGER: Remove shimmer once name is loaded
+            greetingEl.classList.remove('skeleton');
         }
     }
 
@@ -62,6 +64,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (data) {
             currentBalance = parseFloat(data.balance);
             updateBalanceUI(isBalanceHidden);
+            
+            // 🚀 SKELETON TRIGGER: Remove shimmer once balance is loaded
+            const balanceAmount = document.getElementById('balance-amount');
+            if (balanceAmount) balanceAmount.classList.remove('skeleton');
         }
     }
 
@@ -118,7 +124,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const notes = (tx.admin_notes || '').toLowerCase();
         const ref = (tx.reference || tx.external_reference || '').toUpperCase();
 
-        // 🚀 THE FIX: Catch Certificates before Education PINs
         if (srvType.includes('certificate')) {
             return srvType.toUpperCase();
         }
@@ -171,7 +176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         else if (raw.includes('9mobile') || raw.includes('etisalat')) logoFile = '9mob-logo.png';
         else if (raw.includes('dstv')) logoFile = 'dstv-logo.png';
         else if (raw.includes('gotv')) logoFile = 'gotv-logo.png';
-        else if (raw.includes('startimes')) logoFile = 'startimes-logo.png'; // 🚀 THE FIX: Added StarTimes trigger
+        else if (raw.includes('startimes')) logoFile = 'startimes-logo.png';
         else if (raw.includes('jmb_') || raw.includes('jamb') || raw.includes('admission') || raw.includes('result')) logoFile = 'jamb-logo.png';
         else if (raw.includes('nin_') || raw.includes('nin') || raw.includes('slip')) logoFile = 'nimc-logo.png';
         else if (raw.includes('waec')) logoFile = 'waec-logo.png';
@@ -262,7 +267,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // 🚀 MASTER PUSH CONSENT CONTROLLER
     async function managePushConsent() {
         const consentUI = document.getElementById('push-consent-ui');
         const btnAllow = document.getElementById('btn-allow-push');
@@ -289,19 +293,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Show modal after 1.5 seconds
         console.log("Push Modal: Triggering modal display in 1.5s...");
         setTimeout(() => {
             consentUI.classList.add('active');
         }, 1500);
 
-        // Handle "Maybe Later"
         btnDeny.addEventListener('click', () => {
             consentUI.classList.remove('active');
             localStorage.setItem('bryt_push_dismissed_until', (Date.now() + 172800000).toString()); 
         });
 
-        // Handle "Enable Notifications"
         btnAllow.addEventListener('click', async () => {
             btnAllow.textContent = "Connecting...";
             btnAllow.disabled = true;

@@ -187,3 +187,27 @@ body { background-color: var(--bg-light); color: var(--text-main); line-height: 
 .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: var(--text-muted); font-size: 0.7rem; font-weight: 600; }
 .nav-item.active { color: var(--bryt-primary); }
 @media (min-width: 768px) { .mobile-nav { display: none; } }
+
+/* =========================================
+   BRYT PAY SKELETON SHIMMER (LOADING STATE)
+   ========================================= */
+.skeleton {
+    background: #e2e8f0;
+    background-image: linear-gradient(90deg, #e2e8f0 0px, #f8fafc 40px, #e2e8f0 80px);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+    border-radius: 8px;
+    color: transparent !important;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* Hide actual text inside the skeleton so it just looks like a solid block */
+.skeleton * {
+    visibility: hidden;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
