@@ -33,72 +33,6 @@
         .password-hint.valid { color: #16a34a; }
         .password-hint.invalid { color: #ef4444; }
 
-
-        /* ========================================= */
-        /* 🚀 COMING SOON MODE (Delete to launch!)   */
-        /* ========================================= */
-        #signup-form, #signup-header, .auth-footer {
-            display: none !important;
-        }
-        .coming-soon-box {
-            text-align: center;
-            padding: 20px 0;
-        }
-        .coming-soon-box h1 {
-            font-size: 1.8rem;
-            color: #0f172a;
-            margin-bottom: 12px;
-            font-weight: 800;
-        }
-        .coming-soon-box p {
-            font-size: 0.95rem;
-            color: #64748b;
-            line-height: 1.6;
-            margin-bottom: 32px;
-        }
-        
-        /* New Button Layout for Coming Soon Mode */
-        .coming-soon-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .btn-return {
-            display: inline-block;
-            background: #1D5ED0;
-            color: white;
-            padding: 14px 28px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.9rem;
-            transition: 0.2s;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .btn-return:hover {
-            background: #0f172a;
-        }
-        .btn-secondary {
-            display: inline-block;
-            background: transparent;
-            color: #475569;
-            padding: 14px 28px;
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.9rem;
-            transition: 0.2s;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .btn-secondary:hover {
-            background: #f1f5f9;
-            color: #0f172a;
-            border-color: #94a3b8;
-        }
-        /* ========================================= */
     </style>
 </head>
 <body>
@@ -106,20 +40,6 @@
         <div class="auth-brand">
             <img src="../assets/img/brytpay-logo.png" alt="BRYT Pay" class="brand-logo-img">
         </div>
-
-        <!-- ========================================= -->
-        <!-- 🚀 COMING SOON UI (Delete to launch!)     -->
-        <!-- ========================================= -->
-        <div class="coming-soon-box" id="coming-soon-ui">
-            <h1>Coming Soon 🚀</h1>
-            <p>We are currently putting the finishing touches on BRYT Pay. New account registrations will open very soon!</p>
-            
-            <div class="coming-soon-actions">
-                <a href="/auth/login.html" class="btn-return">Back to Login</a>
-                <a href="/" class="btn-secondary">Back to Home</a>
-            </div>
-        </div>
-        <!-- ========================================= -->
 
         <div class="auth-header" id="signup-header">
             <h1>Join BRYT Pay</h1>
