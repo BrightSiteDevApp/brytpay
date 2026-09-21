@@ -2,78 +2,118 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Notifications — BRYT Pay</title>
+    
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#1D5ED0">
-    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    
     <style>
+        /* Base Reset */
+        * { box-sizing: border-box; }
+        body { background: #f8fafc; margin: 0; font-family: system-ui, -apple-system, sans-serif; overflow-x: hidden; color: #0f172a; }
+        .app-container { max-width: 600px; margin: 0 auto; padding: 24px 16px 90px; }
+
+        /* Sleek Header */
+        .page-header { margin-bottom: 32px; }
+        .back-btn { 
+            text-decoration: none; color: #64748b; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; 
+            letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 20px; transition: color 0.2s;
+        }
+        .back-btn:hover { color: #1D5ED0; }
+        .title-row { display: flex; justify-content: space-between; align-items: flex-end; }
+        .title-row h1 { font-size: 1.8rem; color: #071A3A; margin: 0; font-weight: 800; letter-spacing: -0.5px; }
+        
+        .btn-mark-all { 
+            background: #eff6ff; border: none; color: #1D5ED0; font-size: 0.75rem; 
+            font-weight: 800; cursor: pointer; padding: 8px 14px; border-radius: 20px; transition: 0.2s; display: none;
+        }
+        .btn-mark-all:hover { background: #dbeafe; }
+
+        /* Premium Notification Cards */
+        .notif-feed { display: flex; flex-direction: column; gap: 14px; }
+        
         .notif-card {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 14px;
-            display: flex;
-            gap: 16px;
-            align-items: flex-start;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+            background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px;
+            display: flex; gap: 16px; align-items: flex-start; transition: 0.2s; position: relative;
         }
+        
+        /* Unread State Indicator */
         .notif-card.unread {
-            background: #f8fafc;
-            border-left: 4px solid var(--bryt-primary);
-            box-shadow: 0 8px 20px rgba(29, 94, 208, 0.06);
+            background: #ffffff; border-color: #bfdbfe; box-shadow: 0 8px 24px rgba(29, 94, 208, 0.05);
         }
-        .notif-card:hover { border-color: #cbd5e1; }
-        
-        .notif-icon {
-            width: 44px; height: 44px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        .notif-card.unread::before {
+            content: ''; position: absolute; top: 20px; right: 20px; width: 8px; height: 8px;
+            background: #1D5ED0; border-radius: 50%; box-shadow: 0 0 0 4px #eff6ff;
         }
-        .icon-info { background: #e0f2fe; color: #0284c7; }
-        .icon-alert { background: #fee2e2; color: #ef4444; }
-        .icon-success { background: #dcfce7; color: #16a34a; }
-        
-        .notif-content { flex: 1; min-width: 0; }
-        .notif-title { font-size: 0.95rem; font-weight: 800; color: var(--bryt-navy); margin-bottom: 6px; }
-        .notif-message { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
-        .notif-meta { display: flex; justify-content: space-between; align-items: center; }
-        .notif-time { font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
-        
-        .btn-mark-read {
-            background: #e2e8f0;
-            border: none;
-            color: #475569;
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 6px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
+
+        /* Modern Icon System */
+        .notif-icon-wrap {
+            width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; 
+            justify-content: center; flex-shrink: 0;
         }
-        .btn-mark-read:hover { background: var(--bryt-primary); color: white; }
+        .type-info { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+        .type-alert { background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; }
+        .type-success { background: #ecfdf5; color: #10b981; border: 1px solid #d1fae5; }
+        .type-system { background: #eff6ff; color: #1D5ED0; border: 1px solid #dbeafe; }
+
+        /* Typography */
+        .notif-body { flex: 1; min-width: 0; padding-top: 2px; }
+        .notif-title { font-size: 0.95rem; font-weight: 800; color: #071A3A; margin: 0 0 6px 0; line-height: 1.3; padding-right: 24px;}
+        .notif-text { font-size: 0.85rem; color: #475569; line-height: 1.5; margin: 0 0 12px 0; }
+        
+        /* Bottom Meta Row */
+        .notif-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+        .notif-time { font-size: 0.7rem; color: #94a3b8; font-weight: 700; }
+        
+        .btn-action-read {
+            background: transparent; border: 1px solid #cbd5e1; color: #475569; font-size: 0.7rem; 
+            font-weight: 800; padding: 6px 12px; border-radius: 12px; cursor: pointer; transition: 0.2s;
+        }
+        .btn-action-read:hover { background: #f8fafc; color: #0f172a; border-color: #94a3b8; }
+
+        /* Skeleton Loaders */
+        .skeleton {
+            background: #e2e8f0; background-image: linear-gradient(90deg, #e2e8f0 0px, #f8fafc 40px, #e2e8f0 80px);
+            background-size: 200% 100%; animation: shimmer 1.5s infinite linear; border-radius: 8px;
+            color: transparent !important; pointer-events: none; border: none !important;
+        }
+        .skeleton * { visibility: hidden; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        
+        .skel-card { height: 130px; width: 100%; border-radius: 16px; margin-bottom: 12px; }
+        
+        /* Empty State */
+        .empty-inbox { text-align: center; padding: 60px 20px; }
+        .empty-icon { width: 64px; height: 64px; background: #f1f5f9; color: #94a3b8; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+        .empty-title { font-size: 1.1rem; font-weight: 800; color: #071A3A; margin: 0 0 8px 0; }
+        .empty-desc { font-size: 0.85rem; color: #64748b; margin: 0; line-height: 1.5; }
     </style>
 </head>
 <body>
-    <main class="app-container" style="max-width: 600px; padding-bottom: 90px;">
-        <header style="margin-bottom: 28px;">
-            <a href="/dashboard/" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:700; display:inline-flex; align-items:center; gap:6px; margin-bottom: 16px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back
+
+    <main class="app-container">
+        <header class="page-header">
+            <a href="/dashboard/" class="back-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Dashboard
             </a>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h1 style="font-size: 1.6rem; color: var(--bryt-navy); margin: 0; font-weight: 800; letter-spacing: -0.5px;">Notifications</h1>
-                <button id="mark-all-read" style="background:none; border:none; color:var(--bryt-primary); font-size:0.85rem; font-weight:700; cursor:pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.2s;">Mark all read</button>
+            <div class="title-row">
+                <h1>Inbox</h1>
+                <button id="mark-all-read" class="btn-mark-all">Mark all read</button>
             </div>
         </header>
 
-        <div id="notifications-container">
-            <!-- Loading state -->
-            <div style="text-align: center; padding: 40px; color: #94a3b8;">Loading...</div>
+        <div id="notifications-container" class="notif-feed">
+            <!-- Shimmer Loaders (Will vanish instantly when JS loads data) -->
+            <div class="skel-card skeleton"></div>
+            <div class="skel-card skeleton"></div>
+            <div class="skel-card skeleton"></div>
         </div>
     </main>
 
+    <!-- Supabase CDN & Logic -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../assets/js/supabase-client.js"></script>
     <script src="../../assets/js/notifications.js"></script>
