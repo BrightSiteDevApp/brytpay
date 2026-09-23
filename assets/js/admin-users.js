@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- SECURE ACTION: ADJUST WALLET ---
     document.getElementById('btn-submit-wallet').addEventListener('click', async () => {
         const amount = parseFloat(document.getElementById('wallet-amount').value);
-        const actionType = document.getElementById('wallet-action').value;
+        const actionType = document.getElementById('wallet-action').value.toLowerCase();
         const pin = document.getElementById('wallet-pin').value;
 
         if (!amount || amount <= 0) return alert('Enter a valid amount.');
