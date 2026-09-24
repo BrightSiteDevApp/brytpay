@@ -10,7 +10,7 @@
     
     <!-- Branding -->
     <meta name="theme-color" content="#1D5ED0">
-     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     <link rel="stylesheet" href="../../assets/css/main.css">
     
@@ -131,9 +131,14 @@
 
                 <!-- Live Summary Box -->
                 <div class="summary-card">
-                    <div class="summary-row"><span>Wallet Credit</span> <span id="summary-base" style="font-weight: 600; color: #10b981;">₦0.00</span></div>
-                    <div class="summary-row"><span>Processing Fee</span> <span id="summary-fee">₦0.00</span></div>
-                    <div class="summary-row total"><span>Total to Pay</span> <span id="summary-total">₦0.00</span></div>
+                    <div class="summary-row total">
+                        <span>Amount to Fund</span> 
+                        <span id="summary-total" style="color: #10b981;">₦0.00</span>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #64748b; margin-top: 12px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        Note: Payment gateway charges may apply at checkout.
+                    </div>
                 </div>
 
                 <button type="submit" id="pay-btn" class="btn-primary" style="margin-top: 24px; background: #1D5ED0;">

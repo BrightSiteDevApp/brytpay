@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.querySelectorAll('.gateway-card').forEach(c => c.classList.remove('active'));
             card.classList.add('active');
             selectedGateway = card.getAttribute('data-gateway');
-            updateSummary();
         });
     });
 
@@ -37,24 +36,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     amountInput.addEventListener('input', updateSummary);
 
-    function getFee(baseAmount) {
-        if (baseAmount >= 100 && baseAmount <= 999) return 20;
-        if (baseAmount >= 1000 && baseAmount <= 6999) return 50;
-        if (baseAmount >= 7000 && baseAmount <= 19999) return 100;
-        if (baseAmount >= 20000) return 200;
-        return 0;
-    }
-
+    // 🚀 FIXED: Removed all manual fee calculations
     function updateSummary() {
         const base = parseFloat(amountInput.value) || 0;
-        const fee = base >= 100 ? getFee(base) : 0;
-        const total = base + fee;
-
-        document.getElementById('summary-base').textContent = `₦${base.toLocaleString('en-NG')}`;
-        document.getElementById('summary-fee').textContent = `₦${fee.toLocaleString('en-NG')}`;
-        document.getElementById('summary-total').textContent = `₦${total.toLocaleString('en-NG')}`;
-        
-        payBtn.innerHTML = `Pay ₦${total.toLocaleString('en-NG')} <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`;
+        document.getElementById('summary-total').textContent = `₦${base.toLocaleString('en-NG')}`;
+        payBtn.innerHTML = `Pay ₦${base.toLocaleString('en-NG')} <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`;
     }
 
     fundForm.addEventListener('submit', (e) => {
@@ -62,15 +48,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const base = parseFloat(amountInput.value);
         if (isNaN(base) || base < 100) return alert('Please enter a valid amount (Minimum ₦100).');
 
-        const fee = getFee(base);
-        const totalPayable = base + fee;
         const reference = `BRYT_FUND_${user.id}_${Date.now()}`;
 
         if (selectedGateway === 'PAYSTACK') {
             const handler = PaystackPop.setup({
                 key: PAYSTACK_PUBLIC_KEY,
                 email: user.email,
-                amount: totalPayable * 100, 
+                amount: base * 100, // Paystack requires kobo
                 currency: 'NGN',
                 ref: reference,
                 callback: function(res) {
@@ -84,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             FlutterwaveCheckout({
                 public_key: FLUTTERWAVE_PUBLIC_KEY,
                 tx_ref: reference,
-                amount: totalPayable,
+                amount: base,
                 currency: 'NGN',
                 customer: { email: user.email, name: 'BRYT Pay User' },
                 customizations: { title: 'BRYT Pay', description: 'Wallet Funding' },
@@ -96,7 +80,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // 🚀 FIXED: Smart UI State Management
     async function verifyPaymentSecurely(ref, provider) {
         const overlay = document.getElementById('success-overlay');
         const statusText = document.getElementById('overlay-status');
@@ -107,7 +90,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         overlay.classList.add('active'); 
 
         try {
-            // 🚀 ALWAYS get a fresh token here so it never expires while they are in their bank app!
             const { data: { session: freshSession } } = await window.db.auth.getSession();
             if (!freshSession) throw new Error("Session expired. Please log in again.");
 
@@ -127,7 +109,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 loadSvg.style.display = 'none';
                 successSvg.style.display = 'block';
 
-                // 🚀 DYNAMIC MESSAGING: Check if the webhook beat us to it!
                 if (result.message && result.message.includes('Webhook')) {
                     statusText.innerHTML = `Transfer Captured! 🚀<br><span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">Your wallet was already funded in the background with ₦${result.credited_amount.toLocaleString()}.</span><br><br>Redirecting in <span id="countdown" style="color:#1D5ED0;">3</span>...`;
                 } else {
