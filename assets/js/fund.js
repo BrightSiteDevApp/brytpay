@@ -36,11 +36,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     amountInput.addEventListener('input', updateSummary);
 
-    // 🚀 FIXED: Removed all manual fee calculations
     function updateSummary() {
         const base = parseFloat(amountInput.value) || 0;
-        document.getElementById('summary-total').textContent = `₦${base.toLocaleString('en-NG')}`;
-        payBtn.innerHTML = `Pay ₦${base.toLocaleString('en-NG')} <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`;
+        const formattedAmount = base.toLocaleString('en-NG', { minimumFractionDigits: 2 });
+        document.getElementById('summary-total').textContent = `₦${formattedAmount}`;
+        payBtn.innerHTML = `Pay ₦${formattedAmount} <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`;
     }
 
     fundForm.addEventListener('submit', (e) => {
@@ -109,11 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 loadSvg.style.display = 'none';
                 successSvg.style.display = 'block';
 
-                if (result.message && result.message.includes('Webhook')) {
-                    statusText.innerHTML = `Transfer Captured! 🚀<br><span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">Your wallet was already funded in the background with ₦${result.credited_amount.toLocaleString()}.</span><br><br>Redirecting in <span id="countdown" style="color:#1D5ED0;">3</span>...`;
-                } else {
-                    statusText.innerHTML = `Payment Successful!<br><span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">₦${result.credited_amount.toLocaleString()} has been credited to your wallet.</span><br><br>Redirecting in <span id="countdown" style="color:#1D5ED0;">3</span>...`;
-                }
+                statusText.innerHTML = `Payment Successful! 🚀<br><span style="color: #64748b; font-size: 0.95rem; font-weight: 500;">Your wallet has been funded with <strong style="color:#0B1220;">₦${result.credited_amount.toLocaleString('en-NG', {minimumFractionDigits: 2})}</strong>.</span><br><br>Redirecting in <span id="countdown" style="color:#1D5ED0; font-weight: 700;">3</span>...`;
 
                 const urlParams = new URLSearchParams(window.location.search);
                 const redirectUrl = urlParams.get('redirect');

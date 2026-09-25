@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let selectedPrice = 0;
     let isReprint = false;
 
-    // 🚀 Injecting the Toast function
     function showToast(message, type = 'success') {
         const toast = document.getElementById('bryt-toast');
         const toastText = document.getElementById('toast-text');
@@ -40,7 +39,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
-    // Elements
     const userBalanceEl = document.getElementById('user-balance');
     const serviceModal = document.getElementById('service-modal');
     const modalTitle = document.getElementById('modal-service-title');
@@ -49,7 +47,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const reprintTypeSelect = document.getElementById('reprint-type');
     const jambForm = document.getElementById('jamb-form');
     
-    // Input Fields
     const fullNameInput = document.getElementById('full-name');
     const jambRegInput = document.getElementById('jamb-reg');
     const jambYearInput = document.getElementById('jamb-year');
@@ -58,7 +55,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnCancel = document.getElementById('modal-cancel');
     const btnSubmit = document.getElementById('modal-submit');
 
-    // Load Balance
+    // 🚀 Multi-Step Logic
+    window.goToStep = function(stepNum) {
+        document.querySelectorAll('.modal-step').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.dot').forEach(el => el.classList.remove('active'));
+        document.getElementById(`step-${stepNum}`).classList.add('active');
+        document.getElementById(`dot-${stepNum}`).classList.add('active');
+    };
+
+    window.validateAndGoToStep = function(currentStep, nextStep) {
+        const stepContainer = document.getElementById(`step-${currentStep}`);
+        const inputs = stepContainer.querySelectorAll('input[required], select[required]');
+        let isValid = true;
+        
+        inputs.forEach(input => {
+            if (!input.checkValidity()) {
+                input.reportValidity();
+                isValid = false;
+            }
+        });
+
+        if (isValid) goToStep(nextStep);
+    };
+
     async function loadBalance() {
         const { data } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
         if (data) {
@@ -68,14 +87,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     await loadBalance();
 
-    // Handle Card Clicks
     document.querySelectorAll('.service-card').forEach(card => {
         card.addEventListener('click', () => {
             selectedService = card.getAttribute('data-service');
             selectedPrice = parseFloat(card.getAttribute('data-price'));
             isReprint = card.getAttribute('data-type') === 'reprint';
 
-            // Setup Modal UI
             modalTitle.textContent = selectedService;
             modalPayAmt.textContent = `₦${selectedPrice.toLocaleString()}`;
             
@@ -87,18 +104,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 reprintTypeSelect.required = false;
             }
 
-            // Clear previous inputs
             jambForm.reset();
+            goToStep(1); // 🚀 Ensure it always opens on Phase 1
             serviceModal.style.display = 'flex';
         });
     });
 
-    // Close Modal
     btnCancel.addEventListener('click', () => {
         serviceModal.style.display = 'none';
     });
 
-    // Submit Order
     jambForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -108,7 +123,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const whatsapp = whatsappInput.value.trim();
         const email = emailInput.value.trim();
         
-        // Format the final service name (If reprint, append the dropdown selection)
         const finalServiceName = isReprint ? `Reprint: ${reprintTypeSelect.value}` : selectedService;
 
         if (whatsapp.length !== 11 || !/^\d+$/.test(whatsapp)) {
@@ -122,11 +136,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         btnSubmit.disabled = true;
-        btnCancel.disabled = true;
         btnSubmit.textContent = 'Processing...';
 
         try {
-            // Call the Upgraded RPC
             const { data, error } = await window.db.rpc('process_jamb_order', {
                 p_customer_name: fullName,
                 p_jamb_reg: jambReg,
@@ -139,7 +151,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error) throw error;
 
-            // Success UI Transition
             serviceModal.style.display = 'none';
             document.getElementById('service-selection-view').style.display = 'none';
             
@@ -148,13 +159,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('success-candidate').textContent = fullName;
             document.getElementById('jamb-success-card').style.display = 'block';
 
-            await loadBalance(); // Refresh balance visually
+            await loadBalance(); 
 
         } catch (err) {
             showToast(`Order could not be completed: ${err.message || 'Server error'}`, 'error');
         } finally {
             btnSubmit.disabled = false;
-            btnCancel.disabled = false;
             btnSubmit.innerHTML = `Pay ₦${selectedPrice.toLocaleString()}`;
         }
     });

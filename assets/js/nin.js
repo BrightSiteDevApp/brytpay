@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const user = session.user;
     let currentBalance = 0;
     
-    // 🚀 Injecting the Toast function
     function showToast(message, type = 'success') {
         const toast = document.getElementById('bryt-toast');
         const toastText = document.getElementById('toast-text');
@@ -51,6 +50,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     const labelIdentifier = document.getElementById('label-identifier');
     const inputIdentifier = document.getElementById('nin-identifier');
     
+    // 🚀 Multi-Step Logic
+    window.goToStep = function(stepNum) {
+        document.querySelectorAll('.modal-step').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.dot').forEach(el => el.classList.remove('active'));
+        document.getElementById(`step-${stepNum}`).classList.add('active');
+        document.getElementById(`dot-${stepNum}`).classList.add('active');
+    };
+
+    window.validateAndGoToStep = function(currentStep, nextStep) {
+        const stepContainer = document.getElementById(`step-${currentStep}`);
+        const inputs = stepContainer.querySelectorAll('input[required], select[required]');
+        let isValid = true;
+        
+        inputs.forEach(input => {
+            if (!input.checkValidity()) {
+                input.reportValidity();
+                isValid = false;
+            }
+        });
+
+        if (isValid) goToStep(nextStep);
+    };
+    
     async function loadBalance() {
         const { data } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
         if (data) {
@@ -73,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     tabNin.addEventListener('click', () => {
         tabNin.classList.add('active'); tabPhone.classList.remove('active');
         activeType = 'NIN_NUMBER';
-        labelIdentifier.textContent = 'National Identity Number (NIN)';
+        labelIdentifier.textContent = 'National Identity Number (NIN) *';
         inputIdentifier.placeholder = 'Enter the 11-digit NIN';
         updateCardPrices();
     });
@@ -81,7 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     tabPhone.addEventListener('click', () => {
         tabPhone.classList.add('active'); tabNin.classList.remove('active');
         activeType = 'PHONE_NUMBER';
-        labelIdentifier.textContent = 'Linked Phone Number';
+        labelIdentifier.textContent = 'Linked Phone Number *';
         inputIdentifier.placeholder = 'Enter the registered phone number';
         updateCardPrices();
     });
@@ -97,11 +119,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('modal-pay-amt').textContent = `₦${selectedPrice.toLocaleString()}`;
             
             document.getElementById('nin-form').reset();
+            goToStep(1); // 🚀 Ensure it always opens on Phase 1
             serviceModal.style.display = 'flex';
         });
     });
 
-    document.getElementById('modal-cancel').addEventListener('click', () => serviceModal.style.display = 'none');
+    // Close button targets elements with class .btn-cancel-modal
+    document.querySelectorAll('.btn-cancel-modal').forEach(btn => {
+        btn.addEventListener('click', () => serviceModal.style.display = 'none');
+    });
 
     document.getElementById('nin-form').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -117,9 +143,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const btnSubmit = document.getElementById('modal-submit');
-        const btnCancel = document.getElementById('modal-cancel');
         
-        btnSubmit.disabled = true; btnCancel.disabled = true;
+        btnSubmit.disabled = true; 
         btnSubmit.textContent = 'Processing...';
 
         try {
@@ -138,7 +163,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             serviceModal.style.display = 'none';
             document.getElementById('service-selection-view').style.display = 'none';
             document.querySelector('.info-notice-box').style.display = 'none';
-            document.querySelector('.tab-container').style.display = 'none';
             
             document.getElementById('success-ref').textContent = data.order_reference;
             document.getElementById('success-service').textContent = selectedService;
@@ -150,7 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (err) {
             showToast(`Order could not be completed: ${err.message || 'Server error'}`, 'error');
         } finally {
-            btnSubmit.disabled = false; btnCancel.disabled = false;
+            btnSubmit.disabled = false; 
             btnSubmit.innerHTML = `Pay ₦${selectedPrice.toLocaleString()}`;
         }
     });
