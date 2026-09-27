@@ -8,6 +8,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const user = session.user;
     let currentBalance = 0;
+    let userAccountId = '';
+
+    // 🚀 NEW: Load hidden state from local storage immediately
+    let isBalanceHidden = localStorage.getItem('brytpay_balance_hidden') === 'true';
 
     async function checkUnreadNotifications() {
         const notifDot = document.getElementById('notif-dot');
@@ -50,13 +54,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function loadProfile() {
-        const { data } = await window.db.from('profiles').select('full_name').eq('id', user.id).single();
+        const { data } = await window.db.from('profiles').select('full_name, account_id').eq('id', user.id).single();
         const greetingEl = document.getElementById('user-greeting');
-        if (greetingEl) {
-            greetingEl.textContent = (data && data.full_name) ? data.full_name.split(' ')[0] : "User";
-            // 🚀 SKELETON TRIGGER: Remove shimmer once name is loaded
-            greetingEl.classList.remove('skeleton');
+        const displayIdEl = document.getElementById('display-account-id');
+        
+        if (data) {
+            if (greetingEl) {
+                greetingEl.textContent = data.full_name ? data.full_name.split(' ')[0] : "User";
+                greetingEl.classList.remove('skeleton');
+            }
+            if (displayIdEl && data.account_id) {
+                userAccountId = data.account_id;
+                displayIdEl.textContent = userAccountId;
+            }
         }
+    }
+
+    const copyBtn = document.getElementById('copy-id-btn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+            if (!userAccountId) return;
+            navigator.clipboard.writeText(userAccountId).then(() => {
+                const toast = document.getElementById('copy-toast');
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            });
+        });
     }
 
     async function loadWallet() {
@@ -65,7 +88,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentBalance = parseFloat(data.balance);
             updateBalanceUI(isBalanceHidden);
             
-            // 🚀 SKELETON TRIGGER: Remove shimmer once balance is loaded
             const balanceAmount = document.getElementById('balance-amount');
             if (balanceAmount) balanceAmount.classList.remove('skeleton');
         }
@@ -75,7 +97,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return amount.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    let isBalanceHidden = false;
     const toggleBtn = document.getElementById('toggle-balance');
     const balanceAmount = document.getElementById('balance-amount');
     const balanceCurrency = document.getElementById('balance-currency');
@@ -96,6 +117,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (toggleBtn) {
         toggleBtn.addEventListener('click', () => {
             isBalanceHidden = !isBalanceHidden;
+            // 🚀 NEW: Save the state so it persists on reload
+            localStorage.setItem('brytpay_balance_hidden', isBalanceHidden);
             updateBalanceUI(isBalanceHidden);
         });
     }

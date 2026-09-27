@@ -11,17 +11,79 @@
 
     <link rel="stylesheet" href="../../assets/css/main.css?v=2.1">
     <style>
-        .service-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
-        .service-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 16px; padding: 20px 12px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.02); display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .service-card:hover { border-color: var(--bryt-primary); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(29, 94, 208, 0.08); }
-        .service-icon { width: 52px; height: 52px; object-fit: contain; margin-bottom: 12px; }
-        .service-title { font-size: 0.85rem; font-weight: 700; color: var(--bryt-navy); margin-bottom: 6px; line-height: 1.3; }
-        .service-price { font-size: 0.8rem; color: var(--bryt-primary); font-weight: 800; background: #F0F6FF; padding: 4px 10px; border-radius: 8px; }
+        .service-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 12px; 
+            margin-bottom: 24px; 
+        }
+        .service-card { 
+            background: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 20px; 
+            padding: 24px 16px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .service-card:hover { 
+            border-color: var(--bryt-primary); 
+            transform: translateY(-3px); 
+            box-shadow: 0 8px 20px rgba(29, 94, 208, 0.08); 
+        }
+        .service-icon { 
+            width: 48px; 
+            height: 48px; 
+            object-fit: contain; 
+            margin-bottom: 12px; 
+        }
+        .service-title { 
+            font-size: 0.85rem; 
+            font-weight: 800; 
+            color: var(--bryt-navy); 
+            margin-bottom: 6px; 
+            line-height: 1.3; 
+        }
+        .service-price { 
+            font-size: 0.8rem; 
+            color: var(--bryt-primary); 
+            font-weight: 800; 
+            background: #F0F6FF; 
+            padding: 4px 12px; 
+            border-radius: 8px; 
+        }
         
-        .btn-view-orders { display: inline-flex; align-items: center; gap: 8px; background: var(--bryt-navy); color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 600; padding: 10px 18px; border-radius: 10px; box-shadow: 0 4px 15px rgba(7, 26, 58, 0.15); transition: background 0.2s; }
+        .btn-view-orders { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            background: var(--bryt-navy); 
+            color: #fff; 
+            text-decoration: none; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            padding: 10px 18px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(7, 26, 58, 0.15); 
+            transition: background 0.2s; 
+        }
         .btn-view-orders:hover { background: #0f2854; }
 
-        .info-notice-box { background-color: #eff6ff; border: 1px dashed #3b82f6; border-radius: 12px; padding: 14px 16px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 12px; }
+        .info-notice-box { 
+            background-color: #eff6ff; 
+            border: 1px dashed #3b82f6; 
+            border-radius: 12px; 
+            padding: 14px 16px; 
+            margin-bottom: 24px; 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 12px; 
+        }
         .info-notice-icon { flex-shrink: 0; margin-top: 2px; color: #3b82f6; }
         .info-notice-text { margin: 0; font-size: 0.75rem; color: #1e3a8a; line-height: 1.5; font-weight: 500; }
 
@@ -38,9 +100,9 @@
         .modal-step { display: none; animation: fadeIn 0.3s ease; }
         .modal-step.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .step-indicators { display: flex; justify-content: center; gap: 6px; margin-bottom: 20px; }
+        .step-indicators { display: flex; justify-content: center; gap: 6px; margin-bottom: 24px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: #e2e8f0; transition: 0.3s; }
-        .dot.active { background: #1D5ED0; width: 16px; border-radius: 4px; }
+        .dot.active { background: var(--bryt-primary); width: 16px; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -51,24 +113,25 @@
     </div>
 
     <main class="app-container" style="max-width: 520px; padding-bottom: 90px;">
-        <header style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <header style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
-                <a href="/dashboard/" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; margin-bottom: 12px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back
+                <a href="/dashboard/" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:700; display:inline-flex; align-items:center; gap:6px; margin-bottom: 12px; transition: color 0.2s;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 
+                    Back to Dashboard
                 </a>
-                <h1 style="font-size: 1.4rem; color: var(--bryt-navy); margin-bottom: 4px;">JAMB Services</h1>
-                <p style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Balance: <span id="user-balance" style="color: var(--bryt-primary);">₦0.00</span></p>
+                <h1 style="font-size: 1.45rem; font-weight: 800; color: var(--bryt-navy); margin: 0 0 4px 0;">JAMB Services</h1>
+                <p style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin: 0;">Balance: <span id="user-balance" style="color: var(--bryt-primary);">₦0.00</span></p>
             </div>
             <a href="orders.html" class="btn-view-orders">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                View Orders
+                My Orders
             </a>
         </header>
 
         <div class="info-notice-box">
             <svg class="info-notice-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
             <p class="info-notice-text">
-                <strong style="color: #1d4ed8;">Delivery Notice:</strong> Your document will be sent via <strong>Email, WhatsApp, and In-App</strong>. You can download it from any of these 3 channels. Processing takes roughly <strong>15-30 minutes</strong>.
+                <strong style="color: #1d4ed8;">Delivery Notice:</strong> Your document will be sent via <strong>Email & WhatsApp</strong>. You can also download it securely from the app. Processing takes roughly <strong>15-30 minutes</strong>.
             </p>
         </div>
 
@@ -109,11 +172,11 @@
             <h2 style="font-size: 1.3rem; color: var(--bryt-navy); margin-bottom: 6px;">Order Submitted!</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px;">Your request is now being processed by our desk.</p>
 
-            <div class="modal-breakdown" style="text-align: left; margin-bottom: 28px;">
+            <div class="modal-breakdown" style="text-align: left; margin-bottom: 28px; background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid var(--border-color);">
                 <div class="modal-row"><span style="color: var(--text-muted);">Order ID</span><strong id="success-ref" style="color: var(--bryt-navy); font-family: monospace;">---</strong></div>
                 <div class="modal-row"><span style="color: var(--text-muted);">Service</span><strong id="success-service" style="color: var(--bryt-navy);">---</strong></div>
                 <div class="modal-row"><span style="color: var(--text-muted);">Candidate</span><strong id="success-candidate" style="color: var(--bryt-navy);">---</strong></div>
-                <div class="modal-row"><span style="color: var(--text-muted);">Status</span><span class="tx-status status-pending">PROCESSING</span></div>
+                <div class="modal-row" style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #cbd5e1;"><span style="color: var(--text-muted);">Status</span><span style="background: #fef9c3; color: #a16207; font-weight: 800; font-size: 0.65rem; padding: 4px 8px; border-radius: 8px;">PROCESSING</span></div>
             </div>
 
             <div style="display: flex; gap: 12px;">
@@ -124,8 +187,9 @@
 
     <!-- 🚀 2-PHASE MODAL -->
     <div id="service-modal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 450px;">
-            <h3 class="modal-title" id="modal-service-title" style="text-align: center; margin-bottom: 12px;">Service Request</h3>
+        <div class="modal-content" style="max-width: 400px; padding: 24px 16px; border-radius: 20px;">
+            <h3 class="modal-title" id="modal-service-title" style="text-align: center; margin-bottom: 4px; font-size: 1.25rem;">Service Request</h3>
+            <p style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">Provide the candidate's exact details below.</p>
             
             <div class="step-indicators">
                 <div class="dot active" id="dot-1"></div>
@@ -136,11 +200,11 @@
                 
                 <!-- PHASE 1: CANDIDATE DETAILS -->
                 <div id="step-1" class="modal-step active">
-                    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">Step 1: Candidate Details</p>
+                    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px; font-weight: 700;">Step 1: Candidate Details</p>
 
-                    <div class="form-group" id="reprint-group" style="display: none; background: #F8FAFC; padding: 12px; border: 1px dashed var(--bryt-primary); border-radius: 8px;">
-                        <label class="form-label" style="color: var(--bryt-primary);">Select Reprint Type</label>
-                        <select id="reprint-type" class="form-select" style="background: white;">
+                    <div class="form-group" id="reprint-group" style="display: none; background: #F0F6FF; padding: 12px; border: 1px dashed var(--bryt-primary); border-radius: 12px; margin-bottom: 16px;">
+                        <label class="form-label" style="color: var(--bryt-primary); font-size: 0.75rem;">Select Reprint Type *</label>
+                        <select id="reprint-type" class="form-select" style="background: white; border-color: #bfdbfe; padding: 10px; font-size: 0.85rem;">
                             <option value="UTME Examination Slip">UTME Examination Slip</option>
                             <option value="UTME Registration Slip">UTME Registration Slip</option>
                             <option value="DE Registration Slip">DE Registration Slip</option>
@@ -149,45 +213,45 @@
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Candidate Full Name *</label>
-                        <input type="text" id="full-name" class="form-input" placeholder="e.g. Ibrahim Emmanuel Musa" required>
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label class="form-label" style="font-size: 0.75rem;">Candidate Full Name *</label>
+                        <input type="text" id="full-name" class="form-input" placeholder="e.g. Ibrahim Emmanuel Musa" style="padding: 12px; font-size: 0.9rem;" required>
                     </div>
                     
                     <div style="display: flex; gap: 12px; margin-bottom: 24px;">
                         <div class="form-group" style="flex: 2; margin: 0;">
-                            <label class="form-label">JAMB Reg Number *</label>
-                            <input type="text" id="jamb-reg" class="form-input" placeholder="e.g. 202612345678AB" style="text-transform: uppercase;" required>
+                            <label class="form-label" style="font-size: 0.75rem; color: var(--bryt-primary);">JAMB Reg Number *</label>
+                            <input type="text" id="jamb-reg" class="form-input" placeholder="e.g. 202612345678AB" style="text-transform: uppercase; padding: 12px; font-size: 0.9rem; font-weight: 700; letter-spacing: 1px;" required>
                         </div>
                         <div class="form-group" style="flex: 1; margin: 0;">
-                            <label class="form-label">JAMB Year *</label>
-                            <input type="number" id="jamb-year" class="form-input" placeholder="2026" min="2000" max="2030" required>
+                            <label class="form-label" style="font-size: 0.75rem;">Exam Year *</label>
+                            <input type="number" id="jamb-year" class="form-input" placeholder="2026" min="2000" max="2030" style="padding: 12px; font-size: 0.9rem;" required>
                         </div>
                     </div>
 
                     <div class="modal-actions" style="display: flex; gap: 12px;">
-                        <button type="button" id="modal-cancel" class="btn-secondary" style="flex: 1; padding: 16px; font-weight: 700;">Cancel</button>
-                        <button type="button" class="btn-primary" onclick="validateAndGoToStep(1, 2)" style="flex: 1; padding: 16px; font-weight: 800;">Next</button>
+                        <button type="button" id="modal-cancel" class="btn-secondary" style="flex: 1; padding: 14px; font-weight: 700;">Cancel</button>
+                        <button type="button" class="btn-primary" onclick="validateAndGoToStep(1, 2)" style="flex: 1; padding: 14px; font-weight: 800;">Next</button>
                     </div>
                 </div>
 
                 <!-- PHASE 2: CONTACT & SUBMIT -->
                 <div id="step-2" class="modal-step">
-                    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">Step 2: Delivery Contact</p>
+                    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px; font-weight: 700;">Step 2: Delivery Contact</p>
 
-                    <div class="form-group">
-                        <label class="form-label">Active WhatsApp Number *</label>
-                        <input type="tel" id="whatsapp" class="form-input" placeholder="08012345678" maxlength="11" required>
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label class="form-label" style="font-size: 0.75rem;">Active WhatsApp Number *</label>
+                        <input type="tel" id="whatsapp" class="form-input" placeholder="08012345678" maxlength="11" style="padding: 12px; font-size: 0.9rem;" required>
                     </div>
 
                     <div class="form-group" style="margin-bottom: 24px;">
-                        <label class="form-label">Email Address *</label>
-                        <input type="email" id="email" class="form-input" placeholder="candidate@example.com" required>
+                        <label class="form-label" style="font-size: 0.75rem;">Email Address *</label>
+                        <input type="email" id="email" class="form-input" placeholder="candidate@example.com" style="padding: 12px; font-size: 0.9rem;" required>
                     </div>
 
                     <div class="modal-actions" style="display: flex; gap: 12px;">
-                        <button type="button" class="btn-secondary" onclick="goToStep(1)" style="flex: 1; padding: 16px; font-weight: 700;">Back</button>
-                        <button type="submit" id="modal-submit" class="btn-primary" style="flex: 2; padding: 16px; font-weight: 800;">Pay <span id="modal-pay-amt">₦0</span></button>
+                        <button type="button" class="btn-secondary" onclick="goToStep(1)" style="flex: 1; padding: 14px; font-weight: 700;">Back</button>
+                        <button type="submit" id="modal-submit" class="btn-primary" style="flex: 2; padding: 14px; font-weight: 800; box-shadow: 0 4px 15px rgba(29, 94, 208, 0.2);">Pay <span id="modal-pay-amt">₦0</span></button>
                     </div>
                 </div>
 

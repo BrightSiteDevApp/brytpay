@@ -38,19 +38,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
-    // 🚀 EXACT PLAN IDs + STRICT 5% PROFIT MARGIN
     const curatedCheapPlans = {
-        'mtn_sme-data': [ // The "MTN SME" button
+        'mtn_sme-data': [
             { code: '46', price: 599,  label: 'MTN 1GB SME (30 Days)' },
             { code: '48', price: 1208, label: 'MTN 2GB SME (30 Days)' },
             { code: '49', price: 1439, label: 'MTN 3GB SME (30 Days)' },
             { code: '50', price: 2153, label: 'MTN 5GB SME (30 Days)' }
         ],
-        'mtn_shared-data': [ // The "MTN CG / SHARED" button
+        'mtn_shared-data': [
             { code: '44', price: 315,  label: 'MTN 500MB Data Share (30 Days)' },
             { code: '71', price: 945,  label: 'MTN 2GB Gifting (7 Days)' }
         ],
-        'airtel_dd-data': [ // The "Airtel AWOOF" button
+        'airtel_dd-data': [
             { code: '69', price: 525,  label: 'Airtel 1.5GB Gifting (1 Day)' },
             { code: '15', price: 840,  label: 'Airtel 1GB Gifting (7 Days)' },
             { code: '17', price: 1565, label: 'Airtel 2GB Gifting (30 Days)' },
@@ -58,8 +57,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             { code: '52', price: 1649, label: 'Airtel 5GB Gifting (7 Days)' },
             { code: '21', price: 4274, label: 'Airtel 10GB Gifting (30 Days)' }
         ],
-        'glo_sme-data': [ // The "Glo SME" button
-            { code: '84', price: 263,  label: 'Glo 1GB (1 Day)' }, // 🚀 NEW GLO PLAN
+        'glo_sme-data': [
+            { code: '84', price: 263,  label: 'Glo 1GB (1 Day)' },
             { code: '35', price: 237,  label: 'Glo 500MB CG (30 Days)' },
             { code: '36', price: 447,  label: 'Glo 1GB CG (30 Days)' },
             { code: '40', price: 893,  label: 'Glo 2GB CG (30 Days)' },
@@ -67,8 +66,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             { code: '38', price: 2363, label: 'Glo 5GB CG (30 Days)' },
             { code: '39', price: 4610, label: 'Glo 10GB CG (30 Days)' }
         ],
-        'glo_cg-data': [ // The "Glo CG / GIFT" button (We mirror the same list here so it is not empty)
-            { code: '84', price: 263,  label: 'Glo 1GB (1 Day)' }, // 🚀 NEW GLO PLAN
+        'glo_cg-data': [
+            { code: '84', price: 263,  label: 'Glo 1GB (1 Day)' },
             { code: '35', price: 237,  label: 'Glo 500MB CG (30 Days)' },
             { code: '36', price: 447,  label: 'Glo 1GB CG (30 Days)' },
             { code: '40', price: 893,  label: 'Glo 2GB CG (30 Days)' },
@@ -76,7 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             { code: '38', price: 2363, label: 'Glo 5GB CG (30 Days)' },
             { code: '39', price: 4610, label: 'Glo 10GB CG (30 Days)' }
         ],
-        '9mobile_cg-data': [ // The "9mobile SME / CG" button
+        '9mobile_cg-data': [
             { code: '91', price: 250,  label: '9mobile 500MB (30 Days)' }, 
             { code: '92', price: 450,  label: '9mobile 1GB (30 Days)' }  
         ]
@@ -88,6 +87,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const selectTrigger = document.getElementById('custom-select-trigger');
     const selectText = document.getElementById('custom-select-text');
     const optionsList = document.getElementById('custom-options-list');
+    const submitBtn = document.getElementById('submit-btn');
+    const carrierIndicator = document.getElementById('carrier-indicator');
     
     const confirmModal = document.getElementById('confirm-modal');
     const modalPlan = document.getElementById('modal-plan');
@@ -104,18 +105,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         '0809': '9mobile', '0818': '9mobile', '0817': '9mobile', '0909': '9mobile', '0908': '9mobile'
     };
 
-    document.getElementById('phone').addEventListener('input', (e) => {
+    // Auto-detect carrier and update input badge
+    phoneInput.addEventListener('input', (e) => {
         const val = e.target.value.trim();
         if (val.length >= 4) {
             const prefix = val.substring(0, 4);
             const detectedNetwork = networkPrefixes[prefix];
             if (detectedNetwork) {
-                const targetBtn = document.querySelector(`.network-btn[data-network="${detectedNetwork}"]`);
-                if (targetBtn && !targetBtn.classList.contains('active')) {
-                    targetBtn.click();
+                // If current selected card does not match detected network, select first one that matches
+                if (selectedNetwork !== detectedNetwork) {
+                    const targetBtn = document.querySelector(`.network-btn[data-network="${detectedNetwork}"]`);
+                    if (targetBtn) targetBtn.click();
                 }
+                carrierIndicator.textContent = detectedNetwork.toUpperCase();
+                carrierIndicator.classList.add('active');
+                return;
             }
         }
+        carrierIndicator.classList.remove('active');
     });
 
     const { data: walletData } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
@@ -128,6 +135,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!e.target.closest('.custom-select-wrapper')) selectWrapper.classList.remove('open');
     });
 
+    function updateButton() {
+        if (hiddenPlanInput.value) {
+            const [, priceStr] = hiddenPlanInput.value.split('|');
+            const amt = parseFloat(priceStr);
+            submitBtn.innerHTML = `Proceed to Pay ₦${amt.toLocaleString('en-NG')} <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+        } else {
+            submitBtn.innerHTML = `Proceed <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+        }
+    }
+
     function renderDropdownOptions() {
         optionsList.textContent = '';
         const combinedKey = `${selectedNetwork}_${selectedType}`;
@@ -137,12 +154,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             selectText.textContent = 'No plans available for this category';
             selectText.style.opacity = '0.6';
             hiddenPlanInput.value = '';
+            updateButton();
             return;
         }
 
         selectText.textContent = 'Select a data plan...';
         selectText.style.opacity = '0.6';
         hiddenPlanInput.value = '';
+        updateButton();
 
         currentPlans.forEach(plan => {
             const formattedPrice = `₦${plan.price.toLocaleString('en-NG')}`;
@@ -154,7 +173,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const priceStrong = document.createElement('strong');
             priceStrong.textContent = formattedPrice;
 
-            opt.appendChild(nameSpan); opt.appendChild(priceStrong);
+            opt.appendChild(nameSpan); 
+            opt.appendChild(priceStrong);
             opt.dataset.value = `${plan.code}|${plan.price}|${selectedNetwork}|${plan.label}`;
             
             opt.addEventListener('click', () => {
@@ -162,12 +182,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 selectText.textContent = `${plan.label} — ${formattedPrice}`;
                 selectText.style.opacity = '1';
                 selectWrapper.classList.remove('open');
+                updateButton();
             });
             optionsList.appendChild(opt);
         });
     }
     
-    renderDropdownOptions(); // Load default on page load
+    renderDropdownOptions();
 
     document.querySelectorAll('.network-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -176,6 +197,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             selectedNetwork = btn.getAttribute('data-network');
             selectedType = btn.getAttribute('data-type'); 
             selectedLogo = btn.getAttribute('data-logo');
+
+            if (carrierIndicator.classList.contains('active')) {
+                carrierIndicator.textContent = selectedNetwork.toUpperCase();
+            }
+
             renderDropdownOptions();
         });
     });
@@ -203,12 +229,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const phone = phoneInput.value.trim();
         const [plan_code, priceStr, network] = hiddenPlanInput.value.split('|');
 
-        modalConfirm.disabled = true; modalCancel.disabled = true;
+        modalConfirm.disabled = true; 
+        modalCancel.disabled = true;
         modalConfirm.textContent = 'Processing...';
 
         try {
-            // Note: We ONLY send the CheapDataHub bundle ID (plan_code) to the backend.
-            // The backend mathematically enforces the exact price and cannot be hacked.
             const { data: resData, error } = await window.db.functions.invoke('vend-data-swift', {
                 body: { network: network, plan_code: plan_code, phone: phone }
             });
@@ -218,12 +243,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             showToast(resData.message || `Success! Data sent to ${phone}.`, "success");
             confirmModal.style.display = 'none';
-            setTimeout(() => window.location.reload(), 2500);
+            setTimeout(() => window.location.reload(), 2000);
 
         } catch (err) {
             showToast(err.message, "error");
-            modalConfirm.disabled = false; modalCancel.disabled = false;
-            modalConfirm.textContent = 'Pay Securely';
+            modalConfirm.disabled = false; 
+            modalCancel.disabled = false;
+            modalConfirm.textContent = 'Pay Now';
             confirmModal.style.display = 'none';
         }
     });

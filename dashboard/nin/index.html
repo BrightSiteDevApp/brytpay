@@ -17,20 +17,20 @@
 
         .service-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
         .service-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.02); display: flex; flex-direction: column; align-items: center; }
-        .service-card:hover { border-color: #16a34a; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(22, 163, 74, 0.08); }
+        .service-card:hover { border-color: var(--bryt-primary); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(29, 94, 208, 0.08); }
         
         .slip-sample-img { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; border: 1px solid #f1f5f9; background: #f8fafc; }
         
         .service-title { font-size: 0.85rem; font-weight: 800; color: var(--bryt-navy); margin-bottom: 4px; }
         .service-desc { font-size: 0.65rem; color: var(--text-muted); margin-bottom: 10px; line-height: 1.3; }
-        .service-price { font-size: 0.85rem; color: #15803d; font-weight: 800; background: #dcfce7; padding: 4px 12px; border-radius: 8px; transition: all 0.2s; }
+        .service-price { font-size: 0.85rem; color: var(--bryt-primary); font-weight: 800; background: #F0F6FF; padding: 4px 12px; border-radius: 8px; transition: all 0.2s; }
         
         .btn-view-orders { display: inline-flex; align-items: center; gap: 8px; background: var(--bryt-navy); color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 600; padding: 10px 18px; border-radius: 10px; box-shadow: 0 4px 15px rgba(7, 26, 58, 0.15); transition: background 0.2s; white-space: nowrap; flex-shrink: 0; }
         .btn-view-orders:hover { background: #0f2854; }
 
-        .info-notice-box { background-color: #f0fdf4; border: 1px dashed #22c55e; border-radius: 12px; padding: 14px 16px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 12px; }
-        .info-notice-icon { flex-shrink: 0; margin-top: 2px; color: #16a34a; }
-        .info-notice-text { margin: 0; font-size: 0.75rem; color: #14532d; line-height: 1.5; font-weight: 500; }
+        .info-notice-box { background-color: #eff6ff; border: 1px dashed #3b82f6; border-radius: 12px; padding: 14px 16px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 12px; }
+        .info-notice-icon { flex-shrink: 0; margin-top: 2px; color: #3b82f6; }
+        .info-notice-text { margin: 0; font-size: 0.75rem; color: #1e3a8a; line-height: 1.5; font-weight: 500; }
 
         .bryt-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150px); background: #ffffff; padding: 14px 20px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; z-index: 9999; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); min-width: 300px; border-left: 4px solid var(--bryt-primary); }
         .bryt-toast.show { transform: translateX(-50%) translateY(0); }
@@ -47,7 +47,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         .step-indicators { display: flex; justify-content: center; gap: 6px; margin-bottom: 20px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: #e2e8f0; transition: 0.3s; }
-        .dot.active { background: #16a34a; width: 16px; border-radius: 4px; }
+        .dot.active { background: var(--bryt-primary); width: 16px; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -60,8 +60,9 @@
     <main class="app-container" style="max-width: 520px; padding-bottom: 90px;">
         <header style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
-                <a href="/dashboard/" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; margin-bottom: 16px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back
+                <a href="/dashboard/" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; margin-bottom: 16px; transition: color 0.2s;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 
+                    Back to Dashboard
                 </a>
                 
                 <h1 style="font-size: 1.5rem; color: var(--bryt-navy); margin: 0;">NIN Services</h1>
@@ -77,7 +78,7 @@
        <div class="info-notice-box">
             <svg class="info-notice-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
             <p class="info-notice-text">
-                <strong style="color: #166534;">Processing Time (3-5 Mins):</strong> Your NIN Slip will be sent directly to your <strong>Email & WhatsApp</strong> once processed. You can also download the PDF directly from the app.
+                <strong style="color: #1d4ed8;">Processing Time (3-5 Mins):</strong> Your NIN Slip will be sent directly to your <strong>Email & WhatsApp</strong> once processed. You can also download the PDF directly from the app.
             </p>
         </div>
 
@@ -129,7 +130,7 @@
                 <div class="modal-row" style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #cbd5e1;"><span style="color: var(--text-muted);">Status</span><span style="background: #fef9c3; color: #a16207; font-weight: 800; font-size: 0.65rem; padding: 4px 8px; border-radius: 8px;">PROCESSING</span></div>
             </div>
 
-            <a href="orders.html" class="btn-primary" style="display: block; width: 100%; text-decoration: none; text-align: center; background: #16a34a; border-color: #16a34a;">Track Order & Download Slip</a>
+            <a href="orders.html" class="btn-primary" style="display: block; width: 100%; text-decoration: none; text-align: center;">Track Order & Download Slip</a>
         </div>
     </main>
 
@@ -160,13 +161,13 @@
                     </div>
                     
                     <div class="form-group" style="margin-bottom: 24px;">
-                        <label class="form-label" id="label-identifier" style="color: #16a34a; font-size: 0.75rem; margin-bottom: 4px;">National Identity Number (NIN) *</label>
+                        <label class="form-label" id="label-identifier" style="color: var(--bryt-primary); font-size: 0.75rem; margin-bottom: 4px;">National Identity Number (NIN) *</label>
                         <input type="text" id="nin-identifier" class="form-input" placeholder="Enter the 11-digit NIN" maxlength="15" style="padding: 10px; font-size: 0.85rem;" required>
                     </div>
 
                     <div class="modal-actions" style="display: flex; gap: 12px;">
                         <button type="button" class="btn-secondary btn-cancel-modal" style="flex: 1; padding: 12px; font-weight: 700; font-size: 0.85rem;">Cancel</button>
-                        <button type="button" class="btn-primary" onclick="validateAndGoToStep(1, 2)" style="flex: 1; padding: 12px; font-weight: 800; font-size: 0.85rem; background: #16a34a; border-color: #16a34a;">Next</button>
+                        <button type="button" class="btn-primary" onclick="validateAndGoToStep(1, 2)" style="flex: 1; padding: 12px; font-weight: 800; font-size: 0.85rem;">Next</button>
                     </div>
                 </div>
 
@@ -186,7 +187,7 @@
 
                     <div class="modal-actions" style="display: flex; align-items: center; gap: 12px;">
                         <button type="button" class="btn-secondary" onclick="goToStep(1)" style="flex: 1; padding: 12px; font-weight: 700; font-size: 0.85rem;">Back</button>
-                        <button type="submit" id="modal-submit" class="btn-primary" style="flex: 2; background: #16a34a; border-color: #16a34a; padding: 12px; font-size: 0.9rem; font-weight: 800; box-shadow: 0 4px 15px rgba(22, 163, 74, 0.2);">
+                        <button type="submit" id="modal-submit" class="btn-primary" style="flex: 2; padding: 12px; font-size: 0.9rem; font-weight: 800; box-shadow: 0 4px 15px rgba(29, 94, 208, 0.2);">
                             Pay <span id="modal-pay-amt">₦0</span>
                         </button>
                     </div>

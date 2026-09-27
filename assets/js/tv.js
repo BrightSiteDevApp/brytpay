@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
-    // 🚀 EXACT PLAN IDs WITH 2% PROFIT MARGIN APPLIED (Cost x 1.02)
     const tvPlans = {
         'dstv': [
             { code: 3, price: 4488, label: 'DStv Padi' },
@@ -70,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             { code: 24, price: 3366, label: 'Super (Dish) - 1 Week' },
             { code: 26, price: 9690, label: 'Super (Antenna) - 1 Month' }
         ],
-        'showmax': [] // Handled via unavailable state
+        'showmax': [] 
     };
 
     const hiddenPlanInput = document.getElementById('tv-plan');
@@ -104,11 +103,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!e.target.closest('.custom-select-wrapper')) selectWrapper.classList.remove('open');
     });
 
+    function updateButton() {
+        if (hiddenPlanInput.value) {
+            const [, priceStr] = hiddenPlanInput.value.split('|');
+            const amt = parseFloat(priceStr);
+            submitBtn.innerHTML = `Proceed to Pay ₦${amt.toLocaleString('en-NG')} <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+        } else {
+            submitBtn.innerHTML = `Proceed <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+        }
+    }
+
     function renderDropdownOptions() {
         optionsList.textContent = '';
         const currentPlans = tvPlans[selectedNetwork] || [];
 
         hiddenPlanInput.value = '';
+        updateButton();
 
         if (selectedNetwork === 'showmax') {
             selectText.textContent = 'Service Currently Unavailable';
@@ -116,11 +126,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             smartcardInput.disabled = true;
             verifyBtn.disabled = true;
             submitBtn.disabled = true;
-            nameBox.style.display = 'block';
+            
+            nameBox.style.display = 'flex';
             nameBox.style.background = '#fef2f2';
             nameBox.style.borderColor = '#fecaca';
             nameBox.style.color = '#b91c1c';
-            nameBox.textContent = '⚠️ Showmax is currently undergoing maintenance and is not available right now.';
+            nameBox.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> Showmax is undergoing maintenance.';
             return;
         }
 
@@ -147,13 +158,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 selectText.textContent = `${plan.label} — ${formattedPrice}`;
                 selectText.style.opacity = '1';
                 selectWrapper.classList.remove('open');
+                updateButton();
             });
             optionsList.appendChild(opt);
         });
 
         resetVerification();
     }
-    renderDropdownOptions();
+    
+    renderDropdownOptions(); // Load default on page load
 
     function resetVerification() {
         verifiedCustomerName = null;
@@ -161,11 +174,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         nameBox.style.background = '#f0fdf4';
         nameBox.style.borderColor = '#bbf7d0';
         nameBox.style.color = '#166534';
-        nameBox.textContent = '';
+        nameBox.innerHTML = '';
         
-        inputLabel.textContent = "Smartcard / IUC Number";
+        inputLabel.textContent = "3. Smartcard / IUC Number";
         smartcardInput.placeholder = "e.g. 1029384756";
-        verifyBtn.style.display = 'inline-flex';
+        verifyBtn.style.display = 'block';
         verifyBtn.disabled = false;
         submitBtn.disabled = true;
         verifyBtn.textContent = 'Verify';
@@ -203,8 +216,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (resData && !resData.success) throw new Error(resData.message);
 
             verifiedCustomerName = resData.customer_name;
-            nameBox.textContent = `✓ Account: ${verifiedCustomerName}`;
-            nameBox.style.display = 'block';
+            nameBox.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg> <span><strong>Account:</strong> ${verifiedCustomerName}</span>`;
+            nameBox.style.display = 'flex';
             submitBtn.disabled = false;
             verifyBtn.textContent = 'Verified';
             showToast("Account Verified Successfully", "success");
@@ -265,7 +278,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             showToast(err.message, "error");
             btn.disabled = false; 
             document.getElementById('modal-cancel').disabled = false;
-            btn.textContent = 'Pay Securely';
+            btn.textContent = 'Pay Now';
             confirmModal.style.display = 'none';
         }
     });
