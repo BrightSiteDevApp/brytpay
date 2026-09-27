@@ -19,13 +19,18 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
         }
 
-        /* 🚀 Sleek Network Selector */
+        /* 🚀 Sleek Network Selector (Added mobile wrapping) */
         .provider-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             margin-top: 10px;
             margin-bottom: 24px;
+        }
+        @media (max-width: 400px) {
+            .provider-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
         .provider-btn {
             background: #f8fafc;
@@ -225,18 +230,19 @@
     </div>
 
     <main class="app-container" style="max-width: 520px; padding-bottom: 90px;">
-        <header style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
+        <!-- 🚀 THE FIX: Header layout changed to align items center and handle text overflow -->
+        <header style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <div style="min-width: 0; flex: 1;">
                 <a href="/dashboard/" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:700; display:inline-flex; align-items:center; gap:6px; margin-bottom: 12px; transition: color 0.2s;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                    Back to Dashboard
+                    Back
                 </a>
-                <h1 style="font-size: 1.45rem; font-weight: 800; color: var(--bryt-navy); margin: 0 0 4px 0;">Purchase Airtime</h1>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Instant top-up to any mobile network</p>
+                <h1 style="font-size: 1.3rem; font-weight: 800; color: var(--bryt-navy); margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Purchase Airtime</h1>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Instant top-up to any network</p>
             </div>
-            <div style="text-align: right; background: #F0F6FF; padding: 10px 14px; border-radius: 12px; border: 1px solid #dbeafe;">
+            <div style="text-align: right; background: #F0F6FF; padding: 10px 14px; border-radius: 12px; border: 1px solid #dbeafe; flex-shrink: 0;">
                 <div style="font-size: 0.7rem; color: #3b82f6; text-transform: uppercase; font-weight: 800; margin-bottom: 2px;">Balance</div>
-                <strong id="user-balance" style="color: #1D5ED0; font-size: 1rem; font-weight: 800;">₦0.00</strong>
+                <strong id="user-balance" style="color: #1D5ED0; font-size: 0.95rem; font-weight: 800;">₦0.00</strong>
             </div>
         </header>
 

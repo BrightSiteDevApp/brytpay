@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // ==========================================
-    // 🛡️ SECURITY FIX: Smart Redirect Helper (Anti-Open Redirect)
+    // 🛡️ SMART REDIRECT HELPER (Anti-Open Redirect)
     // ==========================================
     const handleSmartRedirect = () => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -100,7 +100,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            // 🚀 UPDATED TO 6-DIGIT TEXT
             const signupHeader = document.getElementById('signup-header');
             signupHeader.innerHTML = `<h1>Check your email</h1><p>We sent a 6-digit code to <strong id="safe-reg-email"></strong></p>`;
             document.getElementById('safe-reg-email').textContent = regEmail; 
@@ -139,6 +138,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (profileError) console.error("Failed to save phone number to profiles:", profileError);
 
                 await window.db.from('wallets').upsert({ user_id: user.id, balance: 0.00 });
+
+                // 🚀 TRIGGER WELCOME EMAIL ONLY UPON VERIFIED OTP
+                // Invoking this without await ensures user redirection is immediate
+                window.db.functions.invoke('send-welcome-email', {
+                    body: {}
+                }).catch(err => console.error("Welcome email error:", err));
+
             } catch (err) {
                 console.error("Database error during profile creation:", err);
             }
@@ -163,7 +169,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('forgot-pwd-trigger').addEventListener('click', () => {
             loginForm.style.display = 'none';
             resetEmailForm.style.display = 'block';
-            // 🚀 UPDATED TO 6-DIGIT TEXT
             authTitle.innerHTML = `<h1>Reset Password</h1><p>We'll send you a 6-digit code.</p>`;
             if (errorEl) errorEl.style.display = 'none';
         });
@@ -245,7 +250,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const btn = document.getElementById('send-otp-btn');
 
             btn.disabled = true;
-            // 🚀 UPDATED TO 6-DIGIT TEXT
             btn.textContent = 'Sending...';
 
             const { error } = await window.db.auth.resetPasswordForEmail(recoveryEmail);
