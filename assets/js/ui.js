@@ -1,4 +1,23 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    
+    // 🚀 NEW: Support Dropdown Logic
+    const supportTrigger = document.getElementById('support-trigger');
+    const supportMenu = document.getElementById('support-menu');
+    if (supportTrigger && supportMenu) {
+        supportTrigger.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevents the document click listener from firing immediately
+            const isMenuOpen = supportMenu.style.display === 'block';
+            supportMenu.style.display = isMenuOpen ? 'none' : 'block';
+        });
+
+        // Close menu if clicked outside
+        document.addEventListener('click', (e) => {
+            if (!supportTrigger.contains(e.target) && !supportMenu.contains(e.target)) {
+                supportMenu.style.display = 'none';
+            }
+        });
+    }
+
     const { data: { session }, error: sessionError } = await window.db.auth.getSession();
     
     if (!session) {
@@ -10,7 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentBalance = 0;
     let userAccountId = '';
 
-    // 🚀 NEW: Load hidden state from local storage immediately
     let isBalanceHidden = localStorage.getItem('brytpay_balance_hidden') === 'true';
 
     async function checkUnreadNotifications() {
@@ -117,7 +135,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (toggleBtn) {
         toggleBtn.addEventListener('click', () => {
             isBalanceHidden = !isBalanceHidden;
-            // 🚀 NEW: Save the state so it persists on reload
             localStorage.setItem('brytpay_balance_hidden', isBalanceHidden);
             updateBalanceUI(isBalanceHidden);
         });

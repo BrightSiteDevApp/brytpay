@@ -97,7 +97,7 @@
                 <img src="../assets/img/brytpay-logo.png" alt="BRYT Pay" class="brand-logo-img">
             </a>
             
-            <div class="nav-icons-container">
+           <div class="nav-icons-container">
                  <div class="nav-links" style="display: none;"> 
                     <a href="/dashboard/" class="nav-link" style="color: var(--bryt-primary);">Home</a>
                     <a href="/dashboard/history/" class="nav-link">History</a>
@@ -105,14 +105,29 @@
                     <a href="/dashboard/account/" class="nav-link">Account</a>
                 </div>
 
-                <a href="https://wa.me/2349153375488?text=Hi%20Support%20from%20BRYT%20Pay,%20I%20need%20assistance%20with%20" target="_blank" class="nav-icon-btn" aria-label="Support">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Z"></path>
-                        <path d="M21 11v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z"></path>
-                        <path d="M3 11a9 9 0 1 1 18 0"></path>
-                        <path d="M21 16v2a4 4 0 0 1-4 4h-5"></path>
-                    </svg>
-                </a>
+                <!-- 🚀 NEW: Headset Support Icon with Dropdown Menu -->
+                <div style="position: relative;" id="support-dropdown-wrap">
+                    <button type="button" class="nav-icon-btn" id="support-trigger" aria-label="Support">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Z"></path>
+                            <path d="M21 11v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z"></path>
+                            <path d="M3 11a9 9 0 1 1 18 0"></path>
+                            <path d="M21 16v2a4 4 0 0 1-4 4h-5"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- The Dropdown Menu (Hidden by default) -->
+                    <div id="support-menu" style="display: none; position: absolute; top: 100%; right: 0; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 8px; width: 160px; z-index: 50;">
+                        <a href="mailto:bryttechnologies@gmail.com?subject=Support%20Request" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: #0f172a; text-decoration: none; font-size: 0.85rem; font-weight: 600; border-radius: 8px; transition: 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            Email Us
+                        </a>
+                        <a href="https://wa.me/2349153375488?text=Hi%20Support%20from%20BRYT%20Pay,%20I%20need%20assistance%20with%20" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: #0f172a; text-decoration: none; font-size: 0.85rem; font-weight: 600; border-radius: 8px; transition: 0.2s;" onmouseover="this.style.background='#f0fdf4'; this.style.color='#16a34a';" onmouseout="this.style.background='transparent'; this.style.color='#0f172a';">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                            WhatsApp
+                        </a>
+                    </div>
+                </div>
 
                 <a href="/dashboard/notifications/" class="nav-icon-btn" id="notif-bell" aria-label="Notifications">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
