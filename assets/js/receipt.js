@@ -12,6 +12,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    // 🚀 THE FIX: Smart Back Button Logic
+    const backBtn = document.getElementById('smart-back-btn');
+    if (backBtn) {
+        const referrer = document.referrer;
+        
+        if (referrer.includes('/dashboard/orders/')) {
+            backBtn.href = '/dashboard/orders/';
+            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to Orders`;
+        } else if (referrer.includes('/dashboard/') && !referrer.includes('/history/') && !referrer.includes('/orders/')) {
+            backBtn.href = '/dashboard/';
+            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to Dashboard`;
+        } else {
+            backBtn.href = '/dashboard/history/';
+            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to History`;
+        }
+    }
+
     const recDate = document.getElementById('rec-date');
     const recAmount = document.getElementById('rec-amount');
     const recStatus = document.getElementById('rec-status');
@@ -175,16 +192,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         receiptDetailsList.innerHTML = rowsHtml;
 
-        // 🚀 THE FIX: Fallback logic for mobile HTTP testing
         const copyBtn = document.getElementById('copy-ref-btn');
         if (copyBtn) {
             copyBtn.addEventListener('click', async () => {
                 try {
-                    // Try modern approach first
                     if (navigator.clipboard && window.isSecureContext) {
                         await navigator.clipboard.writeText(actualRef);
                     } else {
-                        // Fallback for mobile browser local network testing
                         const textArea = document.createElement("textarea");
                         textArea.value = actualRef;
                         textArea.style.position = "absolute";

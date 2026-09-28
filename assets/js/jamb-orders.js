@@ -2,6 +2,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session } } = await window.db.auth.getSession();
     if (!session) { window.location.href = '/auth/login.html'; return; }
 
+    // 🚀 THE FIX: Smart Back Button Logic for JAMB Orders
+    const backBtn = document.getElementById('smart-back-btn');
+    if (backBtn) {
+        const referrer = document.referrer;
+        if (referrer.includes('/dashboard/orders/')) {
+            backBtn.href = '/dashboard/orders/';
+            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Orders Hub`;
+        } else {
+            backBtn.href = '/dashboard/jamb/';
+            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> JAMB Services`;
+        }
+    }
+
     const container = document.getElementById('orders-container');
 
     const { data, error } = await window.db
@@ -11,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         .order('created_at', { ascending: false });
 
     if (error || !data || data.length === 0) {
-        container.innerHTML = `<div style="padding: 40px 20px; text-align: center; color: #64748b;">No transactions found.</div>`;
+        container.innerHTML = `<div style="padding: 40px 20px; text-align: center; color: #64748b; font-size: 0.9rem; font-weight: 600;">No transactions found.</div>`;
         return;
     }
 
@@ -19,34 +32,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     data.forEach(order => {
         const dateObj = new Date(order.created_at);
-        const dateStr = dateObj.toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' });
-        const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase();
+        const dateStr = dateObj.toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute:'2-digit' });
         
-        let statusClass = 'status-processing';
+        let statusClass = 'status-pending';
         let statusText = 'Pending';
         const st = (order.status || '').toUpperCase();
 
-        // 🚀 SMART STATUS SCANNER
-        if (st.includes('REFUND')) { statusClass = 'status-failed'; statusText = 'Refunded'; }
+        if (st.includes('REFUND')) { statusClass = 'status-successful'; statusText = 'Refunded'; }
         else if (st.includes('FAIL')) { statusClass = 'status-failed'; statusText = 'Failed'; }
-        else if (st.includes('COMPLETE') || st.includes('SUCCESS')) { statusClass = 'status-completed'; statusText = 'Processed'; }
-        else if (st.includes('PROCESS')) { statusClass = 'status-processing'; statusText = 'Processing'; }
+        else if (st.includes('COMPLETE') || st.includes('SUCCESS')) { statusClass = 'status-successful'; statusText = 'Processed'; }
+        else if (st.includes('PROCESS')) { statusClass = 'status-pending'; statusText = 'Processing'; }
 
-        const title = `${order.service_type} (${order.jamb_registration_number})`;
+        const title = order.service_type || 'JAMB SERVICE';
         const amount = `₦${parseFloat(order.amount).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
 
         container.innerHTML += `
-            <a href="order-details.html?id=${order.id}" class="list-card">
-                <div class="list-left">
-                    <img src="../../assets/img/jamb-logo.png" class="list-icon" alt="JAMB">
-                    <div>
-                        <div class="list-title">${title}</div>
-                        <div class="list-date">${dateStr} - ${timeStr}</div>
+            <a href="order-details.html?id=${order.id}" class="tx-row">
+                <div class="tx-left">
+                    <div class="tx-brand"><img src="../../assets/img/jamb-logo.png" alt="JAMB"></div>
+                    <div class="tx-info">
+                        <div class="tx-title">${title}</div>
+                        <div class="tx-date">${dateStr} • Reg: ${order.jamb_registration_number || 'N/A'}</div>
                     </div>
                 </div>
-                <div class="list-right">
-                    <div class="list-amount">${amount}</div>
-                    <span class="status-badge ${statusClass}">${statusText}</span>
+                <div class="tx-right">
+                    <div class="tx-amount">${amount}</div>
+                    <span class="tx-status ${statusClass}">${statusText}</span>
                 </div>
             </a>
         `;

@@ -7,6 +7,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     let selectedProvider = '';
     const CERT_PRICE = 10000;
 
+    // 🚀 THE FIX: Smart Back Button Logic
+    const backBtn = document.getElementById('smart-back-btn');
+    if (backBtn) {
+        const referrer = document.referrer;
+        if (referrer.includes('/dashboard/services/')) {
+            backBtn.href = '/dashboard/services/';
+            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Services`;
+        } else {
+            backBtn.href = '/dashboard/';
+            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Dashboard`;
+        }
+    }
+
     function showToast(message, type = 'success') {
         const toast = document.getElementById('bryt-toast');
         const toastText = document.getElementById('toast-text');
@@ -47,7 +60,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const serviceModal = document.getElementById('service-modal');
     
-    // Multi-Step Logic
     window.goToStep = function(stepNum) {
         document.querySelectorAll('.modal-step').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.dot').forEach(el => el.classList.remove('active'));
@@ -75,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (card.classList.contains('disabled')) return;
             selectedProvider = card.getAttribute('data-service');
             document.getElementById('cert-form').reset();
-            goToStep(1); // Always open at phase 1
+            goToStep(1);
             serviceModal.style.display = 'flex';
         });
     });
@@ -96,14 +108,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnSubmit.textContent = 'Processing...';
 
         try {
-            // 🚀 Notice: We no longer send p_amount. The backend handles it securely!
             const { data, error } = await window.db.rpc('process_exam_cert_order', {
                 p_customer_name: document.getElementById('cert-name').value.trim(),
                 p_provider: selectedProvider,
                 p_country: document.getElementById('cert-country').value,
                 p_exam_year: document.getElementById('cert-year').value.trim(),
                 p_exam_type: document.getElementById('cert-type').value,
-                p_dob: document.getElementById('cert-dob').value, // Mandatory now
+                p_dob: document.getElementById('cert-dob').value, 
                 p_candidate_no: document.getElementById('cert-candidate-no').value.trim().toUpperCase(),
                 p_whatsapp: document.getElementById('cert-whatsapp').value.trim(),
                 p_email: document.getElementById('cert-email').value.trim()

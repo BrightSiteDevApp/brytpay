@@ -3,6 +3,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!session) { window.location.href = '/auth/login.html'; return; }
     const user = session.user;
 
+    // 🚀 THE FIX: Smart Back Button Logic
+    const backBtn = document.getElementById('smart-back-btn');
+    if (backBtn) {
+        const referrer = document.referrer;
+        if (referrer.includes('/dashboard/services/')) {
+            backBtn.href = '/dashboard/services/';
+            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Services`;
+        } else {
+            backBtn.href = '/dashboard/';
+            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Dashboard`;
+        }
+    }
+
     function showToast(message, type = 'success') {
         const toast = document.getElementById('bryt-toast');
         const toastText = document.getElementById('toast-text');
@@ -127,13 +140,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // 🚀 ULTRA-HD PREMIUM IMAGE DOWNLOADER (CLEAN HEADER)
     window.downloadReceipt = async function(examType, pinsText) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         const pinLines = pinsText.split('\n').filter(l => l.trim() !== '');
 
-        // High-Resolution Scaler
         const scale = 3; 
         const baseWidth = 640;
         const baseHeight = 290 + (pinLines.length * 90);
@@ -142,16 +153,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         canvas.height = baseHeight * scale;
         
         ctx.scale(scale, scale);
-        ctx.textBaseline = 'middle'; // Fixes text vertical alignment
+        ctx.textBaseline = 'middle'; 
 
-        // Base Background
         ctx.fillStyle = '#f8fafc';
         ctx.fillRect(0, 0, baseWidth, baseHeight);
         
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(20, 20, baseWidth - 40, baseHeight - 40);
 
-        // Top Blue Banner
         ctx.fillStyle = '#1D5ED0';
         ctx.fillRect(20, 20, baseWidth - 40, 100);
 
@@ -163,11 +172,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             img.src = src;
         });
 
-        // Only load the footer brand logo and the exam logo
         const brytLogo = await loadImg('../../assets/img/brytpay-logo.png');
         const examLogo = await loadImg(`../../assets/img/${examType.toLowerCase()}-logo.png`);
 
-        // Title text (Centered beautifully in the blue banner, NO overlapping logo!)
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 30px sans-serif';
         ctx.textAlign = 'left';
@@ -181,7 +188,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             ctx.drawImage(examLogo, baseWidth - 115, 35, 70, 70); 
         }
 
-        // PIN Section
         let y = 180;
         pinLines.forEach((line) => {
             ctx.fillStyle = '#e2e8f0';
@@ -196,7 +202,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             y += 90;
         });
 
-        // Footer Section
         ctx.fillStyle = '#e2e8f0';
         ctx.fillRect(20, baseHeight - 100, baseWidth - 40, 2);
 

@@ -2,17 +2,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session } } = await window.db.auth.getSession();
     if (!session) { window.location.href = '/auth/login.html'; return; }
 
+    // 🚀 THE FIX: Smart Back Button Logic
+    const backBtn = document.getElementById('smart-back-btn');
+    if (backBtn) {
+        const referrer = document.referrer;
+        // If they came from the main dashboard orders hub
+        if (referrer.includes('/dashboard/orders/')) {
+            backBtn.href = '/dashboard/orders/';
+            backBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Orders Hub`;
+        } 
+        // Otherwise default back to the local JAMB orders page
+        else {
+            backBtn.href = 'orders.html';
+            backBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> My JAMB Orders`;
+        }
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('id');
-    if (!orderId) { window.location.href = 'orders.html'; return; }
+    const orderRef = urlParams.get('ref');
+
+    if (!orderId && !orderRef) { window.location.href = 'orders.html'; return; }
 
     let currentOrder = null;
 
-    const { data, error } = await window.db
-        .from('jamb_orders')
-        .select('*')
-        .eq('id', orderId)
-        .single();
+    let query = window.db.from('jamb_orders').select('*');
+    
+    if (orderRef) {
+        query = query.eq('order_reference', orderRef);
+    } else {
+        query = query.eq('id', orderId);
+    }
+
+    const { data, error } = await query.single();
 
     if (error || !data) { 
         alert('Order not found.'); 
@@ -28,7 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('sum-amount').textContent = `₦${parseFloat(data.amount).toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
     document.getElementById('sum-date').textContent = `${dateObj.toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' })} - ${dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }).toLowerCase()}`;
 
-    // 🚀 SMART STATUS SCANNER
     const statusBadge = document.getElementById('sum-status');
     statusBadge.className = 'status-pill'; 
     const st = (data.status || '').toUpperCase();

@@ -7,6 +7,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     let selectedType = 'sme-data';
     let selectedLogo = 'mtn-logo.png';
 
+    // 🚀 THE FIX: Smart Back Button Logic
+    const backBtn = document.getElementById('smart-back-btn');
+    if (backBtn) {
+        const referrer = document.referrer;
+        if (referrer.includes('/dashboard/services/')) {
+            backBtn.href = '/dashboard/services/';
+            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Services`;
+        } else {
+            backBtn.href = '/dashboard/';
+            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Dashboard`;
+        }
+    }
+
     function showToast(message, type = 'success') {
         const toast = document.getElementById('bryt-toast');
         const toastText = document.getElementById('toast-text');
@@ -105,14 +118,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         '0809': '9mobile', '0818': '9mobile', '0817': '9mobile', '0909': '9mobile', '0908': '9mobile'
     };
 
-    // Auto-detect carrier and update input badge
     phoneInput.addEventListener('input', (e) => {
         const val = e.target.value.trim();
         if (val.length >= 4) {
             const prefix = val.substring(0, 4);
             const detectedNetwork = networkPrefixes[prefix];
             if (detectedNetwork) {
-                // If current selected card does not match detected network, select first one that matches
                 if (selectedNetwork !== detectedNetwork) {
                     const targetBtn = document.querySelector(`.network-btn[data-network="${detectedNetwork}"]`);
                     if (targetBtn) targetBtn.click();
@@ -125,10 +136,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         carrierIndicator.classList.remove('active');
     });
 
-    const { data: walletData } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
-    if (walletData) {
-        document.getElementById('user-balance').textContent = `₦${parseFloat(walletData.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+    async function fetchBalance() {
+        const { data } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
+        if (data) {
+            document.getElementById('user-balance').textContent = `₦${parseFloat(data.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+        }
     }
+    await fetchBalance();
 
     selectTrigger.addEventListener('click', () => selectWrapper.classList.toggle('open'));
     document.addEventListener('click', (e) => {

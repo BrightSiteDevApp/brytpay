@@ -4,6 +4,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const user = session.user;
     let currentBalance = 0;
+
+    // 🚀 THE FIX: Smart Back Button Logic
+    const backBtn = document.getElementById('smart-back-btn');
+    if (backBtn) {
+        const referrer = document.referrer;
+        if (referrer.includes('/dashboard/services/')) {
+            backBtn.href = '/dashboard/services/';
+            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Services`;
+        } else {
+            backBtn.href = '/dashboard/';
+            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Dashboard`;
+        }
+    }
     
     function showToast(message, type = 'success') {
         const toast = document.getElementById('bryt-toast');
@@ -50,7 +63,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const labelIdentifier = document.getElementById('label-identifier');
     const inputIdentifier = document.getElementById('nin-identifier');
     
-    // 🚀 Multi-Step Logic
     window.goToStep = function(stepNum) {
         document.querySelectorAll('.modal-step').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.dot').forEach(el => el.classList.remove('active'));
@@ -119,12 +131,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('modal-pay-amt').textContent = `₦${selectedPrice.toLocaleString()}`;
             
             document.getElementById('nin-form').reset();
-            goToStep(1); // 🚀 Ensure it always opens on Phase 1
+            goToStep(1);
             serviceModal.style.display = 'flex';
         });
     });
 
-    // Close button targets elements with class .btn-cancel-modal
     document.querySelectorAll('.btn-cancel-modal').forEach(btn => {
         btn.addEventListener('click', () => serviceModal.style.display = 'none');
     });

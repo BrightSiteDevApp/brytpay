@@ -6,6 +6,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     let selectedNetwork = 'mtn';
     let selectedLogo = 'mtn-logo.png';
 
+    // 🚀 THE FIX: Smart Back Button Logic
+    const backBtn = document.getElementById('smart-back-btn');
+    if (backBtn) {
+        const referrer = document.referrer;
+        if (referrer.includes('/dashboard/services/')) {
+            backBtn.href = '/dashboard/services/';
+            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Services`;
+        } else {
+            backBtn.href = '/dashboard/';
+            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Dashboard`;
+        }
+    }
+
     function showToast(message, type = 'success') {
         const toast = document.getElementById('bryt-toast');
         const toastText = document.getElementById('toast-text');
@@ -53,7 +66,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modalConfirm = document.getElementById('modal-confirm');
     const modalLogo = document.getElementById('modal-network-logo');
 
-    // Network prefix mapping
     const networkPrefixes = {
         '0803': 'mtn', '0806': 'mtn', '0703': 'mtn', '0706': 'mtn', '0813': 'mtn', '0816': 'mtn', '0810': 'mtn', '0814': 'mtn', '0903': 'mtn', '0906': 'mtn', '0913': 'mtn', '0916': 'mtn', '0704': 'mtn', '0702': 'mtn',
         '0802': 'airtel', '0808': 'airtel', '0708': 'airtel', '0812': 'airtel', '0701': 'airtel', '0902': 'airtel', '0901': 'airtel', '0904': 'airtel', '0907': 'airtel', '0912': 'airtel', '0911': 'airtel',
@@ -61,7 +73,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         '0809': '9mobile', '0818': '9mobile', '0817': '9mobile', '0909': '9mobile', '0908': '9mobile'
     };
 
-    // Auto-detect carrier and show badge
     phoneInput.addEventListener('input', (e) => {
         const val = e.target.value.trim();
         if (val.length >= 4) {
@@ -88,7 +99,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     await fetchBalance();
 
-    // Network selector clicks
     document.querySelectorAll('.network-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.network-btn').forEach(b => b.classList.remove('active'));
@@ -102,7 +112,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // Dynamic button label updater
     function updateButton() {
         const amt = parseFloat(amountInput.value);
         if (amt && amt >= 100) {
@@ -114,7 +123,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     amountInput.addEventListener('input', updateButton);
 
-    // Preset chips
     document.querySelectorAll('.preset-chip').forEach(chip => {
         chip.addEventListener('click', () => {
             document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
@@ -124,7 +132,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // Form submit
     airtimeForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const phone = phoneInput.value.trim();
@@ -150,7 +157,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     modalCancel.addEventListener('click', () => confirmModal.style.display = 'none');
 
-    // Confirm purchase
     modalConfirm.addEventListener('click', async () => {
         modalConfirm.disabled = true;
         modalCancel.disabled = true;
