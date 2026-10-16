@@ -31,7 +31,7 @@ jobs:
 
       - name: Decode Keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/brytpay-upload.jks
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode --ignore-garbage > $GITHUB_WORKSPACE/android/app/brytpay-upload.jks
 
       - name: Grant Execute Permission to Gradle
         working-directory: ./android
@@ -43,7 +43,7 @@ jobs:
           SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           SIGNING_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-        run: ./gradlew bundleRelease assembleRelease -Pandroid.injected.signing.store.file=brytpay-upload.jks -Pandroid.injected.signing.store.password=$SIGNING_STORE_PASSWORD -Pandroid.injected.signing.key.alias=$SIGNING_KEY_ALIAS -Pandroid.injected.signing.key.password=$SIGNING_KEY_PASSWORD
+        run: ./gradlew bundleRelease assembleRelease -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/android/app/brytpay-upload.jks -Pandroid.injected.signing.store.password=$SIGNING_STORE_PASSWORD -Pandroid.injected.signing.key.alias=$SIGNING_KEY_ALIAS -Pandroid.injected.signing.key.password=$SIGNING_KEY_PASSWORD
 
       - name: Save Builds for Download
         uses: actions/upload-artifact@v4
