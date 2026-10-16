@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline — BRYT Pay</title>
+    <meta name="theme-color" content="#1D5ED0">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 20px; height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #ffffff; font-family: 'Sora', sans-serif; text-align: center; color: #071A3A; flex-direction: column; }
+        svg { width: 64px; height: 64px; color: #94a3b8; margin-bottom: 20px; }
+        h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
+        p { font-size: 0.95rem; color: #64748B; max-width: 300px; margin-bottom: 32px; line-height: 1.5; }
+        button { background: #1D5ED0; color: white; border: none; padding: 14px 32px; border-radius: 8px; font-family: 'Sora'; font-weight: 700; font-size: 1rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l22 22"></path><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path><path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+    <h1>You are offline</h1>
+    <p>Please check your internet connection and try again.</p>
+    <button onclick="window.location.reload()">Retry Connection</button>
+</body>
+</html>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BRYT Pay</string>
+    <string name="title_activity_main">BRYT Pay</string>
+    <string name="package_name">com.brytdigitalservices.brytpay</string>
+    <string name="custom_url_scheme">com.brytdigitalservices.brytpay</string>
+</resources>

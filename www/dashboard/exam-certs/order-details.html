@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Certificate Summary — BRYT Pay</title>
+
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#1D5ED0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { background: #f8fafc; margin: 0; color: var(--bryt-navy); overflow-x: hidden; padding-bottom: 75px !important; font-family: system-ui, -apple-system, sans-serif; }
+        
+        /* Centered Header Fix */
+        .header-bar { 
+            padding: 12px 16px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: #ffffff; 
+            border-bottom: 1px solid #e2e8f0; 
+            position: sticky; 
+            top: 0; 
+            z-index: 10; 
+        }
+        .header-bar h2 { margin: 0; font-size: 0.95rem; font-weight: 800; color: var(--bryt-navy); }
+        .header-back-btn { 
+            position: absolute; 
+            left: 16px; 
+            text-decoration: none; 
+            color: #64748b; 
+            font-size: 0.75rem; 
+            font-weight: 800; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 4px; 
+            transition: color 0.2s; 
+        }
+        .header-back-btn:hover { color: var(--bryt-primary); }
+        
+        .page-container { padding: 16px; max-width: 520px; margin: 0 auto; }
+
+        /* Sleek Horizontal Summary Card */
+        .summary-card { background: #ffffff; border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 14px; margin-bottom: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .summary-icon { width: 44px; height: 44px; background: #f1f5f9; border-radius: 50%; padding: 8px; object-fit: contain; flex-shrink: 0; }
+        .summary-info { flex-grow: 1; }
+        .summary-title { font-size: 0.85rem; font-weight: 800; color: var(--bryt-navy); margin-bottom: 2px; }
+        .summary-price { font-size: 1.15rem; font-weight: 800; color: var(--bryt-primary); }
+        
+        /* Compact Details List */
+        .details-list { background: #ffffff; padding: 0 16px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.02); margin-bottom: 20px; }
+        .detail-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; }
+        .detail-item:last-child { border-bottom: none; }
+        .detail-label { font-size: 0.7rem; color: #64748b; font-weight: 600; }
+        .detail-value { font-size: 0.75rem; font-weight: 800; color: var(--bryt-navy); text-align: right; }
+        
+        .status-pill { padding: 4px 10px; border-radius: 8px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-completed { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .status-processing { background: #fef9c3; color: #a16207; border: 1px solid #fef08a; }
+        .status-failed { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        
+        /* Full-Width Download Button */
+        .btn-download { background: var(--bryt-primary); color: #ffffff; border: none; padding: 14px; border-radius: 10px; font-weight: 800; font-size: 0.85rem; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; box-shadow: 0 4px 12px rgba(29, 94, 208, 0.2); }
+        .btn-download svg { width: 18px; height: 18px; }
+        .btn-download:hover { background: #154c9a; }
+        .btn-download:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; }
+
+        /* Transparent Copy Button */
+        .btn-copy { background: transparent; border: none; color: #94a3b8; padding: 2px; cursor: pointer; display: inline-flex; align-items: center; transition: color 0.2s; outline: none; }
+        .btn-copy:hover { color: var(--bryt-primary); }
+
+        .mobile-nav { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: #ffffff !important; z-index: 9000 !important; border-top: 1px solid #e2e8f0 !important; display: flex !important; justify-content: space-around !important; padding: 10px 0 8px 0 !important; }
+        .mobile-nav .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none; transition: color 0.2s; }
+        .mobile-nav .nav-item span { font-size: 0.65rem; font-weight: 700; }
+        .mobile-nav .nav-item svg { width: 20px; height: 20px; }
+        .mobile-nav .nav-item.active { color: var(--bryt-primary); }
+        @media (min-width: 768px) { .mobile-nav { display: none !important; } body { padding-bottom: 0 !important; } }
+    </style>
+</head>
+<body>
+
+    <div class="header-bar">
+        <a href="orders.html" id="smart-back-btn" class="header-back-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back
+        </a>
+        <h2>Order Summary</h2>
+    </div>
+
+    <main class="page-container">
+        
+        <div class="summary-card">
+            <img src="../../assets/img/waec-logo.png" id="sum-icon" class="summary-icon" onerror="this.src='../../assets/img/brytpay-logo.png'">
+            <div class="summary-info">
+                <div class="summary-title" id="sum-title">---</div>
+                <div class="summary-price" id="sum-price">₦0.00</div>
+            </div>
+        </div>
+
+        <div class="details-list">
+            <div class="detail-item">
+                <div class="detail-label">Order Reference</div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <div class="detail-value" id="sum-ref" style="font-family: monospace; color: var(--bryt-primary);">---</div>
+                    <button type="button" class="btn-copy" onclick="copyDetail('sum-ref', this)" title="Copy Ref">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Payment Method</div>
+                <div class="detail-value">BRYT Wallet</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Amount Paid</div>
+                <div class="detail-value" id="sum-amount">₦0.00</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Transaction Date</div>
+                <div class="detail-value" id="sum-date">---</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Processing Status</div>
+                <div><span id="sum-status" class="status-pill status-processing">Pending</span></div>
+            </div>
+        </div>
+
+        <button class="btn-download" id="btn-download-doc" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Document Pending
+        </button>
+    </main>
+
+    <nav class="mobile-nav no-print">
+        <a href="/dashboard/" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+        <a href="/dashboard/services/" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span>Services</span></a>
+        <a href="/dashboard/fund/" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
+        <a href="/dashboard/orders/" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>My Orders</span></a>
+        <a href="/dashboard/account/" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../assets/js/supabase-client.js"></script>
+    <script src="../../assets/js/cert-order-details.js"></script>
+
+    <!-- Clipboard Utility -->
+    <script>
+        function copyDetail(elementId, btnElement) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            let textToCopy = el.textContent.trim();
+            if (!textToCopy || textToCopy === '---') return;
+
+            const originalHTML = btnElement.innerHTML;
+            const showSuccess = () => {
+                btnElement.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                setTimeout(() => { btnElement.innerHTML = originalHTML; }, 1500);
+            };
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(showSuccess);
+            } else {
+                const temp = document.createElement('textarea');
+                temp.value = textToCopy;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+                showSuccess();
+            }
+        }
+    </script>
+</body>
+</html>

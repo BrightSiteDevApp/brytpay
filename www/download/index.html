@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download BRYT Pay App</title>
+    
+    <meta name="theme-color" content="#1D5ED0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    
+    <style>
+        body { background: #f8fafc; font-family: 'Sora', system-ui, sans-serif; margin: 0; padding: 0; color: #0f172a; }
+        .download-container { max-width: 480px; margin: 40px auto; padding: 24px; text-align: center; }
+        .app-icon { width: 80px; height: 80px; background: #ffffff; border-radius: 20px; padding: 12px; box-shadow: 0 10px 25px rgba(29, 94, 208, 0.1); margin: 0 auto 24px; object-fit: contain; display: block; border: 1px solid #e2e8f0; }
+        h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; color: #0f172a; }
+        p.subtitle { font-size: 1rem; color: #64748b; margin-bottom: 32px; line-height: 1.6; }
+        
+        /* Device specific views */
+        .device-view { display: none; background: #ffffff; border-radius: 16px; padding: 32px 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; }
+        
+        /* Android View */
+        .btn-download { display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: #1D5ED0; color: white; padding: 16px 32px; border-radius: 12px; font-weight: 700; font-size: 1.05rem; text-decoration: none; width: 100%; box-sizing: border-box; transition: background 0.2s; border: none; cursor: pointer; }
+        .btn-download:hover { background: #0f172a; }
+        .security-note { font-size: 0.8rem; color: #94a3b8; margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+        /* iOS View */
+        .ios-steps { text-align: left; margin-top: 24px; }
+        .ios-step { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .step-icon { width: 40px; height: 40px; background: #f1f5f9; color: #1D5ED0; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .step-text h4 { margin: 0 0 4px 0; font-size: 0.95rem; font-weight: 700; color: #0f172a; }
+        .step-text p { margin: 0; font-size: 0.85rem; color: #64748b; line-height: 1.5; }
+        .safari-warning { background: #fffbeb; color: #b45309; padding: 12px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 24px; font-weight: 600; border: 1px solid #fef3c7; display: flex; gap: 8px; align-items: center; }
+
+        /* Desktop View */
+        .qr-placeholder { width: 180px; height: 180px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 16px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: #94a3b8; }
+    </style>
+</head>
+<body>
+
+    <main class="download-container">
+        <img src="../assets/img/brytpay-logo.png" alt="BRYT Pay" class="app-icon">
+        <h1>Get BRYT Pay</h1>
+        <p class="subtitle">The smartest way to handle your digital services and payments.</p>
+
+        <!-- ANDROID VIEW -->
+        <div id="view-android" class="device-view">
+            <h3 style="margin-top: 0;">Download for Android</h3>
+            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 24px;">Install the official BRYT Pay Android application to your device.</p>
+            <a href="/app/brytpay.apk" class="btn-download" download>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download APK
+            </a>
+            <div class="security-note">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Secure & verified by BRYT Technologies
+            </div>
+        </div>
+
+        <!-- IOS VIEW -->
+        <div id="view-ios" class="device-view">
+            <h3 style="margin-top: 0;">Install on iPhone & iPad</h3>
+            
+            <div class="safari-warning">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                You must open this page in the Safari browser.
+            </div>
+
+            <div class="ios-steps">
+                <div class="ios-step">
+                    <div class="step-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                    </div>
+                    <div class="step-text">
+                        <h4>1. Tap the Share button</h4>
+                        <p>Look for the square icon with an upward arrow at the bottom of your screen.</p>
+                    </div>
+                </div>
+                
+                <div class="ios-step">
+                    <div class="step-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    </div>
+                    <div class="step-text">
+                        <h4>2. Add to Home Screen</h4>
+                        <p>Scroll down the share menu list and tap "Add to Home Screen".</p>
+                    </div>
+                </div>
+
+                <div class="ios-step">
+                    <div class="step-icon" style="font-weight: 800; font-size: 1.2rem;">+</div>
+                    <div class="step-text">
+                        <h4>3. Confirm</h4>
+                        <p>Tap "Add" in the top right corner to finish installing the app.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DESKTOP VIEW -->
+        <div id="view-desktop" class="device-view">
+            <h3 style="margin-top: 0;">Scan to Install</h3>
+            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 24px;">Open <strong>brytpay.name.ng/download/</strong> on your mobile phone to install the app.</p>
+            <div class="qr-placeholder">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><rect x="7" y="7" width="3" height="3"/><rect x="14" y="7" width="3" height="3"/><rect x="7" y="14" width="3" height="3"/><rect x="14" y="14" width="3" height="3"/></svg>
+            </div>
+        </div>
+
+        <a href="/" style="display: block; margin-top: 32px; color: #64748b; text-decoration: none; font-size: 0.85rem; font-weight: 600;">&larr; Back to Website</a>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const ua = navigator.userAgent.toLowerCase();
+            const isIOS = /iphone|ipad|ipod/.test(ua);
+            const isAndroid = /android/.test(ua);
+            
+            // Redirect them to the dashboard if they open this page while already inside the app!
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+                window.location.href = '/dashboard/';
+                return;
+            }
+
+            // Display the correct UI block based on their device
+            if (isIOS) {
+                document.getElementById('view-ios').style.display = 'block';
+            } else if (isAndroid) {
+                document.getElementById('view-android').style.display = 'block';
+            } else {
+                document.getElementById('view-desktop').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

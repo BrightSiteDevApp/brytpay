@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin: NIN Orders — BRYT Pay</title>
+
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#1D5ED0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../assets/css/main.css?v=2.0">
+    <style>
+        * { box-sizing: border-box; }
+        body { background: #f8fafc; margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+        
+        /* Overall Page Font Scaling */
+        .admin-container { max-width: 900px; margin: 0 auto; padding: 16px 12px 60px; }
+        
+        .admin-header-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .page-title { font-size: 1.05rem; color: #0f172a; margin: 0 0 2px 0; font-weight: 800; }
+        .page-desc { font-size: 0.65rem; color: #64748b; margin: 0; }
+
+        .search-bar-wrap { display: flex; gap: 8px; align-items: center; width: 100%; max-width: 280px; }
+        .search-input { width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.65rem; outline: none; background: #ffffff; }
+        .search-input:focus { border-color: #1D5ED0; }
+
+        .admin-table { width: 100%; border-collapse: collapse; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; }
+        .admin-table th { background: #f8fafc; padding: 8px 10px; text-align: left; font-size: 0.55rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; }
+        .admin-table td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; font-size: 0.65rem; color: #1e293b; vertical-align: middle; }
+        .admin-table tr:hover { background: #f8fafc; cursor: pointer; }
+        .admin-table tr:last-child td { border-bottom: none; }
+
+        .service-col { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+        .jamb-logo { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; background: #f1f5f9; padding: 2px; }
+
+        .order-ref { font-family: monospace; font-weight: 700; color: #1D5ED0; background: #eff6ff; padding: 3px 6px; border-radius: 4px; letter-spacing: 0.5px; font-size: 0.6rem; }
+
+        .status-badge { font-size: 0.55rem; font-weight: 800; padding: 3px 6px; border-radius: 8px; text-transform: uppercase; white-space: nowrap; }
+        .badge-paid { background: #f1f5f9; color: #475569; }
+        .badge-processing { background: #fef9c3; color: #a16207; }
+        .badge-completed { background: #dcfce7; color: #15803d; }
+        .badge-failed { background: #fee2e2; color: #b91c1c; }
+
+        /* PERFECTLY CENTERED & SCALED MODAL */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(7, 26, 58, 0.7); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 12px; }
+        
+        .modal-content { background: #ffffff; width: 100%; max-width: 290px; max-height: 85vh; overflow-y: auto; border-radius: 12px; padding: 16px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); margin: auto; }
+        
+        .modal-title { margin: 0 0 2px 0; font-size: 0.95rem; font-weight: 800; color: #0f172a; }
+        
+        .modal-top-row { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+        .modal-desc { font-family: monospace; color: #1D5ED0; font-weight: 700; font-size: 0.65rem; margin: 0; }
+
+        .modal-breakdown { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 10px; margin-bottom: 14px; }
+        .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 0.65rem; border-bottom: 1px dashed #e2e8f0; }
+        .modal-row:last-child { border-bottom: none; }
+        .modal-row span { color: #64748b; font-weight: 600; font-size: 0.6rem; }
+        
+        /* Transparent Copy Buttons */
+        .detail-wrap { display: inline-flex; align-items: center; gap: 4px; text-align: right; }
+        .detail-wrap strong { color: #0f172a; font-weight: 800; }
+        .btn-copy { background: transparent; border: none; color: #94a3b8; padding: 2px; cursor: pointer; display: inline-flex; align-items: center; transition: color 0.2s; outline: none; }
+        .btn-copy:hover { color: #1D5ED0; }
+        .btn-copy svg { width: 12px; height: 12px; }
+
+        .form-group { margin-bottom: 10px; }
+        .form-label { display: block; font-weight: 800; font-size: 0.55rem; color: #475569; margin-bottom: 4px; text-transform: uppercase; }
+        .form-select, .form-input { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.65rem; background: #ffffff; outline: none; }
+        .form-select:focus, .form-input:focus { border-color: #1D5ED0; }
+
+        .upload-box { display: none; background: #f0f9ff; border: 1px dashed #1D5ED0; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
+        .upload-box small { color: #64748b; font-size: 0.55rem; margin-top: 3px; display: block; }
+
+        .modal-actions { display: flex; gap: 6px; margin-top: 14px; }
+        .btn-modal { padding: 8px; border-radius: 6px; font-weight: 800; font-size: 0.65rem; border: none; cursor: pointer; flex: 1; transition: 0.2s; }
+        .btn-cancel { background: #f1f5f9; color: #475569; }
+        .btn-cancel:hover { background: #e2e8f0; }
+        .btn-save { background: #0f172a; color: #ffffff; flex: 1.5; }
+        .btn-save:hover { background: #1D5ED0; }
+
+        @media (max-width: 480px) {
+            .admin-header-row { flex-direction: column; align-items: flex-start; }
+            .search-bar-wrap { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="admin-container">
+        <div class="admin-header-row">
+            <div>
+                <a href="/admin" style="display: inline-flex; align-items: center; gap: 4px; color: #64748b; text-decoration: none; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Back to Admin
+                </a>
+                <h1 class="page-title">NIN Desk</h1>
+                <p class="page-desc">Process NIN orders and dispatch slips.</p>
+            </div>
+            <div class="search-bar-wrap">
+                <input type="text" id="search-orders" class="search-input" placeholder="Search Identifier or Ref...">
+            </div>
+        </div>
+
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Order Ref</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="admin-orders-body">
+                <tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 20px; font-size: 0.65rem;">Loading orders...</td></tr>
+            </tbody>
+        </table>
+    </main>
+
+    <!-- Compact Modal -->
+    <div id="admin-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="modal-title">Process Order</h3>
+            
+            <div class="modal-top-row">
+                <p class="modal-desc" id="modal-order-ref">---</p>
+                <button type="button" class="btn-copy" onclick="copyDetail('modal-order-ref', this)" title="Copy Ref">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                </button>
+            </div>
+
+            <div class="modal-breakdown">
+                <div class="modal-row">
+                    <span>Candidate:</span>
+                    <div class="detail-wrap">
+                        <strong id="modal-name">---</strong>
+                        <button type="button" class="btn-copy" onclick="copyDetail('modal-name', this)" title="Copy Name">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-row">
+                    <span>Identifier:</span>
+                    <div class="detail-wrap">
+                        <strong id="modal-reg" style="font-family: monospace;">---</strong>
+                        <!-- ONLY DIGITS EXTRACTED FOR NIN -->
+                        <button type="button" class="btn-copy" onclick="copyDetail('modal-reg', this, true)" title="Copy Numbers Only">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-row">
+                    <span>WhatsApp:</span>
+                    <div class="detail-wrap">
+                        <strong id="modal-whatsapp">---</strong>
+                        <button type="button" class="btn-copy" onclick="copyDetail('modal-whatsapp', this, true)" title="Copy Number">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-row">
+                    <span>Email:</span>
+                    <div class="detail-wrap">
+                        <strong id="modal-email">---</strong>
+                        <button type="button" class="btn-copy" onclick="copyDetail('modal-email', this)" title="Copy Email">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Update Status</label>
+                <select id="update-status" class="form-select">
+                    <option value="PAID">PAID</option>
+                    <option value="PROCESSING">PROCESSING</option>
+                    <option value="FAILED">FAILED</option>
+                    <option value="REFUND_PENDING">REFUND PENDING</option>
+                    <option value="COMPLETED">COMPLETED</option>
+                </select>
+            </div>
+
+            <div class="upload-box" id="upload-section">
+                <label class="form-label" style="color: #1D5ED0;">Upload Document</label>
+                <input type="file" id="document-upload" class="form-input" accept=".pdf, .jpg, .jpeg, .png">
+                <small>Securely stored and emailed to user.</small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Admin Notes</label>
+                <textarea id="update-notes" class="form-input" placeholder="e.g. Dispatched to agent..." rows="2" style="resize: vertical;"></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" id="modal-cancel" class="btn-modal btn-cancel">Cancel</button>
+                <button type="button" id="modal-save" class="btn-modal btn-save">Save & Dispatch</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Nav -->
+    <nav class="mobile-nav no-print" style="position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; z-index: 9999; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; padding: 10px 0;">
+        <a href="/dashboard/" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span style="font-size: 0.65rem; font-weight: 700;">Home</span></a>
+        <a href="/dashboard/services/" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span style="font-size: 0.65rem; font-weight: 700;">Services</span></a>
+        <a href="/dashboard/fund/" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span style="font-size: 0.65rem; font-weight: 700;">Wallet</span></a>
+        <a href="/dashboard/orders/" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span style="font-size: 0.65rem; font-weight: 700;">My Orders</span></a>
+        <a href="/dashboard/account/" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size: 0.65rem; font-weight: 700;">Account</span></a>
+    </nav>
+    <style>@media (min-width: 768px) { .mobile-nav { display: none !important; } body { padding-bottom: 0 !important; } }</style>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../assets/js/supabase-client.js?v=2.0"></script>
+    <script src="../../assets/js/admin-nin.js"></script>
+
+    <!-- Clipboard Utility -->
+    <script>
+        function copyDetail(elementId, btnElement, extractDigitsOnly = false) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            let textToCopy = el.textContent.trim();
+            if (!textToCopy || textToCopy === '---') return;
+
+            if (extractDigitsOnly) {
+                const matches = textToCopy.match(/\d+/g);
+                if (matches) { textToCopy = matches.join(''); }
+            }
+
+            const originalHTML = btnElement.innerHTML;
+            
+            const showSuccess = () => {
+                btnElement.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                setTimeout(() => { btnElement.innerHTML = originalHTML; }, 1500);
+            };
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(showSuccess);
+            } else {
+                const temp = document.createElement('textarea');
+                temp.value = textToCopy;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+                showSuccess();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+name: Build BRYT Pay Android App
+
+on:
+  workflow_dispatch: # Allows you to manually trigger the build
+
+jobs:
+  build:
+    name: Generate Android App Bundle
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install NPM Dependencies
+        run: npm install
+
+      - name: Sync Web Files to Android
+        run: npx cap sync android
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Grant Execute Permission to Gradle
+        working-directory: ./android
+        run: chmod +x gradlew
+
+      - name: Build Release Bundle (.aab)
+        working-directory: ./android
+        run: ./gradlew bundleRelease
+
+      - name: Save AAB File for Download
+        uses: actions/upload-artifact@v4
+        with:
+          name: BRYT-Pay-Release-AAB
+          path: android/app/build/outputs/bundle/release/app-release.aab

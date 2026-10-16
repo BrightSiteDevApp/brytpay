@@ -1,0 +1,23 @@
+{
+  "appId": "com.brytdigitalservices.brytpay",
+  "appName": "BRYT Pay",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 3000,
+      "launchAutoHide": true,
+      "backgroundColor": "#071A3A",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": true,
+      "androidSpinnerStyle": "large",
+      "spinnerColor": "#ffffff",
+      "splashFullScreen": true,
+      "splashImmersive": true
+    },
+    "OtaKit": {
+      "appId": "fe23ea6b-d0da-4a11-8ce8-f4034194d918"
+    }
+  }
+}
