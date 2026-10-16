@@ -1,11 +1,11 @@
 name: Build BRYT Pay Android App
 
 on:
-  workflow_dispatch: # Allows you to manually trigger the build
+  workflow_dispatch: 
 
 jobs:
   build:
-    name: Generate Android App Bundle
+    name: Generate Signed Android App Bundle and APK
     runs-on: ubuntu-latest
 
     steps:
@@ -26,19 +26,29 @@ jobs:
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
-          distribution: "zulu"
-          java-version: "21"
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/brytpay-upload.jks
 
       - name: Grant Execute Permission to Gradle
         working-directory: ./android
         run: chmod +x gradlew
 
-      - name: Build Release Bundle (.aab)
+      - name: Build and Sign AAB and APK
         working-directory: ./android
-        run: ./gradlew bundleRelease
+        env:
+          SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: ./gradlew bundleRelease assembleRelease -Pandroid.injected.signing.store.file=brytpay-upload.jks -Pandroid.injected.signing.store.password=$SIGNING_STORE_PASSWORD -Pandroid.injected.signing.key.alias=$SIGNING_KEY_ALIAS -Pandroid.injected.signing.key.password=$SIGNING_KEY_PASSWORD
 
-      - name: Save AAB File for Download
+      - name: Save Builds for Download
         uses: actions/upload-artifact@v4
         with:
-          name: BRYT-Pay-Release-AAB
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          name: BRYT-Pay-Release-Builds
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            android/app/build/outputs/apk/release/*.apk
