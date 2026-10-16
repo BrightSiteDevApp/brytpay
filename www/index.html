@@ -89,6 +89,25 @@
     }
     </script>
 
+    <script>
+  // Check if running inside the Capacitor Android App
+  const isCapacitor = window.Capacitor !== undefined;
+
+  if (isCapacitor) {
+    // Hide web PWA install banners inside the native app
+    document.documentElement.classList.add('in-app');
+
+    // Check for an active Supabase user session in localStorage
+    const hasSession = Object.keys(localStorage).some(key => key.startsWith('sb-') && key.endsWith('-auth-token'));
+
+    if (hasSession) {
+      window.location.replace('/dashboard/index.html');
+    } else {
+      window.location.replace('/auth/login.html'); // Adjust file name if your login file is named differently
+    }
+  }
+</script>
+
     <link rel="stylesheet" href="assets/css/main.css">
     <style>
         /* =========================================

@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (redirectUrl && redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
             window.location.href = decodeURIComponent(redirectUrl);
         } else {
-            window.location.href = '/dashboard/';
+            window.location.href = '/dashboard/index.html';
         }
     };
 

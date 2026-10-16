@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const amountColor = isCredit ? '#10b981' : '#0B1220';
 
             container.innerHTML += `
-                <div class="tx-row" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid #f1f5f9; gap: 10px; cursor: pointer;" onclick="window.location.href='/dashboard/receipt/?id=${tx.id}'">
+                <div class="tx-row" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid #f1f5f9; gap: 10px; cursor: pointer;" onclick="window.location.href='/dashboard/receipt/index.html?id=${tx.id}'">
                     <div class="tx-left" style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
                         ${brandLogo}
                         <div style="min-width: 0; flex: 1;">

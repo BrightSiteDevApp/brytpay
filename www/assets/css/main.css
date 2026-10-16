@@ -280,3 +280,9 @@ header p { font-size: 0.75rem !important; line-height: 1.3 !important; }
 .payment-slip-amount, #modal-amount { font-size: 1.35rem !important; } /* Service forms */
 .service-price { font-size: 0.75rem !important; }
 .modal-title { font-size: 1.15rem !important; }
+
+/* Automatically hides PWA prompts when running as an installed native app */
+.in-app #install-banner,
+.in-app .pwa-install-prompt {
+  display: none !important;
+}
