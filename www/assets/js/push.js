@@ -34,12 +34,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
-        // 4. Handle incoming notifications while the app is open
-        PushNotifications.addListener('pushNotificationReceived', (notification) => {
-            console.log('Notification received in foreground: ', notification);
-            // You can trigger your custom BRYT toast notification here
-        });
+        // 3. Listen for the generated device token
+        PushNotifications.addListener('registration', async (token) => {
+            console.log('Push token received: ', token.value);
+            
+            const { data: { session } } = await window.db.auth.getSession();
+            if (session) {
+                const { error } = await window.db.from('push_subscriptions').upsert({
+                    user_id: session.user.id,
+                    token: token.value,
+                    platform: 'android',
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'token' });
 
+                // 🛑 DIAGNOSTIC TRAP:
+                if (error) {
+                    alert("Token Save Error: " + error.message);
+                } else {
+                    alert("Android Device Registered Successfully!");
+                }
+            }
+        });
         // 5. Fire the permission request 
         // We delay it slightly (e.g., 2 seconds) so it doesn't interrupt the immediate splash screen load
         setTimeout(() => {
