@@ -286,3 +286,9 @@ header p { font-size: 0.75rem !important; line-height: 1.3 !important; }
 .in-app .pwa-install-prompt {
   display: none !important;
 }
+/* Automatically hide mobile bottom navigation when Android keyboard is open */
+@media screen and (max-height: 600px) {
+    .mobile-nav {
+        display: none !important;
+    }
+}

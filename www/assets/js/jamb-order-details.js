@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             Download Document
         `;
         
-        dlBtn.addEventListener('click', async () => {
+       dlBtn.addEventListener('click', async () => {
             dlBtn.disabled = true;
             dlBtn.textContent = 'Preparing Download...';
 
@@ -94,27 +94,33 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const { data: urlData } = await window.db.storage.from('jamb_documents').createSignedUrl(data.document_path, 60);
                 const response = await fetch(urlData.signedUrl);
                 const blob = await response.blob();
-                const localUrl = window.URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = localUrl;
-                a.download = `BRYT_${data.jamb_registration_number}.${data.document_path.split('.').pop()}`;
-                document.body.appendChild(a);
-                a.click();
-                
-                window.URL.revokeObjectURL(localUrl);
-                document.body.removeChild(a);
-                
-                dlBtn.innerHTML = `
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Downloaded Successfully
-                `;
+                const fileName = `BRYT_${data.jamb_registration_number}.${data.document_path.split('.').pop()}`;
+
+                if (window.Capacitor !== undefined) {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(blob);
+                    reader.onloadend = async () => {
+                        const base64data = reader.result.split(',')[1];
+                        const savedFile = await window.Capacitor.Plugins.Filesystem.writeFile({
+                            path: fileName, data: base64data, directory: 'CACHE'
+                        });
+                        await window.Capacitor.Plugins.Share.share({ title: 'JAMB Document', url: savedFile.uri });
+                        dlBtn.innerHTML = `Downloaded Successfully`;
+                        dlBtn.disabled = false;
+                    };
+                } else {
+                    const localUrl = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none'; a.href = localUrl; a.download = fileName;
+                    document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(localUrl); document.body.removeChild(a);
+                    dlBtn.innerHTML = `Downloaded Successfully`;
+                    dlBtn.disabled = false;
+                }
             } catch (err) {
                 alert('Download failed. Please check your internet connection.');
                 dlBtn.innerHTML = `Try Download Again`;
+                dlBtn.disabled = false;
             }
-            dlBtn.disabled = false;
         });
     }
 
