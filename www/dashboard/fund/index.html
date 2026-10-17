@@ -2,255 +2,312 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fund Wallet — BRYT Pay</title>
-    <meta name="theme-color" content="#1D5ED0">
-    <link rel="stylesheet" href="../../assets/css/main.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root { --bryt-primary: #1D5ED0; --bryt-navy: #0B1220; --slate-50: #f8fafc; --slate-100: #f1f5f9; --slate-200: #e2e8f0; --slate-400: #94a3b8; --slate-500: #64748b; --slate-700: #334155; --slate-800: #1e293b; }
-        body { padding-bottom: 75px !important; background-color: #f8fafc; }
-        
-        .fund-card { background: #ffffff; border: 1px solid var(--slate-200); border-radius: 16px; padding: 18px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02); margin-bottom: 16px; }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Add Money — BRYT Pay</title>
+    
+    <!-- Anti-Flash Dark Mode Script -->
+    <script>
+        if (localStorage.getItem('bryt_theme') === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+        }
+    </script>
 
-        /* Custom BrytPay Toast */
-        .bryt-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150px); background: #ffffff; padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 9999; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); min-width: 260px; border-left: 4px solid var(--bryt-primary); }
-        .bryt-toast.show { transform: translateX(-50%) translateY(0); }
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../../assets/css/main.css">
+
+    <style>
+        :root {
+            --bryt-primary: #1D5ED0;
+            --bryt-navy: #0B1220;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-main: #0B1220;
+            --border-light: #f1f5f9;
+        }
+
+        html.dark-theme {
+            --bryt-navy: #ffffff;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --border-light: #334155;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 80px !important;
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Topbar Header */
+        .app-topbar { 
+            display: flex; align-items: center; gap: 16px; padding: 16px 20px; 
+            background: var(--card-bg); position: sticky; top: 0; z-index: 100; 
+            border-bottom: 1px solid var(--border-light); transition: background 0.3s, border 0.3s; 
+        }
+        .smart-back { 
+            color: var(--text-main); display: flex; align-items: center; 
+            text-decoration: none; padding: 4px; margin-left: -4px;
+        }
+        .page-title { font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0; }
+
+        .main-content { padding: 20px; }
+
+        /* Wallet Balance Pill */
+        .balance-pill { background: var(--card-bg); border: 1px solid var(--border-light); padding: 16px 20px; border-radius: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: 0.3s; }
+        .balance-label { font-size: 0.65rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .balance-amount { font-size: 1.4rem; font-weight: 800; color: var(--text-main); line-height: 1; }
+        .balance-icon { width: 42px; height: 42px; background: #eff6ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--bryt-primary); }
+
+        /* Compact Account Cards */
+        .account-card { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 14px; margin-bottom: 16px; overflow: hidden; transition: 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .account-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px dashed var(--border-light); background: rgba(0,0,0,0.01); }
+        .account-brand { display: flex; align-items: center; gap: 8px; }
+        .account-logo { height: 18px; width: auto; max-width: 60px; object-fit: contain; }
+        .bank-name { font-weight: 800; font-size: 0.75rem; color: var(--text-main); text-transform: uppercase; }
+        
+        .account-tag { font-size: 0.6rem; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
+        .tag-active { background: #dcfce7; color: #15803d; }
+        .tag-basic { background: #e2e8f0; color: #475569; }
+        html.dark-theme .tag-active { background: rgba(21, 128, 61, 0.2); color: #4ade80; }
+        html.dark-theme .tag-basic { background: rgba(51, 65, 85, 0.5); color: #cbd5e1; }
+
+        .account-body { padding: 16px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .acc-label { font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
+        .acc-name { font-size: 0.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .account-num { font-size: 1.15rem; font-weight: 800; color: var(--bryt-primary); letter-spacing: 1px; font-family: monospace; line-height: 1; }
+        
+        .btn-copy { background: transparent; color: var(--text-main); padding: 8px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; border: 1px solid var(--border-light); display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
+        html.dark-theme .btn-copy { border-color: #334155; }
+
+        .account-footer { padding: 10px 16px; background: rgba(0,0,0,0.01); border-top: 1px dashed var(--border-light); font-size: 0.65rem; font-weight: 700; color: #64748b; display: flex; justify-content: space-between; align-items: center; }
+
+        /* Standalone KYC Prompt Card */
+        .standalone-upgrade-card { background: rgba(29, 94, 208, 0.05); border: 1px solid var(--border-light); border-radius: 14px; padding: 16px; margin-bottom: 16px; text-align: left; display: none; }
+        html.dark-theme .standalone-upgrade-card { background: rgba(29, 94, 208, 0.1); border-color: #1e3a8a; }
+        .btn-upgrade-inline { width: 100%; padding: 12px; font-size: 0.85rem; font-weight: 800; border-radius: 10px; background: var(--bryt-primary); color: #fff; border: none; cursor: pointer; margin-top: 4px; }
+        
+        .subtle-link-btn { background: none; border: none; color: var(--bryt-primary); font-size: 0.75rem; font-weight: 700; cursor: pointer; text-decoration: underline; padding: 8px; }
+
+        /* KYC Modals & Unregistered States */
+        .tier-card { border: 1px solid var(--border-light); background: var(--card-bg); border-radius: 14px; padding: 16px; margin-bottom: 16px; text-align: left; }
+        .tier-card-premium { border-color: var(--bryt-primary); position: relative; overflow: hidden; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(11, 18, 32, 0.8); backdrop-filter: blur(4px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 16px; }
+        .modal-card { background: var(--card-bg); border-radius: 16px; max-width: 400px; width: 100%; padding: 20px; border: 1px solid var(--border-light); }
+        .form-input, .form-select { background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-light); padding: 12px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; width: 100%; outline: none; margin-bottom: 12px; box-sizing: border-box; }
+        .form-label { font-size: 0.65rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px; display: block; }
+
+        /* Centered Toast Fix */
+        .bryt-toast { position: fixed; top: 20px; left: 0; right: 0; margin: 0 auto; width: max-content; max-width: 90%; transform: translateY(-150px); background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-light); padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 9999; transition: transform 0.4s; border-left: 4px solid var(--bryt-primary); }
+        .bryt-toast.show { transform: translateY(0); }
         .toast-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
         .toast-success .toast-icon { background: #16a34a; }
         .toast-error .toast-icon { background: #dc2626; }
-        .toast-text { font-size: 0.8rem; font-weight: 600; color: var(--bryt-navy); }
+        .toast-text { font-size: 0.8rem; font-weight: 600; }
 
-        /* Beautiful Self-Contained Bank Cards */
-        .account-card { background: #ffffff; border: 1.5px solid var(--slate-200); border-radius: 14px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); overflow: hidden; transition: all 0.2s ease; }
-        .account-card:hover { border-color: var(--bryt-primary); box-shadow: 0 4px 12px rgba(29, 94, 208, 0.08); }
-        
-        .account-card-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: #f8fafc; border-bottom: 1px solid var(--slate-100); }
-        .account-brand { display: flex; align-items: center; gap: 10px; }
-        .account-logo { height: 22px; width: auto; max-width: 60px; object-fit: contain; border-radius: 4px; }
-        .bank-name-text { font-weight: 800; font-size: 0.8rem; color: var(--bryt-navy); letter-spacing: 0.3px; text-transform: uppercase; }
-        
-        .account-tag { font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
-        .tag-active { background: #dcfce7; color: #15803d; }
-        .tag-basic { background: #fef9c3; color: #a16207; }
-
-        .account-card-body { padding: 16px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .acc-label { font-size: 0.65rem; color: var(--slate-500); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .acc-name { font-size: 0.85rem; font-weight: 800; color: var(--bryt-navy); margin-bottom: 12px; }
-        .account-num { font-size: 1.3rem; font-weight: 800; color: var(--bryt-primary); letter-spacing: 1px; font-family: monospace; }
-        
-        /* Subtle Copy Button */
-        .action-btn { background: var(--slate-100); color: var(--bryt-navy); padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; cursor: pointer; border: 1px solid var(--slate-200); display: inline-flex; align-items: center; gap: 4px; transition: 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
-        .action-btn:hover { background: var(--slate-200); border-color: #cbd5e1; }
-
-        .account-card-footer { padding: 10px 16px; background: #fcfcfc; border-top: 1px dashed var(--slate-200); font-size: 0.7rem; font-weight: 700; color: var(--slate-500); display: flex; justify-content: space-between; align-items: center; }
-        .fee-text { display: flex; align-items: center; gap: 6px; }
-        .fee-text i { color: var(--bryt-primary); }
-
-        /* BRYT Brand Inline Upgrade Box */
-        .inline-upgrade-box { background: #eff6ff; padding: 14px 16px; border-top: 1px solid #bfdbfe; display: none; }
-        .btn-upgrade-inline { width: 100%; padding: 10px; font-size: 0.85rem; font-weight: 800; border-radius: 10px; background: var(--bryt-primary); color: #fff; border: none; cursor: pointer; margin-top: 10px; transition: 0.2s; }
-        .btn-upgrade-inline:hover { background: #154cbd; }
-
-        .support-link-wrapper { text-align: center; margin: 20px 0; }
-        .support-link { display: inline-flex; align-items: center; gap: 6px; color: var(--slate-500); font-size: 0.8rem; font-weight: 600; text-decoration: none; }
-        .mobile-nav { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: #ffffff !important; z-index: 9999 !important; border-top: 1px solid #e2e8f0 !important; display: flex !important; justify-content: space-around !important; padding: 10px 0 !important; box-shadow: 0 -2px 10px rgba(0,0,0,0.05) !important; }
-
-        /* Modal */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(11, 18, 32, 0.6); backdrop-filter: blur(4px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 16px; }
-        .modal-card { background: #ffffff; border-radius: 16px; max-width: 400px; width: 100%; padding: 20px; }
-        .tier-card { border: 2px solid var(--slate-200); border-radius: 14px; padding: 16px; margin-bottom: 16px; text-align: left; }
-        .tier-card-premium { border-color: var(--bryt-primary); position: relative; overflow: hidden; background: #ffffff;}
-        
-        .subtle-link-btn { background: none; border: none; color: var(--bryt-primary); font-size: 0.75rem; font-weight: 700; cursor: pointer; text-decoration: underline; padding: 8px; transition: color 0.2s; }
-        .subtle-link-btn:hover { color: #154cbd; }
+        /* Native Bottom Nav */
+        .mobile-nav { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: var(--card-bg) !important; z-index: 9999 !important; border-top: 1px solid var(--border-light) !important; display: flex !important; justify-content: space-around !important; padding: 12px 0 10px 0 !important; transition: background 0.3s, border 0.3s; }
+        .mobile-nav .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none; transition: color 0.2s; }
+        .mobile-nav .nav-item span { font-size: 0.65rem; font-weight: 800; }
+        .mobile-nav .nav-item svg { width: 22px; height: 22px; }
+        .mobile-nav .nav-item.active { color: var(--bryt-primary); }
     </style>
 </head>
 <body>
 
-    <!-- Notification Toast -->
     <div id="bryt-toast" class="bryt-toast">
         <div id="toast-icon-wrap" class="toast-icon"></div>
         <div id="toast-text" class="toast-text">Message</div>
     </div>
 
-    <main class="app-container" style="max-width: 520px; margin: 0 auto; padding: 16px 16px 24px 16px;">
-        <header style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
-                <a href="/dashboard/" style="text-decoration:none; color:var(--slate-500); font-size:0.85rem; font-weight:700; display:inline-flex; align-items:center; gap:6px; margin-bottom: 8px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Dashboard
-                </a>
-                <h1 style="font-size: 1.35rem; font-weight: 800; color: var(--bryt-navy); margin: 0 0 2px 0;">Fund Wallet</h1>
-                <p style="font-size: 0.75rem; color: var(--slate-500); margin: 0;">Automated Bank Transfer</p>
-            </div>
-            
-            <div style="display: flex; align-items: center; gap: 8px; background: var(--bryt-primary); padding: 6px 12px; border-radius: 16px; box-shadow: 0 4px 12px rgba(29, 94, 208, 0.2);">
-                <div style="background: rgba(255,255,255,0.2); border-radius: 50%; padding: 4px; display: flex;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-end;">
-                    <span style="font-size: 0.55rem; color: #e0f2fe; text-transform: uppercase; font-weight: 800;">Balance</span>
-                    <strong id="user-balance" style="color: #ffffff; font-size: 0.85rem; font-weight: 800;">₦0.00</strong>
-                </div>
-            </div>
-        </header>
+    <header class="app-topbar">
+        <a href="/dashboard/index.html" class="smart-back">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </a>
+        <h1 class="page-title">Add Money</h1>
+    </header>
 
-        <div id="state-loading" class="fund-card" style="text-align: center; padding: 40px 20px;">
-            <div style="display: inline-block; width: 28px; height: 28px; border: 3px solid #e2e8f0; border-top-color: var(--bryt-primary); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
-            <p style="font-size: 0.75rem; color: var(--slate-500); font-weight: 600; margin-top: 12px;">Loading channels...</p>
+    <main class="main-content">
+        <!-- Sleek Balance Pill -->
+        <div class="balance-pill">
+            <div>
+                <div class="balance-label">Wallet Balance</div>
+                <div class="balance-amount" id="user-balance">₦0.00</div>
+            </div>
+            <div class="balance-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            </div>
+        </div>
+
+        <div id="state-loading" style="text-align: center; padding: 40px 20px;">
+            <div style="display: inline-block; width: 28px; height: 28px; border: 3px solid var(--border-light); border-top-color: var(--bryt-primary); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+            <p style="font-size: 0.75rem; color: #64748b; font-weight: 600; margin-top: 12px;">Loading channels...</p>
         </div>
 
         <div id="state-unregistered" style="display: none;">
-            <div class="fund-card">
-                <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--bryt-navy); margin: 0 0 16px 0; text-align: center;">Generate Funding Accounts</h2>
-                
-                <div class="tier-card">
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                        <div style="width: 40px; height: 40px; border-radius: 10px; background: #eff6ff; color: var(--bryt-primary); display: flex; align-items: center; justify-content: center;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                        </div>
-                        <div>
-                            <h3 style="margin: 0; font-size: 0.95rem; color: var(--bryt-navy); font-weight: 800;">Basic Account</h3>
-                            <p style="margin: 0; font-size: 0.7rem; color: var(--slate-500); font-weight: 600;">No ID Required • ₦30,000 Daily Limit</p>
-                        </div>
+            <h2 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin: 0 0 16px 0; text-align: center;">Generate Funding Accounts</h2>
+            
+            <div class="tier-card">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(29, 94, 208, 0.1); color: var(--bryt-primary); display: flex; align-items: center; justify-content: center;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                     </div>
-                    <button id="btn-trigger-basic" style="width: 100%; padding: 12px; font-size: 0.85rem; font-weight: 800; border-radius: 10px; background: var(--slate-800); color: #fff; border: none; cursor: pointer;">Generate 9PSB Account</button>
+                    <div>
+                        <h3 style="margin: 0; font-size: 0.9rem; color: var(--text-main); font-weight: 800;">Basic Account</h3>
+                        <p style="margin: 0; font-size: 0.65rem; color: #64748b; font-weight: 600;">No ID Required • ₦30,000 Limit</p>
+                    </div>
                 </div>
+                <button id="btn-trigger-basic" style="width: 100%; padding: 12px; font-size: 0.8rem; font-weight: 800; border-radius: 10px; background: #334155; color: #fff; border: none; cursor: pointer;">Generate 9PSB Account</button>
+            </div>
 
-                <div class="tier-card tier-card-premium">
-                    <div style="position: absolute; top: 0; right: 0; background: var(--bryt-primary); color: #fff; font-size: 0.55rem; font-weight: 800; padding: 4px 10px; border-bottom-left-radius: 10px;">RECOMMENDED</div>
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                        <div style="width: 40px; height: 40px; border-radius: 10px; background: #eff6ff; color: var(--bryt-primary); display: flex; align-items: center; justify-content: center;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                        </div>
-                        <div>
-                            <h3 style="margin: 0; font-size: 0.95rem; color: var(--bryt-navy); font-weight: 800;">Verified Accounts</h3>
-                            <p style="margin: 0; font-size: 0.7rem; color: var(--slate-500); font-weight: 600;">NIN/BVN Required • Unlimited Deposits</p>
-                        </div>
+            <div class="tier-card tier-card-premium">
+                <div style="position: absolute; top: 0; right: 0; background: var(--bryt-primary); color: #fff; font-size: 0.55rem; font-weight: 800; padding: 4px 10px; border-bottom-left-radius: 10px;">RECOMMENDED</div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(29, 94, 208, 0.1); color: var(--bryt-primary); display: flex; align-items: center; justify-content: center;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                     </div>
-                    <button id="btn-trigger-kyc" style="width: 100%; padding: 12px; font-size: 0.85rem; font-weight: 800; border-radius: 10px; background: var(--bryt-primary); color: #fff; border: none; cursor: pointer;">Verify ID & Generate All</button>
+                    <div>
+                        <h3 style="margin: 0; font-size: 0.9rem; color: var(--text-main); font-weight: 800;">Verified Accounts</h3>
+                        <p style="margin: 0; font-size: 0.65rem; color: #64748b; font-weight: 600;">NIN/BVN Required • Unlimited Deposits</p>
+                    </div>
                 </div>
+                <button id="btn-trigger-kyc" style="width: 100%; padding: 12px; font-size: 0.8rem; font-weight: 800; border-radius: 10px; background: var(--bryt-primary); color: #fff; border: none; cursor: pointer;">Verify ID & Generate All</button>
             </div>
         </div>
 
         <div id="state-active" style="display: none;">
-            
-            <p style="font-size: 0.75rem; color: var(--slate-500); margin-bottom: 16px; text-align: center; font-weight: 600; padding: 0 10px;">You can make a transfer to any of the accounts below and your wallet will be credited in seconds.</p>
+            <p style="font-size: 0.7rem; color: #64748b; margin-bottom: 16px; text-align: center; font-weight: 600;">Make a transfer to any account below and your wallet will be credited instantly.</p>
 
-            <!-- PalmPay (1) Card -->
+            <!-- PalmPay (1) -->
             <div class="account-card" id="palmpay-card-1" style="display: none;">
-                <div class="account-card-header">
+                <div class="account-header">
                     <div class="account-brand">
                         <img src="../../assets/img/palmpay-logo.png" alt="" class="account-logo">
-                        <span class="bank-name-text">PALMPAY (1)</span>
+                        <span class="bank-name">PALMPAY (1)</span>
                     </div>
                     <span class="account-tag tag-active"><i class="fas fa-check-circle"></i> Verified</span>
                 </div>
-                <div class="account-card-body">
+                <div class="account-body">
                     <div>
                         <div class="acc-label">Account Name</div>
                         <div class="acc-name" id="acc-name-topify">--</div>
                         <div class="account-num" id="palmpay-no-1">0000000000</div>
                     </div>
-                    <button class="action-btn" onclick="copyAccountNumber('palmpay-no-1')"><i class="far fa-copy"></i> Copy</button>
+                    <button class="btn-copy" onclick="copyAccountNumber('palmpay-no-1')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Copy
+                    </button>
                 </div>
-                <div class="account-card-footer">
-                    <span class="fee-text"><i class="fas fa-info-circle"></i> 1.5% Deposit Fee</span>
-                    <span>No Limit</span>
+                <div class="account-footer">
+                    <span>Fee: 1.5%</span>
+                    <span>Limit: None</span>
                 </div>
             </div>
 
-            <!-- PalmPay (2) Card -->
+            <!-- PalmPay (2) -->
             <div class="account-card" id="palmpay-card-2" style="display: none;">
-                <div class="account-card-header">
+                <div class="account-header">
                     <div class="account-brand">
                         <img src="../../assets/img/palmpay-logo.png" alt="" class="account-logo">
-                        <span class="bank-name-text">PALMPAY (2)</span>
+                        <span class="bank-name">PALMPAY (2)</span>
                     </div>
                     <span class="account-tag tag-active"><i class="fas fa-check-circle"></i> Verified</span>
                 </div>
-                <div class="account-card-body">
+                <div class="account-body">
                     <div>
                         <div class="acc-label">Account Name</div>
                         <div class="acc-name">BRYT Pay (Nexpay)</div>
                         <div class="account-num" id="palmpay-no-2">0000000000</div>
                     </div>
-                    <button class="action-btn" onclick="copyAccountNumber('palmpay-no-2')"><i class="far fa-copy"></i> Copy</button>
+                    <button class="btn-copy" onclick="copyAccountNumber('palmpay-no-2')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Copy
+                    </button>
                 </div>
-                <div class="account-card-footer">
-                    <span class="fee-text"><i class="fas fa-info-circle"></i> 1.5% Deposit Fee</span>
-                    <span>No Limit</span>
+                <div class="account-footer">
+                    <span>Fee: 1.5%</span>
+                    <span>Limit: None</span>
                 </div>
             </div>
 
-            <!-- Moniepoint Card -->
+            <!-- Moniepoint -->
             <div class="account-card" id="moniepoint-card" style="display: none;">
-                <div class="account-card-header">
+                <div class="account-header">
                     <div class="account-brand">
                         <img src="../../assets/img/moniepoint-logo.png" alt="" class="account-logo">
-                        <span class="bank-name-text">MONIEPOINT</span>
+                        <span class="bank-name">MONIEPOINT</span>
                     </div>
                     <span class="account-tag tag-active"><i class="fas fa-check-circle"></i> Verified</span>
                 </div>
-                <div class="account-card-body">
+                <div class="account-body">
                     <div>
                         <div class="acc-label">Account Name</div>
                         <div class="acc-name" id="acc-name-moniepoint">--</div>
                         <div class="account-num" id="moniepoint-no">0000000000</div>
                     </div>
-                    <button class="action-btn" onclick="copyAccountNumber('moniepoint-no')"><i class="far fa-copy"></i> Copy</button>
+                    <button class="btn-copy" onclick="copyAccountNumber('moniepoint-no')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Copy
+                    </button>
                 </div>
-                <div class="account-card-footer">
-                    <span class="fee-text"><i class="fas fa-info-circle"></i> 1.5% Deposit Fee</span>
-                    <span>No Limit</span>
+                <div class="account-footer">
+                    <span>Fee: 1.5%</span>
+                    <span>Limit: None</span>
                 </div>
             </div>
 
-            <!-- 9PSB Card -->
+            <!-- 9PSB -->
             <div class="account-card" id="psb9-card" style="display: none;">
-                <div class="account-card-header">
+                <div class="account-header">
                     <div class="account-brand">
                         <img src="../../assets/img/9psb-logo.png" alt="" class="account-logo">
-                        <span class="bank-name-text">9PSB</span>
+                        <span class="bank-name">9PSB</span>
                     </div>
                     <span class="account-tag" id="psb9-badge"></span>
                 </div>
-                <div class="account-card-body">
+                <div class="account-body">
                     <div>
                         <div class="acc-label">Account Name</div>
                         <div class="acc-name">PAYVESSEL/BRYT Pay</div>
                         <div class="account-num" id="psb9-no">0000000000</div>
                     </div>
-                    <button class="action-btn" onclick="copyAccountNumber('psb9-no')"><i class="far fa-copy"></i> Copy</button>
+                    <button class="btn-copy" onclick="copyAccountNumber('psb9-no')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Copy
+                    </button>
                 </div>
-                <div class="account-card-footer">
-                    <span class="fee-text"><i class="fas fa-info-circle"></i> ₦50 Flat Deposit Fee</span>
-                    <span id="psb9-limit-text" style="font-weight: 800; color: #1e293b;"><i class="fas fa-exclamation-triangle" style="color: #b45309;"></i> ₦30,000 Daily Limit</span>
-                </div>
-                
-                <!-- Brand-Matched Inline Upgrade Section -->
-                <div id="inline-upgrade-box" class="inline-upgrade-box">
-                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                        <h4 style="margin: 0; font-size: 0.85rem; color: var(--bryt-primary); font-weight: 800;">Get PalmPay & Moniepoint Accounts</h4>
-                        <div style="display: flex; gap: 3px; margin-left: auto;">
-                            <img src="../../assets/img/palmpay-logo.png" style="height: 14px; width: auto; object-fit: contain;">
-                            <img src="../../assets/img/moniepoint-logo.png" style="height: 14px; width: auto; object-fit: contain;">
-                        </div>
-                    </div>
-                    <p style="margin: 0; font-size: 0.7rem; color: #1e3a8a; font-weight: 600; line-height: 1.4;">Verify your identity to unlock additional virtual accounts with zero deposit limits.</p>
-                    <button id="btn-upgrade-kyc-inline" class="btn-upgrade-inline">Verify ID Now</button>
+                <div class="account-footer">
+                    <span>Fee: ₦50 Flat</span>
+                    <span id="psb9-limit-text" style="display: none;"></span>
                 </div>
             </div>
 
-            <!-- Subtle Link for Topify Users Missing Payvessel -->
+            <!-- Detached Unlimited Promo Card -->
+            <div id="inline-upgrade-box" class="standalone-upgrade-card">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; color: var(--bryt-primary); font-weight: 800;">Get Unlimited Accounts</h4>
+                <p style="margin: 0 0 16px 0; font-size: 0.75rem; color: var(--text-main); font-weight: 600; line-height: 1.4;">
+                    Do your KYC, verify your account with NIN or BVN to get a PalmPay or Moniepoint account with 0 daily limit.
+                </p>
+                <button id="btn-upgrade-kyc-inline" class="btn-upgrade-inline">Verify ID Now</button>
+            </div>
+
+            <!-- More Accounts Toggle -->
             <div id="request-more-wrapper" style="text-align: center; margin-top: 10px; display: none;">
                 <button id="btn-request-more" class="subtle-link-btn">Need more virtual accounts?</button>
             </div>
-
         </div>
 
-        <div class="support-link-wrapper">
-            <a href="https://wa.me/2349014129458?text=Hello%20BRYT%20Pay%20Support,%20I%20need%20help%20with%20funding." target="_blank" class="support-link">
+        <!-- Help Link -->
+        <div class="support-link-wrapper" style="text-align: center; margin: 24px 0 30px 0;">
+            <a href="https://wa.me/2349153375488" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; color: #64748b; font-size: 0.75rem; font-weight: 700; text-decoration: none;">
                 <svg fill="#16a34a" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                 Need help?
             </a>
@@ -260,42 +317,39 @@
     <!-- KYC MODAL -->
     <div id="kyc-modal" class="modal-overlay">
         <div class="modal-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <h3 style="font-size: 1rem; font-weight: 800; color: var(--bryt-navy); margin: 0;">Identity Verification</h3>
-                <button type="button" id="modal-close" style="background: none; border: none; cursor: pointer; color: var(--slate-500); padding: 4px;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3 style="font-size: 1rem; font-weight: 800; color: var(--text-main); margin: 0;">Identity Verification</h3>
+                <button type="button" id="modal-close" style="background: none; border: none; cursor: pointer; color: #64748b; padding: 4px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
-            <p style="font-size: 0.75rem; color: var(--slate-500); margin: 0 0 16px 0; line-height: 1.4;">CBN regulations mandate identity confirmation.</p>
+            <p style="font-size: 0.7rem; color: #64748b; margin: 0 0 16px 0; line-height: 1.4;">CBN regulations mandate identity confirmation.</p>
             <form id="kyc-form">
-                <div style="margin-bottom: 12px;">
-                    <label style="font-size: 0.7rem; font-weight: 800; color: var(--slate-800); text-transform: uppercase; display: block; margin-bottom: 4px;">Document Type</label>
-                    <select id="doc-type" style="width: 100%; padding: 10px; border: 1.5px solid var(--slate-200); border-radius: 10px; font-weight: 700; font-size: 0.85rem; outline: none; background: #fff;">
-                        <option value="nin">National Identity Number (NIN)</option>
-                        <option value="bvn">Bank Verification Number (BVN)</option>
-                    </select>
-                </div>
-                <div style="margin-bottom: 12px;">
-                    <label style="font-size: 0.7rem; font-weight: 800; color: var(--slate-800); text-transform: uppercase; display: block; margin-bottom: 4px;">11-Digit Number</label>
-                    <input type="text" id="doc-number" inputmode="numeric" maxlength="11" pattern="\d{11}" required style="width: 100%; padding: 10px; border: 1.5px solid var(--slate-200); border-radius: 10px; font-size: 0.85rem; font-weight: 700; box-sizing: border-box; outline: none;">
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label style="font-size: 0.7rem; font-weight: 800; color: var(--slate-800); text-transform: uppercase; display: block; margin-bottom: 4px;">Phone Number</label>
-                    <input type="tel" id="user-phone" inputmode="tel" maxlength="11" required style="width: 100%; padding: 10px; border: 1.5px solid var(--slate-200); border-radius: 10px; font-size: 0.85rem; font-weight: 700; box-sizing: border-box; outline: none;">
-                </div>
-                <div id="modal-error" style="display: none; background: #fee2e2; color: #dc2626; font-size: 0.75rem; font-weight: 700; padding: 8px 10px; border-radius: 8px; margin-bottom: 12px;"></div>
-                <button type="submit" id="btn-submit-kyc" style="width: 100%; padding: 12px; font-size: 0.85rem; font-weight: 800; border-radius: 10px; background: var(--bryt-primary); color: #fff; border: none; cursor: pointer;">Provision Accounts</button>
+                <label class="form-label">Document Type</label>
+                <select id="doc-type" class="form-select">
+                    <option value="nin">National Identity Number (NIN)</option>
+                    <option value="bvn">Bank Verification Number (BVN)</option>
+                </select>
+                
+                <label class="form-label">11-Digit Number</label>
+                <input type="text" id="doc-number" class="form-input" inputmode="numeric" maxlength="11" pattern="\d{11}" required>
+                
+                <label class="form-label">Phone Number</label>
+                <input type="tel" id="user-phone" class="form-input" inputmode="tel" maxlength="11" required>
+                
+                <div id="modal-error" style="display: none; background: #fee2e2; color: #dc2626; font-size: 0.7rem; font-weight: 700; padding: 8px 10px; border-radius: 8px; margin-bottom: 12px;"></div>
+                <button type="submit" id="btn-submit-kyc" class="btn-upgrade-inline" style="margin-top: 0;">Provision Accounts</button>
             </form>
         </div>
     </div>
 
-    <!-- Navigation -->
+    <!-- Native Bottom Nav -->
     <nav class="mobile-nav no-print">
-        <a href="/dashboard/" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
-        <a href="/dashboard/services/" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span>Services</span></a>
-        <a href="/dashboard/fund/" class="nav-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
-        <a href="/dashboard/orders/" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>Orders</span></a>
-        <a href="/dashboard/account/" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
+        <a href="/dashboard/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+        <a href="/dashboard/services/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span>Services</span></a>
+        <a href="/dashboard/fund/index.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
+        <a href="/dashboard/orders/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>Orders</span></a>
+        <a href="/dashboard/account/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
     </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

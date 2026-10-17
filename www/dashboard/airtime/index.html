@@ -2,54 +2,123 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Purchase Airtime — BRYT Pay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Airtime — BRYT Pay</title>
     
+    <!-- Anti-Flash Dark Mode Script -->
+    <script>
+        if (localStorage.getItem('bryt_theme') === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+        }
+    </script>
+
     <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#1D5ED0">
+    <meta name="theme-color" content="#ffffff">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
-
     <link rel="stylesheet" href="../../assets/css/main.css">
+
     <style>
-        body { padding-bottom: 75px !important; }
-        .form-card { background: #ffffff; border-radius: 16px; padding: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02); }
+        :root {
+            --bryt-primary: #1D5ED0;
+            --bryt-navy: #0B1220;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-main: #0B1220;
+            --border-light: #f1f5f9;
+        }
 
-        .provider-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; margin-bottom: 20px; }
-        @media (max-width: 400px) { .provider-grid { grid-template-columns: repeat(2, 1fr); } }
-        .provider-btn { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 10px 4px; text-align: center; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .provider-btn:hover { border-color: #cbd5e1; background: #ffffff; }
-        .provider-btn.active { border-color: var(--bryt-primary); background: #F0F6FF; box-shadow: 0 4px 10px rgba(29, 94, 208, 0.08); transform: translateY(-1px); }
-        .provider-btn.active::after { content: '✓'; position: absolute; top: -6px; right: -6px; background: var(--bryt-primary); color: #ffffff; width: 16px; height: 16px; border-radius: 50%; font-size: 9px; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; }
-        .provider-logo { width: 32px; height: 32px; margin-bottom: 4px; border-radius: 50%; object-fit: contain; }
-        .provider-btn-label { font-size: 0.7rem; font-weight: 700; color: var(--bryt-navy); }
+        html.dark-theme {
+            --bryt-navy: #ffffff;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --border-light: #334155;
+        }
 
-        .input-carrier-wrapper, .input-currency-wrapper { position: relative; display: flex; align-items: center; margin-top: 8px; }
-        .input-carrier-wrapper input, .input-currency-wrapper input { width: 100%; padding: 12px 14px 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 0.95rem; font-weight: 600; color: #0f172a; outline: none; transition: all 0.2s; background: #f8fafc; }
-        .input-currency-wrapper input { padding-left: 32px; }
-        .input-carrier-wrapper input:focus, .input-currency-wrapper input:focus { border-color: var(--bryt-primary); background: #ffffff; box-shadow: 0 0 0 3px rgba(29, 94, 208, 0.1); }
-        .input-currency-prefix { position: absolute; left: 14px; font-weight: 800; color: var(--bryt-navy); font-size: 1rem; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 80px !important;
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Topbar Header */
+        .app-topbar { 
+            display: flex; align-items: center; gap: 16px; padding: 16px 20px; 
+            background: var(--card-bg); position: sticky; top: 0; z-index: 100; 
+            border-bottom: 1px solid var(--border-light); transition: background 0.3s, border 0.3s; 
+        }
+        .smart-back { 
+            color: var(--text-main); display: flex; align-items: center; 
+            text-decoration: none; padding: 4px; margin-left: -4px;
+        }
+        .page-title { font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0; }
+
+        .main-content { padding: 20px; }
+
+        /* Sleek Balance Pill */
+        .balance-pill { background: var(--card-bg); border: 1px solid var(--border-light); padding: 16px 20px; border-radius: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: 0.3s; }
+        .balance-label { font-size: 0.65rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .balance-amount { font-size: 1.4rem; font-weight: 800; color: var(--text-main); line-height: 1; }
+        .balance-icon { width: 42px; height: 42px; background: rgba(29, 94, 208, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--bryt-primary); }
+
+        .form-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-light); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02); transition: 0.3s; }
+
+        /* Network Grid */
+        .provider-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; margin-bottom: 20px; }
+        .provider-btn { background: var(--bg-color); border: 1.5px solid var(--border-light); border-radius: 12px; padding: 12px 4px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .provider-btn.active { border-color: var(--bryt-primary); background: rgba(29, 94, 208, 0.05); }
+        .provider-btn.active::after { content: '✓'; position: absolute; top: -6px; right: -6px; background: var(--bryt-primary); color: #ffffff; width: 18px; height: 18px; border-radius: 50%; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid var(--card-bg); }
+        .provider-logo { width: 34px; height: 34px; margin-bottom: 6px; border-radius: 50%; object-fit: contain; }
+        .provider-btn-label { font-size: 0.7rem; font-weight: 700; color: var(--text-main); }
+
+        /* Inputs */
+        .form-group label { font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px; display: block; }
+        .input-carrier-wrapper, .input-currency-wrapper { position: relative; display: flex; align-items: center; }
+        .input-carrier-wrapper input, .input-currency-wrapper input { width: 100%; padding: 14px; border: 1.5px solid var(--border-light); border-radius: 12px; font-size: 0.95rem; font-weight: 700; color: var(--text-main); outline: none; transition: 0.2s; background: var(--bg-color); }
+        .input-currency-wrapper input { padding-left: 36px; }
+        .input-carrier-wrapper input:focus, .input-currency-wrapper input:focus { border-color: var(--bryt-primary); background: var(--card-bg); }
+        .input-currency-prefix { position: absolute; left: 16px; font-weight: 800; color: var(--text-main); font-size: 1.05rem; }
         
-        .carrier-badge { position: absolute; right: 10px; background: #e2e8f0; color: #475569; font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 16px; text-transform: uppercase; display: none; }
-        .carrier-badge.active { display: inline-block; background: #dbeafe; color: var(--bryt-primary); }
+        .carrier-badge { position: absolute; right: 12px; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-light); font-size: 0.65rem; font-weight: 800; padding: 4px 10px; border-radius: 8px; text-transform: uppercase; display: none; }
+        .carrier-badge.active { display: inline-block; }
 
-        .preset-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
-        .preset-chip { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 4px; text-align: center; font-size: 0.75rem; font-weight: 700; color: #475569; cursor: pointer; transition: all 0.2s; }
-        .preset-chip:hover, .preset-chip.active { border-color: var(--bryt-primary); color: var(--bryt-primary); background: #F0F6FF; }
+        /* Amount Chips */
+        .preset-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+        .preset-chip { background: var(--bg-color); border: 1px solid var(--border-light); border-radius: 10px; padding: 10px 4px; text-align: center; font-size: 0.75rem; font-weight: 700; color: var(--text-main); cursor: pointer; transition: 0.2s; }
+        .preset-chip.active { border-color: var(--bryt-primary); color: var(--bryt-primary); background: rgba(29, 94, 208, 0.05); font-weight: 800; }
 
-        /* Modal Updates */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(7, 26, 58, 0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 2000; }
-        .modal-content { background: #ffffff; border-radius: 16px; width: 100%; max-width: 360px; padding: 24px 20px; text-align: center; }
-        .modal-title { font-size: 1.15rem; font-weight: 800; color: var(--bryt-navy); margin-bottom: 4px; }
-        .modal-breakdown { background: #f8fafc; border-radius: 12px; padding: 14px; text-align: left; margin-bottom: 20px; border: 1px solid #e2e8f0; }
-        .modal-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 8px; }
-        .modal-actions { display: flex; gap: 8px; }
-        
-        .bryt-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150px); background: #ffffff; padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 9999; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); min-width: 260px; border-left: 4px solid var(--bryt-primary); }
-        .bryt-toast.show { transform: translateX(-50%) translateY(0); }
+        /* Fullscreen Success Overlay */
+        .success-overlay { position: fixed; inset: 0; background: var(--card-bg); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .success-overlay.active { display: flex; opacity: 1; }
+        .success-circle { width: 80px; height: 80px; border-radius: 50%; background: #10b981; color: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; box-shadow: 0 0 0 10px rgba(16, 185, 129, 0.15); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .success-circle svg { width: 40px; height: 40px; }
+        .success-title { font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px; animation: slideUp 0.5s ease 0.1s both; }
+        .success-desc { font-size: 0.85rem; color: #64748b; font-weight: 600; animation: slideUp 0.5s ease 0.2s both; }
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes slideUp { 0% { transform: translateY(10px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+
+        /* Modals & Toasts */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(11, 18, 32, 0.8); backdrop-filter: blur(4px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 16px; }
+        .modal-card { background: var(--card-bg); border-radius: 16px; max-width: 360px; width: 100%; padding: 24px; border: 1px solid var(--border-light); text-align: center; }
+        .modal-breakdown { background: var(--bg-color); border-radius: 12px; padding: 14px; text-align: left; margin-bottom: 20px; border: 1px solid var(--border-light); }
+        .modal-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 8px; font-weight: 600; }
+
+        .bryt-toast { position: fixed; top: 20px; left: 0; right: 0; margin: 0 auto; width: max-content; max-width: 90%; transform: translateY(-150px); background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-light); padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 9999; transition: transform 0.4s; border-left: 4px solid var(--bryt-primary); }
+        .bryt-toast.show { transform: translateY(0); }
         .toast-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
         .toast-success .toast-icon { background: #16a34a; }
         .toast-error .toast-icon { background: #dc2626; }
-        .toast-text { font-size: 0.8rem; font-weight: 600; color: var(--bryt-navy); }
+        .toast-text { font-size: 0.8rem; font-weight: 600; }
+
+        /* Native Bottom Nav */
+        .mobile-nav { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: var(--card-bg) !important; z-index: 9999 !important; border-top: 1px solid var(--border-light) !important; display: flex !important; justify-content: space-around !important; padding: 12px 0 10px 0 !important; transition: background 0.3s, border 0.3s; }
+        .mobile-nav .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none; transition: color 0.2s; }
+        .mobile-nav .nav-item span { font-size: 0.65rem; font-weight: 800; }
+        .mobile-nav .nav-item svg { width: 22px; height: 22px; }
+        .mobile-nav .nav-item.active { color: var(--bryt-primary); }
     </style>
 </head>
 <body>
@@ -59,32 +128,40 @@
         <div id="toast-text" class="toast-text">Message</div>
     </div>
 
-    <main class="app-container" style="max-width: 520px;">
-        <header style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
-            <div style="min-width: 0; flex: 1;">
-                <a href="/dashboard/" id="smart-back-btn" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:700; display:inline-flex; align-items:center; gap:6px; margin-bottom: 12px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                    Dashboard
-                </a>
-                <h1 style="font-size: 1.35rem; font-weight: 800; color: var(--bryt-navy); margin: 0 0 2px 0;">Purchase Airtime</h1>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">Instant top-up to any network</p>
+    <!-- Fullscreen Success Animation -->
+    <div id="success-overlay" class="success-overlay">
+        <div class="success-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="success-title">Sent!</div>
+        <div class="success-desc">Airtime top-up successful.</div>
+    </div>
+
+    <header class="app-topbar">
+        <a href="/dashboard/index.html" class="smart-back">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </a>
+        <h1 class="page-title">Airtime</h1>
+    </header>
+
+    <main class="main-content">
+        <!-- Sleek Balance Pill -->
+        <div class="balance-pill">
+            <div>
+                <div class="balance-label">Wallet Balance</div>
+                <div class="balance-amount" id="user-balance">₦0.00</div>
             </div>
-            
-            <div style="display: flex; align-items: center; gap: 6px; background: var(--bryt-primary); padding: 6px 12px; border-radius: 16px; box-shadow: 0 4px 12px rgba(29, 94, 208, 0.2); flex-shrink: 0; margin-top: 4px;">
-                <div style="background: rgba(255,255,255,0.2); border-radius: 50%; padding: 4px; display: flex;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-end;">
-                    <span style="font-size: 0.55rem; color: #e0f2fe; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; line-height: 1;">Balance</span>
-                    <strong id="user-balance" style="color: #ffffff; font-size: 0.85rem; font-weight: 800; line-height: 1.2;">₦0.00</strong>
-                </div>
+            <div class="balance-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
             </div>
-        </header>
+        </div>
 
         <div class="form-card">
             <form id="airtime-form">
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label style="font-size: 0.75rem; font-weight: 800; color: #475569; text-transform: uppercase;">1. Select Network</label>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label>1. Select Network</label>
                     <div class="provider-grid" id="provider-container">
                         <div class="provider-btn network-btn active" data-network="mtn" data-logo="mtn-logo.png">
                             <img src="../../assets/img/mtn-logo.png" class="provider-logo" alt="MTN">
@@ -105,21 +182,20 @@
                     </div>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label class="form-label" for="phone" style="font-size: 0.75rem; font-weight: 800; color: #475569; text-transform: uppercase;">2. Phone Number</label>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="phone">2. Phone Number</label>
                     <div class="input-carrier-wrapper">
                         <input type="tel" id="phone" placeholder="0801 234 5678" maxlength="11" required>
                         <span id="carrier-indicator" class="carrier-badge">MTN</span>
                     </div>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 24px;">
-                    <label class="form-label" for="amount" style="font-size: 0.75rem; font-weight: 800; color: #475569; text-transform: uppercase;">3. Amount (₦)</label>
+                <div class="form-group" style="margin-bottom: 28px;">
+                    <label for="amount">3. Amount (₦)</label>
                     <div class="input-currency-wrapper">
                         <span class="input-currency-prefix">₦</span>
                         <input type="number" id="amount" min="100" max="50000" placeholder="0.00" required>
                     </div>
-                    
                     <div class="preset-grid">
                         <div class="preset-chip" data-amt="100">₦100</div>
                         <div class="preset-chip" data-amt="200">₦200</div>
@@ -128,49 +204,50 @@
                     </div>
                 </div>
 
-                <button type="submit" id="submit-btn" class="btn-primary" style="padding: 14px; font-size: 0.9rem; border-radius: 10px; font-weight: 800; display: flex; justify-content: center; gap: 8px;">
+                <button type="submit" id="submit-btn" class="btn-primary" style="padding: 14px; font-size: 0.9rem; border-radius: 12px; font-weight: 800; display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; border: none;">
                     Proceed
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </form>
         </div>
     </main>
 
+    <!-- Review Modal -->
     <div id="confirm-modal" class="modal-overlay">
-        <div class="modal-content">
-            <img id="modal-network-logo" src="../../assets/img/mtn-logo.png" alt="Network" style="width: 50px; height: 50px; border-radius: 50%; margin: 0 auto 12px; object-fit: contain; background: #f8fafc; padding: 4px; border: 1px solid #e2e8f0;">
-            <h3 class="modal-title">Confirm Purchase</h3>
-            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 16px;">Review details before wallet deduction.</p>
+        <div class="modal-card">
+            <img id="modal-network-logo" src="../../assets/img/mtn-logo.png" alt="Network" style="width: 54px; height: 54px; border-radius: 50%; margin: 0 auto 12px; object-fit: contain; background: var(--bg-color); border: 1px solid var(--border-light); padding: 4px;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0 0 4px 0;">Confirm Top-Up</h3>
+            <p style="font-size: 0.75rem; color: #64748b; margin-bottom: 20px;">Review details before wallet deduction.</p>
 
             <div class="modal-breakdown">
                 <div class="modal-row">
-                    <span style="color: var(--text-muted);">Network</span>
-                    <strong id="modal-network" style="color: var(--bryt-navy);">MTN Airtime</strong>
+                    <span style="color: #64748b;">Network</span>
+                    <strong id="modal-network" style="color: var(--text-main);">MTN Airtime</strong>
                 </div>
                 <div class="modal-row" style="margin-bottom: 12px;">
-                    <span style="color: var(--text-muted);">Recipient</span>
-                    <strong id="modal-phone" style="color: var(--bryt-navy); font-family: monospace; font-size: 0.9rem;">---</strong>
+                    <span style="color: #64748b;">Recipient</span>
+                    <strong id="modal-phone" style="color: var(--text-main); font-family: monospace; font-size: 0.95rem;">---</strong>
                 </div>
-                <div class="modal-row" style="padding-top: 10px; border-top: 1px dashed #cbd5e1; align-items: center; margin-bottom: 0;">
-                    <span style="color: var(--text-muted);">Total Debit</span>
-                    <strong id="modal-amount" style="color: #10b981; font-size: 1.15rem; font-weight: 800;">₦0.00</strong>
+                <div class="modal-row" style="padding-top: 12px; border-top: 1px dashed var(--border-light); align-items: center; margin-bottom: 0;">
+                    <span style="color: #64748b;">Total Debit</span>
+                    <strong id="modal-amount" style="color: #10b981; font-size: 1.25rem; font-weight: 800;">₦0.00</strong>
                 </div>
             </div>
 
-            <div class="modal-actions">
-                <button type="button" id="modal-cancel" class="btn-secondary" style="flex: 1; padding: 12px; font-weight: 700;">Cancel</button>
-                <button type="button" id="modal-confirm" class="btn-primary" style="flex: 1.5; padding: 12px; font-weight: 800;">Pay Now</button>
+            <div style="display: flex; gap: 8px;">
+                <button type="button" id="modal-cancel" style="flex: 1; padding: 12px; border-radius: 12px; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-light); font-weight: 700; font-size: 0.85rem; cursor: pointer;">Cancel</button>
+                <button type="button" id="modal-confirm" style="flex: 1.5; padding: 12px; border-radius: 12px; background: var(--bryt-primary); color: #ffffff; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer;">Pay Now</button>
             </div>
         </div>
     </div>
 
-    <!-- Navigation included via main.css fix! -->
+    <!-- Native Bottom Nav -->
     <nav class="mobile-nav no-print">
-        <a href="/dashboard/" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
-        <a href="/dashboard/services/" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span>Services</span></a>
-        <a href="/dashboard/fund/" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
-        <a href="/dashboard/orders/" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>My Orders</span></a>
-        <a href="/dashboard/account/" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
+        <a href="/dashboard/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+        <a href="/dashboard/services/index.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span>Services</span></a>
+        <a href="/dashboard/fund/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
+        <a href="/dashboard/orders/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>Orders</span></a>
+        <a href="/dashboard/account/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
     </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

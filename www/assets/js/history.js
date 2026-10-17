@@ -6,16 +6,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     let allTransactions = [];
     const container = document.getElementById('history-container');
 
-    // 🚀 THE FIX: Smart Back Button Logic
+    // 🚀 SMART ROUTING
     const backBtn = document.getElementById('smart-back-btn');
     if (backBtn) {
-        const referrer = document.referrer;
+        const referrer = document.referrer || '';
         if (referrer.includes('/dashboard/account/')) {
-            backBtn.href = '/dashboard/account/';
-            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Account`;
+            backBtn.href = '/dashboard/account/index.html';
         } else {
-            backBtn.href = '/dashboard/';
-            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Dashboard`;
+            backBtn.href = '/dashboard/index.html';
         }
     }
 
@@ -25,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const s = (tx.service_type || '').toLowerCase();
         const p = (tx.provider || tx.recipient || '').toLowerCase();
         const t = (tx.type || '').toLowerCase();
-        return t === 'credit' || s.includes('fund') || s.includes('deposit') || p.includes('paystack') || p.includes('flutterwave');
+        return t === 'credit' || s.includes('fund') || s.includes('deposit') || p.includes('paystack') || p.includes('flutterwave') || p.includes('payvessel');
     };
 
     const formatRef = (ref) => {
@@ -99,10 +97,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         else if (raw.includes('neco')) logoFile = 'neco-logo.png';
         else if (raw.includes('nabteb')) logoFile = 'nabteb-logo.png';
 
-        if (logoFile) return `<div class="tx-brand"><img src="../../assets/img/${logoFile}" alt="Logo" onerror="this.parentElement.innerHTML='💼'"></div>`;
+        if (logoFile) return `<div class="tx-brand" style="background: #ffffff; border: 1px solid var(--border-light);"><img src="../../assets/img/${logoFile}" alt="Logo" onerror="this.parentElement.innerHTML='💼'"></div>`;
 
-        if (isCreditTx(tx)) return `<div class="tx-brand" style="background: #ecfdf5; color: #10b981; border-color: #bbf7d0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>`;
-        return `<div class="tx-brand" style="background: #f1f5f9; color: #64748b;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>`;
+        if (isCreditTx(tx)) return `<div class="tx-brand" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>`;
+        return `<div class="tx-brand" style="background: var(--bg-color); color: #64748b; border: 1px solid var(--border-light);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>`;
     };
 
     const renderTransactions = (filterStatus = 'all') => {
@@ -118,7 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (filteredTx.length === 0) {
-            container.innerHTML = `<div class="empty-state" style="padding: 40px 20px; text-align: center; color: #64748b; font-size: 0.9rem; font-weight: 600;">No ${filterStatus !== 'all' ? filterStatus : ''} transactions found.</div>`;
+            container.innerHTML = `<div class="empty-state" style="padding: 40px 20px; text-align: center; color: #64748b; font-size: 0.85rem; font-weight: 600;">No ${filterStatus !== 'all' ? filterStatus : ''} transactions found.</div>`;
             return;
         }
 
@@ -141,7 +139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             const sign = isCredit ? '+' : '-';
-            const amountColor = isCredit ? '#10b981' : '#0B1220';
+            const amountColor = isCredit ? '#10b981' : 'var(--text-main)';
 
             container.innerHTML += `
                 <div class="tx-row" onclick="window.location.href='/dashboard/receipt/index.html?id=${tx.id}'">

@@ -6,8 +6,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     let allTransactions = [];
 
     // View Elements
+    const headerCategories = document.getElementById('header-categories');
+    const headerList = document.getElementById('header-list');
     const categoriesView = document.getElementById('categories-view');
     const listView = document.getElementById('orders-list-view');
+    
     const btnBack = document.getElementById('btn-back-categories');
     const listTitle = document.getElementById('dynamic-list-title');
     const listContainer = document.getElementById('dynamic-tx-container');
@@ -90,10 +93,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         else if (raw.includes('neco')) logoFile = 'neco-logo.png';
         else if (raw.includes('nabteb')) logoFile = 'nabteb-logo.png';
 
-        if (logoFile) return `<div class="tx-brand"><img src="../../assets/img/${logoFile}" alt="Logo" onerror="this.parentElement.innerHTML='💼'"></div>`;
+        if (logoFile) {
+            return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: var(--card-bg); border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; padding: 4px;"><img src="../../assets/img/${logoFile}" alt="Logo" style="width:100%;height:100%;object-fit:contain;"></div>`;
+        }
 
-        if (isCreditTx(tx)) return `<div class="tx-brand" style="background: #ecfdf5; color: #10b981; border-color: #bbf7d0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>`;
-        return `<div class="tx-brand" style="background: #f1f5f9; color: #64748b;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>`;
+        if (isCreditTx(tx)) {
+            return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>`;
+        }
+        
+        return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>`;
     };
 
     const determineCategory = (tx) => {
@@ -166,7 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const filtered = allTransactions.filter(tx => determineCategory(tx) === categoryCode);
 
         if (filtered.length === 0) {
-            listContainer.innerHTML = `<div style="padding: 40px 20px; text-align: center; color: #64748b; font-size: 0.9rem; font-weight: 600;">No ${categoryName} transactions found.</div>`;
+            listContainer.innerHTML = `<div style="padding: 40px 20px; text-align: center; color: #64748b; font-size: 0.85rem; font-weight: 600;">No ${categoryName} transactions found.</div>`;
             return;
         }
 
@@ -177,7 +185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const isCredit = categoryCode === 'funding' || (tx.status || '').toLowerCase() === 'refunded';
             const sign = isCredit ? '+' : '-';
-            const amountColor = isCredit ? '#10b981' : '#0f172a';
+            const amountColor = isCredit ? '#10b981' : 'var(--text-main)';
             
             const st = (tx.status || '').toLowerCase();
             let displayStatus = 'Successful';
@@ -191,10 +199,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 statusStyle = 'background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;';
             }
 
-            let targetUrl = `/dashboard/receipt/?id=${tx.id}`; 
+            let targetUrl = `/dashboard/receipt/index.html?id=${tx.id}`; 
             const sharedRef = tx.reference || tx.external_reference;
 
-            // 🚀 THE FIX: Link Education pins directly to the new details page
+            // Strict HTML pathing for Capacitor
             if (categoryCode === 'jamb') {
                 targetUrl = `/dashboard/jamb/order-details.html?ref=${sharedRef}`;
             } else if (categoryCode === 'nin') {
@@ -206,19 +214,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             listContainer.innerHTML += `
-                <a href="${targetUrl}" class="tx-row">
-                    <div class="tx-left">
+                <a href="${targetUrl}" class="tx-row" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 12px; border-bottom: 1px solid var(--border-light); gap: 10px; cursor: pointer; text-decoration: none;">
+                    <div class="tx-left" style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
                         ${brandLogo}
-                        <div class="tx-info">
-                            <div class="tx-title">${serviceName}</div>
-                            <div class="tx-date">${date} • Ref: ${formatRef(tx.reference || tx.external_reference)}</div>
+                        <div style="min-width: 0; flex: 1;">
+                            <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">${serviceName}</div>
+                            <div style="font-size: 0.68rem; color: #64748b; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px;">${date} · Ref: ${formatRef(tx.reference || tx.external_reference)}</div>
                         </div>
                     </div>
-                    <div class="tx-right">
-                        <div class="tx-amount" style="color: ${amountColor};">
+                    <div class="tx-right" style="text-align: right; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+                        <div style="font-weight: 800; font-size: 0.95rem; color: ${amountColor}; letter-spacing: -0.3px; white-space: nowrap;">
                             ${sign}₦${formatCurrency(parseFloat(tx.amount))}
                         </div>
-                        <span class="tx-status" style="${statusStyle}">${displayStatus}</span>
+                        <span style="display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; text-transform: capitalize; ${statusStyle}">${displayStatus}</span>
                     </div>
                 </a>
             `;
@@ -231,7 +239,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const catCode = card.getAttribute('data-category');
             const catName = card.querySelector('.cat-title').textContent;
             
+            headerCategories.style.display = 'none';
             categoriesView.style.display = 'none';
+            headerList.style.display = 'flex';
             listView.style.display = 'block';
             window.scrollTo(0, 0); 
             
@@ -240,7 +250,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     btnBack.addEventListener('click', () => {
+        headerList.style.display = 'none';
         listView.style.display = 'none';
+        headerCategories.style.display = 'flex';
         categoriesView.style.display = 'block';
     });
 });

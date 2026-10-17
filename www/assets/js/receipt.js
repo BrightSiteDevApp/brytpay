@@ -8,24 +8,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!txId) {
         alert('Transaction ID is missing.');
-        window.location.href = '/dashboard/history/';
+        window.location.href = '/dashboard/history/index.html';
         return;
     }
 
-    // Smart Back Button Logic (Now just says "Back" but routes intelligently)
     const backBtn = document.getElementById('smart-back-btn');
     if (backBtn) {
-        const referrer = document.referrer;
-        
+        const referrer = document.referrer || '';
         if (referrer.includes('/dashboard/orders/')) {
-            backBtn.href = '/dashboard/orders/';
+            backBtn.href = '/dashboard/orders/index.html';
         } else if (referrer.includes('/dashboard/') && !referrer.includes('/history/') && !referrer.includes('/orders/')) {
-            backBtn.href = '/dashboard/';
+            backBtn.href = '/dashboard/index.html';
         } else {
-            backBtn.href = '/dashboard/history/';
+            backBtn.href = '/dashboard/history/index.html';
         }
-        
-        backBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back`;
     }
 
     const recDate = document.getElementById('rec-date');
@@ -93,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .eq('user_id', user.id)
             .single();
 
-        if (error || !data) return window.location.href = '/dashboard/history/';
+        if (error || !data) return window.location.href = '/dashboard/history/index.html';
 
         const txDate = new Date(data.created_at);
         recDate.textContent = txDate.toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute:'2-digit' });
@@ -103,15 +99,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const st = (data.status || '').toLowerCase();
         if (['successful', 'completed', 'processed', 'refunded'].includes(st)) {
             recStatus.textContent = st === 'refunded' ? 'REFUNDED' : 'SUCCESSFUL';
-            recStatus.style.background = '#dcfce7'; 
+            recStatus.style.background = 'rgba(34, 197, 94, 0.1)'; 
             recStatus.style.color = '#16a34a'; 
         } else if (['pending', 'processing'].includes(st)) {
             recStatus.textContent = 'PROCESSING';
-            recStatus.style.background = '#fef08a'; 
+            recStatus.style.background = 'rgba(234, 179, 8, 0.1)'; 
             recStatus.style.color = '#ca8a04'; 
         } else {
             recStatus.textContent = 'FAILED';
-            recStatus.style.background = '#fee2e2'; 
+            recStatus.style.background = 'rgba(239, 68, 68, 0.1)'; 
             recStatus.style.color = '#dc2626'; 
         }
 
@@ -139,23 +135,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             displayProvider = 'BRYT PAY JAMB DESK';
             displayRecipient = 'JAMB Candidate';
             trackUrl = `/dashboard/jamb/order-details.html?ref=${sharedRef}`;
-            trackText = 'View JAMB Order Details →';
+            trackText = 'View JAMB Details →';
         } else if (ref.startsWith('NIN_') || txType === 'nin_order' || rawService.includes('nin') || rawService.includes('slip')) {
             displayService = data.service_type || 'NIN SERVICE';
             displayProvider = 'BRYT PAY NIN DESK';
             displayRecipient = 'NIN Holder';
             trackUrl = `/dashboard/nin/order-details.html?ref=${sharedRef}`;
-            trackText = 'View NIN Order Details →';
+            trackText = 'View NIN Details →';
         } else if (rawService.includes('education') || rawService.includes('waec') || rawService.includes('neco') || rawService.includes('nabteb') || txType.includes('education') || rawService.includes('certificate')) {
             displayService = cleanStr(data.service_type) || 'EXAM SERVICE';
             displayProvider = 'BRYT PAY EXAMS';
             displayRecipient = data.recipient || 'N/A';
             if (rawService.includes('certificate')) {
                 trackUrl = `/dashboard/exam-certs/order-details.html?ref=${sharedRef}`;
-                trackText = 'View Certificate Details →';
+                trackText = 'View Certificate →';
             } else {
                 trackUrl = `/dashboard/education/order-details.html?id=${data.id}`;
-                trackText = 'View PIN Details →';
+                trackText = 'View Full PIN →';
             }
         } else if (rawService.includes('data')) {
             let net = rawService.replace(/data/gi, '').replace(/-/g, ' ').trim().toUpperCase();
@@ -184,7 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         rowsHtml += `
             <div class="receipt-row" style="align-items: center;">
-                <div class="receipt-key" style="margin-top: 2px;">Transaction Ref</div>
+                <div class="receipt-key" style="margin-top: 2px;">Ref. Number</div>
                 <div class="receipt-value" style="display: flex; align-items: center; justify-content: flex-end; gap: 6px;" title="${actualRef}">
                     <span>${formatRef(actualRef)}</span>
                     ${actualRef !== 'N/A' ? `
@@ -217,13 +213,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     const originalHTML = copyBtn.innerHTML;
                     copyBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1D5ED0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-                    
-                    setTimeout(() => {
-                        copyBtn.innerHTML = originalHTML;
-                    }, 2000);
-                } catch (err) {
-                    console.error('Copy failed', err);
-                }
+                    setTimeout(() => { copyBtn.innerHTML = originalHTML; }, 2000);
+                } catch (err) {}
             });
         }
 
@@ -243,15 +234,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await fetchTransaction();
 
+    // The Receipt should force Dark Mode text to light temporarily so the image looks clean
+    function prepForRender(element) {
+        element.style.background = '#ffffff';
+        element.style.color = '#0f172a';
+        const texts = element.querySelectorAll('.receipt-title, .receipt-value, .receipt-amount, .pin-data');
+        texts.forEach(el => el.style.color = '#0B1220');
+    }
+
+    function restoreFromRender(element) {
+        element.style.background = '';
+        element.style.color = '';
+        const texts = element.querySelectorAll('.receipt-title, .receipt-value, .receipt-amount, .pin-data');
+        texts.forEach(el => el.style.color = '');
+    }
+
    downloadPdfBtn.addEventListener('click', () => {
         downloadPdfBtn.disabled = true;
         const originalText = downloadPdfBtn.innerHTML;
-        downloadPdfBtn.textContent = 'Saving PDF...';
+        downloadPdfBtn.textContent = 'Preparing...';
         
         const copyBtn = document.getElementById('copy-ref-btn');
         if (copyBtn) copyBtn.style.display = 'none';
 
         const element = document.getElementById('receipt-content');
+        prepForRender(element);
+
         const opt = {
             margin:       0.5,
             filename:     `BRYT_Receipt_${txId.substring(0,8)}.pdf`,
@@ -261,7 +269,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         if (window.Capacitor) {
-            // NATIVE ANDROID HANDLING
             html2pdf().set(opt).from(element).toPdf().output('datauristring').then(async (pdfBase64) => {
                 try {
                     const base64Data = pdfBase64.split(',')[1];
@@ -275,16 +282,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                         url: savedFile.uri
                     });
                 } catch (err) {
-                    alert('Failed to save PDF natively.');
+                    alert('Failed to save PDF.');
                 } finally {
+                    restoreFromRender(element);
                     if (copyBtn) copyBtn.style.display = 'flex';
                     downloadPdfBtn.disabled = false;
                     downloadPdfBtn.innerHTML = originalText;
                 }
             });
         } else {
-            // STANDARD WEB HANDLING
             html2pdf().set(opt).from(element).save().then(() => {
+                restoreFromRender(element);
                 if (copyBtn) copyBtn.style.display = 'flex';
                 downloadPdfBtn.disabled = false;
                 downloadPdfBtn.innerHTML = originalText;
@@ -295,18 +303,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     downloadImgBtn.addEventListener('click', async () => {
         downloadImgBtn.disabled = true;
         const originalText = downloadImgBtn.innerHTML;
-        downloadImgBtn.textContent = 'Saving Image...';
+        downloadImgBtn.textContent = 'Preparing...';
         
         const copyBtn = document.getElementById('copy-ref-btn');
         if (copyBtn) copyBtn.style.display = 'none';
 
         const element = document.getElementById('receipt-content');
+        prepForRender(element);
         
         try {
             const canvas = await html2canvas(element, { scale: 3, useCORS: true });
             
             if (window.Capacitor) {
-                // NATIVE ANDROID HANDLING
                 const base64Data = canvas.toDataURL('image/png').split(',')[1];
                 const savedFile = await window.Capacitor.Plugins.Filesystem.writeFile({
                     path: `BRYT_Receipt_${txId.substring(0,8)}.png`,
@@ -318,7 +326,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     url: savedFile.uri
                 });
             } else {
-                // STANDARD WEB HANDLING
                 const link = document.createElement('a');
                 link.download = `BRYT_Receipt_${txId.substring(0,8)}.png`;
                 link.href = canvas.toDataURL('image/png');
@@ -327,6 +334,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (err) {
             alert('Failed to generate image. Please try PDF.');
         } finally {
+            restoreFromRender(element);
             if (copyBtn) copyBtn.style.display = 'flex';
             downloadImgBtn.disabled = false;
             downloadImgBtn.innerHTML = originalText;

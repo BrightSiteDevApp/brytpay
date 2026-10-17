@@ -2,19 +2,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session } } = await window.db.auth.getSession();
     if (!session) { window.location.href = '/auth/login.html'; return; }
     
-    // 🚀 SMART BACK BUTTON ROUTING (Updates both URL and Text)
+    // 🚀 SMART BACK BUTTON ROUTING
     const backBtn = document.getElementById('smart-back-btn');
     if (backBtn) {
         const referrer = document.referrer || '';
-        if (referrer.includes('/dashboard/receipt/')) {
-            backBtn.href = referrer; 
-            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back`;
-        } else if (referrer.includes('/dashboard/orders/')) {
-            backBtn.href = '/dashboard/orders/';
-            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back`;
+        if (referrer.includes('/dashboard/orders/')) {
+            backBtn.href = '/dashboard/orders/index.html';
         } else {
-            backBtn.href = 'orders.html';
-            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back`;
+            backBtn.href = '/dashboard/education/orders.html';
         }
     }
 
@@ -22,7 +17,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const orderId = urlParams.get('id');
     if (!orderId) { window.location.href = 'orders.html'; return; }
 
-    // Fetch the transaction
     const { data: tx, error } = await window.db.from('transactions').select('*').eq('id', orderId).single();
     if (error || !tx) { 
         alert('PIN order not found.'); 
@@ -30,7 +24,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return; 
     }
 
-    // Extract PINs and Exam Type from notes
     const notes = tx.admin_notes || "";
     const parts = notes.split('PIN Details:');
     const pinsText = parts.length > 1 ? parts[1].trim() : "PIN generation pending...";
@@ -40,25 +33,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (txStr.includes('neco')) examType = 'neco';
     if (txStr.includes('nabteb')) examType = 'nabteb';
 
-    // Populate UI
     document.getElementById('sum-title').textContent = `${examType.toUpperCase()} Result Checker`;
     document.getElementById('sum-price').textContent = `₦${parseFloat(tx.amount).toLocaleString('en-NG')}`;
-    document.getElementById('sum-amount').textContent = `₦${parseFloat(tx.amount).toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
     
     const dateObj = new Date(tx.created_at);
     document.getElementById('sum-date').textContent = `${dateObj.toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' })} - ${dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }).toLowerCase()}`;
     
-    // Use transaction reference or fallback to the first 8 characters of ID
     document.getElementById('sum-ref').textContent = tx.reference || tx.id.slice(0,8).toUpperCase();
     document.getElementById('sum-pins').textContent = pinsText;
     document.getElementById('exam-logo').src = `../../assets/img/${examType}-logo.png`;
 
-    // Hook up Download Button
     document.getElementById('btn-download-doc').addEventListener('click', () => {
         downloadReceipt(examType, pinsText);
     });
 
-    // 🚀 ULTRA-HD PREMIUM IMAGE DOWNLOADER
+    // 🚀 ULTRA-HD IMAGE GENERATOR & SMART DOWNLOADER
     async function downloadReceipt(examType, pinsText) {
         const btn = document.getElementById('btn-download-doc');
         btn.innerHTML = 'Generating...';
@@ -142,12 +131,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         ctx.textAlign = 'center';
         ctx.fillText('Visit brytpay.name.ng to purchase more securely', baseWidth / 2, baseHeight - 20);
 
-        const link = document.createElement('a');
-        link.download = `BRYT_${examType.toUpperCase()}_PIN.png`;
-        link.href = canvas.toDataURL('image/png', 1.0);
-        link.click();
+        // 🚀 SMART CAPACITOR DOWNLOAD
+        if (window.Capacitor !== undefined) {
+            const base64data = canvas.toDataURL('image/png', 1.0).split(',')[1];
+            const fileName = `BRYT_${examType.toUpperCase()}_PIN.png`;
+            try {
+                const savedFile = await window.Capacitor.Plugins.Filesystem.writeFile({
+                    path: fileName, data: base64data, directory: 'CACHE'
+                });
+                await window.Capacitor.Plugins.Share.share({ title: 'PIN Card', url: savedFile.uri });
+            } catch (err) {
+                alert("Could not save PIN card.");
+            }
+        } else {
+            const link = document.createElement('a');
+            link.download = `BRYT_${examType.toUpperCase()}_PIN.png`;
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
+        }
 
-        btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download PIN Card`;
+        // 🚀 THE FIX: Adding strict width and height to the SVG!
+        btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download PIN Card`;
         btn.disabled = false;
     }
 });

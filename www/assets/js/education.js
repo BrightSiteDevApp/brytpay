@@ -3,16 +3,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!session) { window.location.href = '/auth/login.html'; return; }
     const user = session.user;
 
-    // 🚀 THE FIX: Smart Back Button Logic
+    // 🚀 SMART BACK BUTTON ROUTING
     const backBtn = document.getElementById('smart-back-btn');
     if (backBtn) {
-        const referrer = document.referrer;
+        const referrer = document.referrer || '';
         if (referrer.includes('/dashboard/services/')) {
-            backBtn.href = '/dashboard/services/';
-            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Services`;
+            backBtn.href = '/dashboard/services/index.html';
         } else {
-            backBtn.href = '/dashboard/';
-            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Dashboard`;
+            backBtn.href = '/dashboard/index.html';
         }
     }
 
@@ -91,6 +89,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modalAmount = document.getElementById('modal-amount');
     const btnCancel = document.getElementById('modal-cancel');
     const btnConfirm = document.getElementById('modal-confirm');
+    
+    const successOverlay = document.getElementById('success-overlay');
+    const pinRevealBox = document.getElementById('pin-reveal-content');
+    const liveDownloadBtn = document.getElementById('btn-download-receipt-live');
 
     function renderQtyDropdown() {
         optionsList.textContent = '';
@@ -219,10 +221,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         ctx.textAlign = 'center';
         ctx.fillText('Visit brytpay.name.ng to purchase more securely', baseWidth / 2, baseHeight - 20);
 
-        const link = document.createElement('a');
-        link.download = `BRYT_${examType.toUpperCase()}_PIN.png`;
-        link.href = canvas.toDataURL('image/png', 1.0);
-        link.click();
+        if (window.Capacitor !== undefined) {
+            // NATIVE MOBILE DOWNLOAD
+            const base64data = canvas.toDataURL('image/png', 1.0).split(',')[1];
+            const fileName = `BRYT_${examType.toUpperCase()}_PIN.png`;
+            try {
+                const savedFile = await window.Capacitor.Plugins.Filesystem.writeFile({
+                    path: fileName, data: base64data, directory: 'CACHE'
+                });
+                await window.Capacitor.Plugins.Share.share({ title: 'PIN Card', url: savedFile.uri });
+            } catch (err) {
+                showToast("Save failed", "error");
+            }
+        } else {
+            // CHROME WEB DOWNLOAD
+            const link = document.createElement('a');
+            link.download = `BRYT_${examType.toUpperCase()}_PIN.png`;
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
+        }
     };
 
     document.getElementById('auto-exam-form').addEventListener('submit', async (e) => {
@@ -239,7 +256,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         modalNetworkLogo.src = `../../assets/img/${autoExamLogo}`;
-        modalPlan.textContent = `${autoExamType.toUpperCase()} Result Checker`;
+        modalPlan.textContent = `${autoExamType.toUpperCase()}`;
         modalQty.textContent = `${qty} PIN${qty > 1 ? 's' : ''}`;
         modalAmount.textContent = `₦${totalAmount.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
 
@@ -266,26 +283,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             confirmModal.style.display = 'none';
             const safePins = resData.pins.replace(/"/g, '&quot;').replace(/\n/g, '\\n');
 
-            document.getElementById('auto-exam-form').innerHTML = `
-                <div style="text-align: center; padding: 24px 0;">
-                    <div style="width: 56px; height: 56px; background: #dcfce7; border-radius: 50%; color: #16a34a; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    </div>
-                    <h3 style="color: #0f172a; margin-bottom: 8px;">Purchase Successful!</h3>
-                    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 24px;">Here are your result checker details:</p>
-
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: left; font-family: monospace; font-size: 0.9rem; color: #1e293b; white-space: pre-wrap; word-break: break-all; margin-bottom: 24px;">${resData.pins}</div>
-
-                    <div style="display: flex; gap: 12px; flex-direction: column;">
-                        <button type="button" onclick="downloadReceipt('${autoExamType}', '${safePins}')" class="btn-secondary" style="width: 100%; padding: 14px; border: 2px solid #1D5ED0; color: #1D5ED0; background: #ffffff; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                            Download PIN Card
-                        </button>
-                        <button type="button" onclick="window.location.reload()" class="btn-primary" style="width: 100%; padding: 14px;">Buy Another PIN</button>
-                    </div>
-                </div>
-            `;
-            showToast(resData.message, "success");
+            // 🚀 TRIGGER NEW FULLSCREEN PIN REVEAL UI
+            pinRevealBox.innerHTML = resData.pins;
+            
+            // Re-wire the download button with the fresh pin data
+            liveDownloadBtn.onclick = () => downloadReceipt(autoExamType, safePins);
+            
+            successOverlay.classList.add('active');
 
         } catch (err) {
             showToast(err.message, "error");
@@ -296,6 +300,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // MANUAL LOGIC
     let manualExam = 'WAEC';
     let manualPrice = 5500;
     const slipAmountEl = document.getElementById('slip-amount');
@@ -316,7 +321,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const originalText = btn.innerHTML;
 
         const successUI = () => {
-            btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #0284c7;"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!`;
+            btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: #0ea5e9;"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!`;
             setTimeout(() => { btn.innerHTML = originalText; }, 2000);
         };
 
@@ -331,19 +336,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         textArea.value = accNo;
         textArea.style.position = "fixed";
         textArea.style.left = "-999999px";
-        textArea.style.top = "-999999px";
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        textArea.setSelectionRange(0, 99999); 
-
+        
         try {
             const successful = document.execCommand('copy');
             if (successful) successUI();
-            else showToast("Your browser blocked copying.", "error");
-        } catch (err) {
-            showToast("Copy failed.", "error");
-        }
+        } catch (err) {}
         document.body.removeChild(textArea);
     });
 

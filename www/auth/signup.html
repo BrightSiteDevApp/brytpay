@@ -5,38 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Account — BRYT Pay</title>
 
-    <meta name="robots" content="noindex, nofollow">
-    
-    <meta name="theme-color" content="#1D5ED0">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <script>
+        if (localStorage.getItem('bryt_theme') === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+        }
+    </script>
 
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../assets/css/main.css">
+
     <style>
-        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; background: radial-gradient(circle at top right, rgba(21, 159, 227, 0.08), transparent 400px), var(--bg-light); }
-        .auth-card { width: 100%; max-width: 440px; padding: 40px 32px; }
+        :root {
+            --bryt-primary: #1D5ED0;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0B1220;
+            --border-light: #e2e8f0;
+            --success-bg: #dcfce7;
+            --success-text: #15803d;
+            --success-border: #bbf7d0;
+            --failed-bg: #fee2e2;
+            --failed-text: #b91c1c;
+            --failed-border: #fecaca;
+        }
+
+        html.dark-theme {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --border-light: #334155;
+            --success-bg: rgba(34, 197, 94, 0.1);
+            --success-text: #4ade80;
+            --success-border: rgba(34, 197, 94, 0.2);
+            --failed-bg: rgba(239, 68, 68, 0.1);
+            --failed-text: #f87171;
+            --failed-border: rgba(239, 68, 68, 0.2);
+        }
+
+        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; margin: 0; background: radial-gradient(circle at top right, rgba(29, 94, 208, 0.1), transparent 400px), var(--bg-color); transition: background-color 0.3s, color 0.3s; font-family: system-ui, -apple-system, sans-serif; }
+        
+        .auth-card { width: 100%; max-width: 440px; padding: 40px 32px; background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05); transition: 0.3s; }
+        
+        /* Removed the white box and border radius */
         .auth-brand { display: flex; justify-content: center; margin-bottom: 24px; }
-        .brand-logo-img { max-width: 200px; height: auto; object-fit: contain; display: block; margin: 0 auto; }
+        .brand-logo-img { max-width: 180px; height: auto; object-fit: contain; display: block; transition: 0.3s; }
+        
+        /* Subtle glow in dark mode so the black text remains readable */
+        html.dark-theme .brand-logo-img { filter: drop-shadow(0px 2px 15px rgba(255, 255, 255, 0.15)); }
+        
         .auth-header { text-align: center; margin-bottom: 32px; }
-        .auth-header h1 { font-size: 1.5rem; color: var(--bryt-navy); margin-bottom: 8px; letter-spacing: -0.5px; }
-        .auth-header p { font-size: 0.9rem; color: var(--text-muted); }
-        .auth-error { background: var(--failed-bg); color: var(--failed-text); padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; margin-bottom: 24px; display: none; border: 1px solid var(--failed-border); }
-        .auth-success { background: var(--success-bg); color: var(--success-text); padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; margin-bottom: 24px; display: none; border: 1px solid var(--status-success-border); }
-        .auth-footer { text-align: center; margin-top: 28px; font-size: 0.9rem; color: var(--text-muted); }
-        .auth-footer a { color: var(--bryt-primary); font-weight: 600; text-decoration: none; transition: var(--transition); }
+        .auth-header h1 { font-size: 1.5rem; color: var(--text-main); margin: 0 0 8px 0; font-weight: 800; letter-spacing: -0.5px; }
+        .auth-header p { font-size: 0.85rem; color: #64748b; margin: 0; font-weight: 500; }
+        
+        .auth-error { background: var(--failed-bg); color: var(--failed-text); padding: 12px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 700; margin-bottom: 24px; display: none; border: 1px solid var(--failed-border); text-align: center; }
+        .auth-success { background: var(--success-bg); color: var(--success-text); padding: 12px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 700; margin-bottom: 24px; display: none; border: 1px solid var(--success-border); text-align: center; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .form-input { width: 100%; padding: 14px; border: 1.5px solid var(--border-light); border-radius: 12px; font-size: 0.95rem; font-weight: 700; color: var(--text-main); outline: none; transition: 0.2s; background: var(--bg-color); box-sizing: border-box; }
+        .form-input:focus { border-color: var(--bryt-primary); background: var(--card-bg); }
+        
+        .btn-primary { background: var(--bryt-primary); color: #fff; border: none; padding: 16px; font-size: 0.95rem; font-weight: 800; border-radius: 12px; width: 100%; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        .auth-footer { text-align: center; margin-top: 28px; font-size: 0.85rem; color: #64748b; font-weight: 600; }
+        .auth-footer a { color: var(--bryt-primary); font-weight: 800; text-decoration: none; transition: 0.2s; }
         .auth-footer a:hover { text-decoration: underline; }
         
         /* Password Visibility & Hints */
         .password-wrapper { position: relative; }
-        .toggle-password { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
+        .toggle-password { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
         .toggle-password:hover { color: var(--bryt-primary); }
-        .password-hint { font-size: 0.75rem; color: #64748b; margin-top: 6px; transition: color 0.3s ease; }
-        .password-hint.valid { color: #16a34a; }
+        .password-hint { font-size: 0.75rem; color: #64748b; margin-top: 6px; font-weight: 600; transition: color 0.3s ease; }
+        .password-hint.valid { color: #10b981; }
         .password-hint.invalid { color: #ef4444; }
 
     </style>
 </head>
-<body>
-    <div class="form-card auth-card">
+<body class="landing-page">
+    <div class="auth-card">
         <div class="auth-brand">
             <img src="../assets/img/brytpay-logo.png" alt="BRYT Pay" class="brand-logo-img">
         </div>
@@ -56,24 +105,38 @@
                 <input type="text" id="fullname" class="form-input" placeholder="e.g. John Doe" required>
             </div>
             <div class="form-group">
-                <label class="form-label" for="phone">Phone Number <span style="color: #0284c7; font-size: 0.75rem; font-weight: 600;">(WhatsApp Preferred)</span></label>
+                <label class="form-label" for="phone">Phone Number <span style="color: var(--bryt-primary); font-size: 0.65rem; text-transform: none;">(WhatsApp Preferred)</span></label>
                 <input type="tel" id="phone" class="form-input" placeholder="08012345678" maxlength="11" required>
             </div>
             <div class="form-group">
                 <label class="form-label" for="email">Email Address</label>
                 <input type="email" id="email" class="form-input" placeholder="name@example.com" required>
             </div>
+            
             <div class="form-group">
                 <label class="form-label" for="password">Password</label>
                 <div class="password-wrapper">
-                    <input type="password" id="password" class="form-input" placeholder="••••••••" style="padding-right: 40px;" required>
+                    <input type="password" id="password" class="form-input" placeholder="••••••••" style="padding-right: 44px;" required>
                     <div class="toggle-password">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     </div>
                 </div>
-                <div id="pwd-hint" class="password-hint">Must contain an uppercase letter, lowercase letter, and a number (min 8 chars).</div>
+                <div id="pwd-hint" class="password-hint">Min 8 chars, 1 uppercase, 1 lowercase, 1 number.</div>
             </div>
-            <button type="submit" id="signup-btn" class="btn-primary" style="margin-top: 28px;">Create Account</button>
+
+            <!-- Confirm Password -->
+            <div class="form-group" style="margin-bottom: 24px;">
+                <label class="form-label" for="confirm-password">Confirm Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="confirm-password" class="form-input" placeholder="••••••••" style="padding-right: 44px;" required>
+                    <div class="toggle-password">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </div>
+                </div>
+                <div id="pwd-match-hint" class="password-hint"></div>
+            </div>
+
+            <button type="submit" id="signup-btn" class="btn-primary">Create Account</button>
             <div class="auth-footer">Already have an account? <a href="/auth/login.html">Sign In</a></div>
         </form>
 
@@ -81,9 +144,9 @@
         <form id="signup-otp-form" style="display: none; text-align: center;">
             <div class="form-group" style="text-align: left; margin-top: 12px;">
                 <label class="form-label" for="signup-otp-code">6-Digit Verification Code</label>
-                <input type="text" id="signup-otp-code" class="form-input" placeholder="123456" maxlength="6" style="text-align: center; font-size: 1.2rem; letter-spacing: 4px; font-weight: 700;" required>
+                <input type="text" id="signup-otp-code" class="form-input" placeholder="123456" maxlength="6" style="text-align: center; font-size: 1.25rem; letter-spacing: 6px; font-weight: 800;" required>
             </div>
-            <button type="submit" id="verify-signup-btn" class="btn-primary" style="margin-top: 16px; width: 100%;">Verify & Complete</button>
+            <button type="submit" id="verify-signup-btn" class="btn-primary" style="margin-top: 8px;">Verify & Complete</button>
         </form>
 
     </div>

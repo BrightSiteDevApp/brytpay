@@ -292,3 +292,66 @@ header p { font-size: 0.75rem !important; line-height: 1.3 !important; }
         display: none !important;
     }
 }
+/* GLOBAL DARK MODE OVERRIDES */
+html.dark-theme {
+    --bryt-navy: #ffffff !important;
+    --bg-light: #0f172a !important;
+    --card-bg: #1e293b !important;
+    --text-main: #f8fafc !important;
+    --border-color: #334155 !important;
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+html.dark-theme body {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+/* Make inputs and cards adapt to dark mode */
+html.dark-theme .form-card, 
+html.dark-theme .service-card, 
+html.dark-theme .tx-card,
+html.dark-theme .admin-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+html.dark-theme .form-input,
+html.dark-theme .form-select {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* =========================================
+   GLOBAL MOBILE DESKTOP CONSTRAINT
+   ========================================= */
+html { 
+    background-color: #e2e8f0; 
+}
+html.dark-theme { 
+    background-color: #020617; 
+}
+
+/* 🚀 FIX: Only apply the 480px mobile constraint if the body DOES NOT have the .landing-page class */
+body:not(.landing-page) {
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    min-height: 100vh;
+    position: relative;
+    box-shadow: 0 0 40px rgba(0,0,0,0.15);
+    background-color: var(--bg-color);
+}
+
+/* Ensure fixed navigation bars stay inside the phone container for the app ONLY */
+body:not(.landing-page) .app-topbar, 
+body:not(.landing-page) .mobile-nav, 
+body:not(.landing-page) #ptr-indicator, 
+body:not(.landing-page) .bryt-toast, 
+body:not(.landing-page) .push-consent-overlay {
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    left: 0 !important;
+    right: 0 !important;
+}

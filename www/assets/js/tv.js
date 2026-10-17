@@ -7,16 +7,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     let selectedLogo = 'dstv-logo.png';
     let verifiedCustomerName = null;
 
-    // 🚀 THE FIX: Smart Back Button Logic
+    // 🚀 SMART ROUTING
     const backBtn = document.getElementById('smart-back-btn');
     if (backBtn) {
-        const referrer = document.referrer;
+        const referrer = document.referrer || '';
         if (referrer.includes('/dashboard/services/')) {
-            backBtn.href = '/dashboard/services/';
-            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Services`;
+            backBtn.href = '/dashboard/services/index.html';
         } else {
-            backBtn.href = '/dashboard/';
-            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Dashboard`;
+            backBtn.href = '/dashboard/index.html';
         }
     }
 
@@ -81,8 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             { code: 25, price: 3264, label: 'Super (Antenna) - 1 Week' },
             { code: 24, price: 3366, label: 'Super (Dish) - 1 Week' },
             { code: 26, price: 9690, label: 'Super (Antenna) - 1 Month' }
-        ],
-        'showmax': [] 
+        ]
     };
 
     const hiddenPlanInput = document.getElementById('tv-plan');
@@ -98,6 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const optionsList = document.getElementById('custom-options-list');
 
     const confirmModal = document.getElementById('confirm-modal');
+    const successOverlay = document.getElementById('success-overlay');
 
     const { data: walletData } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
     if (walletData) {
@@ -105,10 +103,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     selectTrigger.addEventListener('click', () => {
-        if (selectedNetwork === 'showmax') {
-            showToast("Showmax subscriptions are currently unavailable.", "error");
-            return;
-        }
         selectWrapper.classList.toggle('open');
     });
 
@@ -120,9 +114,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (hiddenPlanInput.value) {
             const [, priceStr] = hiddenPlanInput.value.split('|');
             const amt = parseFloat(priceStr);
-            submitBtn.innerHTML = `Proceed to Pay ₦${amt.toLocaleString('en-NG')} <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+            submitBtn.innerHTML = `Pay ₦${amt.toLocaleString('en-NG')} <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
         } else {
-            submitBtn.innerHTML = `Proceed <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+            submitBtn.innerHTML = `Proceed <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
         }
     }
 
@@ -132,21 +126,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         hiddenPlanInput.value = '';
         updateButton();
-
-        if (selectedNetwork === 'showmax') {
-            selectText.textContent = 'Service Currently Unavailable';
-            selectText.style.opacity = '0.5';
-            smartcardInput.disabled = true;
-            verifyBtn.disabled = true;
-            submitBtn.disabled = true;
-            
-            nameBox.style.display = 'flex';
-            nameBox.style.background = '#fef2f2';
-            nameBox.style.borderColor = '#fecaca';
-            nameBox.style.color = '#b91c1c';
-            nameBox.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> Showmax is undergoing maintenance.';
-            return;
-        }
 
         smartcardInput.disabled = false;
         selectText.textContent = 'Select a package...';
@@ -184,9 +163,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     function resetVerification() {
         verifiedCustomerName = null;
         nameBox.style.display = 'none';
-        nameBox.style.background = '#f0fdf4';
-        nameBox.style.borderColor = '#bbf7d0';
-        nameBox.style.color = '#166534';
+        nameBox.style.background = 'rgba(34, 197, 94, 0.1)';
+        nameBox.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+        nameBox.style.color = '#16a34a';
         nameBox.innerHTML = '';
         
         inputLabel.textContent = "3. Smartcard / IUC Number";
@@ -210,10 +189,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     smartcardInput.addEventListener('input', resetVerification);
 
     verifyBtn.addEventListener('click', async () => {
-        if (selectedNetwork === 'showmax') {
-            return showToast("Showmax is currently unavailable.", "error");
-        }
-
         const smartcard = smartcardInput.value.trim();
         if (!smartcard) return showToast("Enter a Smartcard or IUC number", "error");
 
@@ -244,10 +219,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('tv-form').addEventListener('submit', (e) => {
         e.preventDefault();
-
-        if (selectedNetwork === 'showmax') {
-            return showToast("Showmax is currently unavailable.", "error");
-        }
 
         if (!verifiedCustomerName) return showToast("Please verify the Account first.", "error");
         if (!hiddenPlanInput.value) return showToast("Please select a package.", "error");
@@ -283,9 +254,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (error) throw new Error(error.message);
             if (resData && !resData.success) throw new Error(resData.message);
 
-            showToast(resData.message || `Success! TV Subscription activated.`, "success");
+            // 🚀 SUCCESS! Trigger Fullscreen Animation
             confirmModal.style.display = 'none';
-            setTimeout(() => window.location.reload(), 2500);
+            successOverlay.classList.add('active');
+            
+            // Exactly 1.5s later, reload the page 
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
 
         } catch (err) {
             showToast(err.message, "error");

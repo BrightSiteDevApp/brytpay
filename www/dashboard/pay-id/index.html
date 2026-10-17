@@ -2,287 +2,195 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pay ID — BRYT Pay</title>
     
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#1D5ED0">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <!-- Anti-Flash Dark Mode Script -->
+    <script>
+        if (localStorage.getItem('bryt_theme') === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+        }
+    </script>
 
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../../assets/css/main.css">
+
     <style>
         :root {
             --bryt-primary: #1D5ED0;
             --bryt-navy: #0B1220;
-            --slate-50: #f8fafc;
-            --slate-100: #f1f5f9;
-            --slate-200: #e2e8f0;
-            --slate-400: #94a3b8;
-            --slate-500: #64748b;
-            --slate-700: #334155;
-            --slate-800: #1e293b;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-main: #0B1220;
+            --border-light: #f1f5f9;
         }
 
-        body { padding-bottom: 75px !important; background: #f8fafc; }
-
-        .payid-card {
-            background: #ffffff;
-            border: 1px solid var(--slate-200);
-            border-radius: 16px;
-            padding: 20px 18px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
-            margin-bottom: 16px;
+        html.dark-theme {
+            --bryt-navy: #ffffff;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --border-light: #334155;
         }
 
-        .security-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #eff6ff;
-            color: var(--bryt-primary);
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 5px 12px;
-            border-radius: 20px;
-            margin-bottom: 14px;
-            border: 1px solid #dbeafe;
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 80px !important;
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        /* Redesigned, Minimalist Code Display Box */
-        .code-display-box {
-            background: var(--slate-50);
-            border: 2px dashed #cbd5e1;
-            border-radius: 14px;
-            padding: 24px 16px;
-            text-align: center;
-            margin-bottom: 16px;
-        }
+        /* Topbar Header */
+        .app-topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: var(--card-bg); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-light); transition: background 0.3s, border 0.3s; }
+        .app-topbar-left { display: flex; align-items: center; gap: 16px; }
+        .smart-back { color: var(--text-main); display: flex; align-items: center; text-decoration: none; padding: 4px; margin-left: -4px; cursor: pointer; border: none; background: transparent; }
+        .page-title { font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0; }
+        .page-subtitle { font-size: 0.75rem; color: #64748b; margin: 0; font-weight: 600; }
 
-        .code-label {
-            font-size: 0.65rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--slate-500);
-            margin-bottom: 8px;
-            display: block;
-        }
+        .main-content { padding: 20px; }
 
-        .code-digits {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: var(--bryt-navy);
-            letter-spacing: 8px;
-            font-family: monospace;
-            line-height: 1.1;
-            margin-bottom: 16px;
-            user-select: all;
-        }
+        /* Sleek Balance Pill */
+        .balance-pill { background: var(--card-bg); border: 1px solid var(--border-light); padding: 16px 20px; border-radius: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: 0.3s; }
+        .balance-label { font-size: 0.65rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .balance-amount { font-size: 1.4rem; font-weight: 800; color: var(--text-main); line-height: 1; }
+        .balance-icon { width: 42px; height: 42px; background: rgba(29, 94, 208, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--bryt-primary); }
 
-        .timer-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #eff6ff;
-            color: var(--bryt-primary);
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 6px 14px;
-            border-radius: 20px;
-        }
-        .timer-badge.expiring {
-            background: #fef2f2;
-            color: #ef4444;
-        }
+        .payid-card { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 16px; padding: 20px 18px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02); margin-bottom: 16px; transition: 0.3s; }
 
-        .btn-action-row {
-            display: flex;
-            gap: 10px;
-        }
+        .security-pill { display: inline-flex; align-items: center; gap: 6px; background: rgba(29, 94, 208, 0.1); color: var(--bryt-primary); font-size: 0.7rem; font-weight: 800; padding: 6px 14px; border-radius: 20px; margin-bottom: 16px; border: 1px solid rgba(29, 94, 208, 0.2); }
 
-        .btn-copy-code {
-            flex: 2;
-            background: var(--bryt-primary);
-            color: #ffffff;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            font-weight: 800;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: opacity 0.2s;
-        }
+        /* Code Display Box */
+        .code-display-box { background: var(--bg-color); border: 2px dashed var(--border-light); border-radius: 14px; padding: 24px 16px; text-align: center; margin-bottom: 20px; transition: 0.3s; }
+        .code-label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 8px; display: block; }
+        .code-digits { font-size: 2.2rem; font-weight: 800; color: var(--text-main); letter-spacing: 8px; font-family: monospace; line-height: 1.1; margin-bottom: 16px; user-select: all; }
+
+        .timer-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(29, 94, 208, 0.1); color: var(--bryt-primary); font-size: 0.75rem; font-weight: 800; padding: 6px 14px; border-radius: 20px; transition: 0.3s; }
+        .timer-badge.expiring { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+        .btn-action-row { display: flex; gap: 10px; }
+        
+        .btn-copy-code { flex: 2; background: var(--bryt-primary); color: #ffffff; border: none; padding: 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
         .btn-copy-code:hover { opacity: 0.92; }
 
-        .btn-regen-code {
-            flex: 1;
-            background: var(--slate-100);
-            color: var(--slate-700);
-            border: 1px solid var(--slate-200);
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-        .btn-regen-code:hover { background: var(--slate-200); color: var(--bryt-navy); }
+        .btn-regen-code { flex: 1; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-light); padding: 14px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-regen-code:hover { background: var(--border-light); }
 
         /* Supported Platforms Info */
-        .platform-row {
-            padding: 10px 0;
-            border-bottom: 1px dashed var(--slate-200);
-        }
+        .platform-row { padding: 12px 0; border-bottom: 1px dashed var(--border-light); }
         .platform-row:last-child { border-bottom: none; padding-bottom: 0; }
-        .platform-name { font-size: 0.8rem; font-weight: 800; color: var(--bryt-navy); margin-bottom: 2px;}
-        .platform-desc { font-size: 0.68rem; color: var(--slate-500); font-weight: 600; }
+        .platform-name { font-size: 0.85rem; font-weight: 800; color: var(--text-main); margin-bottom: 2px;}
+        .platform-desc { font-size: 0.7rem; color: #64748b; font-weight: 600; }
 
-        /* Recent Codes Mini List */
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--slate-100);
-        }
+        /* Recent Codes List */
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-light); }
         .history-item:last-child { border-bottom: none; padding-bottom: 0; }
-        .history-code { font-family: monospace; font-size: 0.85rem; font-weight: 800; color: var(--bryt-navy); letter-spacing: 1px; }
-        .history-meta { font-size: 0.65rem; color: var(--slate-500); font-weight: 600; }
+        .history-code { font-family: monospace; font-size: 0.9rem; font-weight: 800; color: var(--text-main); letter-spacing: 1px; }
+        .history-meta { font-size: 0.65rem; color: #64748b; font-weight: 600; margin-top: 2px;}
         
-        .badge-status {
-            font-size: 0.6rem;
-            font-weight: 800;
-            padding: 3px 8px;
-            border-radius: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-        }
-        .status-used { background: #dcfce7; color: #15803d; }
-        .status-active { background: #dbeafe; color: #1d4ed8; }
-        .status-expired { background: #f1f5f9; color: #64748b; }
+        .badge-status { font-size: 0.6rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-used { background: rgba(34, 197, 94, 0.1); color: #16a34a; }
+        .status-active { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .status-expired { background: var(--bg-color); color: #64748b; border: 1px solid var(--border-light); }
 
         /* Toasts */
-        .toast-msg-box {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #0f172a;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            z-index: 10000;
-            display: none;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
+        .toast-msg-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--text-main); color: var(--card-bg); padding: 12px 20px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; z-index: 10000; display: none; align-items: center; gap: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
         .toast-error { background: #fee2e2 !important; color: #dc2626 !important; border: 1px solid #fca5a5; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .mobile-nav {
-            position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: #ffffff !important; z-index: 9999 !important; border-top: 1px solid #e2e8f0 !important; display: flex !important; justify-content: space-around !important; padding: 10px 0 !important; box-shadow: 0 -2px 10px rgba(0,0,0,0.05) !important;
-        }
-        .mobile-nav .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--slate-400); text-decoration: none; transition: color 0.2s; }
-        .mobile-nav .nav-item span { font-size: 0.65rem; font-weight: 700; }
-        .mobile-nav .nav-item svg { width: 20px; height: 20px; }
+        /* Native Bottom Nav */
+        .mobile-nav { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: var(--card-bg) !important; z-index: 9999 !important; border-top: 1px solid var(--border-light) !important; display: flex !important; justify-content: space-around !important; padding: 12px 0 10px 0 !important; transition: background 0.3s, border 0.3s; }
+        .mobile-nav .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none; transition: color 0.2s; }
+        .mobile-nav .nav-item span { font-size: 0.65rem; font-weight: 800; }
+        .mobile-nav .nav-item svg { width: 22px; height: 22px; }
         .mobile-nav .nav-item.active { color: var(--bryt-primary); }
-
-        @media (min-width: 768px) {
-            .mobile-nav { display: none !important; }
-            body { padding-bottom: 0 !important; }
-        }
     </style>
 </head>
 <body>
 
     <!-- Success Toast -->
     <div id="toast" class="toast-msg-box">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
         <span id="toast-text">Copied!</span>
     </div>
 
     <!-- Error Toast -->
     <div id="error-toast" class="toast-msg-box toast-error">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="3"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="3"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
         <span id="error-toast-text">Error</span>
     </div>
 
-    <main class="app-container" style="max-width: 520px; margin: 0 auto; padding: 16px 16px 24px 16px;">
-        
-        <header style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start;">
+    <header class="app-topbar">
+        <div class="app-topbar-left">
+            <a id="smart-back-btn" class="smart-back">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </a>
             <div>
-                <a href="/dashboard/" style="text-decoration:none; color:var(--slate-500); font-size:0.85rem; font-weight:700; display:inline-flex; align-items:center; gap:6px; margin-bottom: 8px; transition: color 0.2s;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                    Dashboard
-                </a>
-                <h1 style="font-size: 1.35rem; font-weight: 800; color: var(--bryt-navy); margin: 0 0 2px 0;">Generate Pay ID</h1>
-                <p style="font-size: 0.75rem; color: var(--slate-500); margin: 0;">One-time checkout code for BRYT platforms</p>
+                <h1 class="page-title">Generate Pay ID</h1>
+                <p class="page-subtitle">One-time checkout code</p>
             </div>
-            
-            <div style="display: flex; align-items: center; gap: 6px; background: var(--bryt-primary); padding: 6px 12px; border-radius: 16px; box-shadow: 0 4px 12px rgba(29, 94, 208, 0.2); flex-shrink: 0; margin-top: 4px;">
-                <div style="background: rgba(255,255,255,0.2); border-radius: 50%; padding: 4px; display: flex;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-end;">
-                    <span style="font-size: 0.55rem; color: #e0f2fe; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; line-height: 1;">Balance</span>
-                    <strong id="user-balance" style="color: #ffffff; font-size: 0.85rem; font-weight: 800; line-height: 1.2;">₦0.00</strong>
-                </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        
+        <div class="balance-pill">
+            <div>
+                <div class="balance-label">Wallet Balance</div>
+                <div class="balance-amount" id="user-balance">₦0.00</div>
             </div>
-        </header>
+            <div class="balance-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            </div>
+        </div>
 
         <div class="security-pill">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             Codes expire automatically after 10 minutes
         </div>
 
         <!-- STATE 1: LOADING -->
-        <div id="state-loading" class="payid-card" style="text-align: center; padding: 36px 20px;">
-            <div style="display: inline-block; width: 26px; height: 26px; border: 3px solid #e2e8f0; border-top-color: var(--bryt-primary); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
-            <p style="font-size: 0.75rem; color: var(--slate-500); font-weight: 600; margin-top: 10px;">Checking active codes...</p>
+        <div id="state-loading" class="payid-card" style="text-align: center; padding: 40px 20px;">
+            <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid var(--border-light); border-top-color: var(--bryt-primary); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+            <p style="font-size: 0.8rem; color: #64748b; font-weight: 600; margin-top: 12px;">Checking active codes...</p>
         </div>
 
-        <!-- STATE 2: GENERATE PROMPT (NO ACTIVE CODE) -->
+        <!-- STATE 2: GENERATE PROMPT -->
         <div id="state-empty" class="payid-card" style="display: none; text-align: center;">
-            <div style="width: 48px; height: 48px; border-radius: 12px; background: #eff6ff; color: var(--bryt-primary); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            <div style="width: 54px; height: 54px; border-radius: 16px; background: rgba(29, 94, 208, 0.1); color: var(--bryt-primary); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
             </div>
-            <h2 style="font-size: 1.05rem; font-weight: 800; color: var(--bryt-navy); margin: 0 0 6px 0;">One-Time Payment Code</h2>
-            <p style="font-size: 0.75rem; color: var(--slate-500); margin: 0 0 18px 0; line-height: 1.45;">
-                Generate a secure 6-digit code to pay instantly on <strong>BRYT DGM</strong> or <strong>BRYT CBT SIM</strong> using your wallet balance.
+            <h2 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0 0 8px 0;">Payment Code</h2>
+            <p style="font-size: 0.8rem; color: #64748b; margin: 0 0 24px 0; line-height: 1.5; font-weight: 500;">
+                Generate a secure 6-digit code to pay instantly on <strong>BRYT DGM</strong> or <strong>BRYT CBT</strong> using your wallet balance.
             </p>
             
-            <button id="btn-generate" style="width: 100%; padding: 14px; font-size: 0.85rem; font-weight: 800; border-radius: 12px; background: var(--bryt-primary); color: #fff; border: none; cursor: pointer;">
+            <button id="btn-generate" style="width: 100%; padding: 16px; font-size: 0.9rem; font-weight: 800; border-radius: 12px; background: var(--bryt-primary); color: #fff; border: none; cursor: pointer;">
                 Generate 6-Digit Pay ID
             </button>
         </div>
 
-        <!-- STATE 3: ACTIVE CODE DISPLAY -->
+        <!-- STATE 3: ACTIVE CODE -->
         <div id="state-active" class="payid-card" style="display: none;">
             <div class="code-display-box">
                 <span class="code-label">Your Active Pay ID</span>
                 <div class="code-digits" id="active-code-display">--- ---</div>
                 <div class="timer-badge" id="timer-badge">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     <span id="countdown-text">Expires in 10:00</span>
                 </div>
             </div>
 
             <div class="btn-action-row">
                 <button class="btn-copy-code" id="btn-copy">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                    Copy Pay ID
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    Copy Code
                 </button>
                 <button class="btn-regen-code" id="btn-regenerate">
                     New Code
@@ -290,29 +198,27 @@
             </div>
         </div>
 
-        <!-- WHERE TO USE CARD -->
         <div class="payid-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <span style="font-size: 0.72rem; font-weight: 800; color: var(--bryt-navy); text-transform: uppercase; letter-spacing: 0.4px;">Where You Can Pay</span>
-                <span style="font-size: 0.65rem; color: var(--slate-400); font-weight: 600;">Zero Extra Fees</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span style="font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Where You Can Pay</span>
+                <span style="font-size: 0.65rem; color: #10b981; font-weight: 800; background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 8px;">Zero Fees</span>
             </div>
 
             <div class="platform-row">
                 <div class="platform-name">BRYT Digital Market (DGM)</div>
-                <div class="platform-desc">Student Vendor Registration (15 Slots)</div>
+                <div class="platform-desc">Student Vendor Registration & Promotions</div>
             </div>
 
             <div class="platform-row">
                 <div class="platform-name">BRYT CBT Simulator</div>
-                <div class="platform-desc">Premium Upgrade / Question Bank</div>
+                <div class="platform-desc">Premium Software Upgrades & Access</div>
             </div>
         </div>
 
-        <!-- RECENT PAY ID ACTIVITY -->
         <div class="payid-card" style="margin-bottom: 0;">
-            <span style="font-size: 0.72rem; font-weight: 800; color: var(--bryt-navy); text-transform: uppercase; letter-spacing: 0.4px; display: block; margin-bottom: 10px;">Recent Codes</span>
+            <span style="font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 12px;">Recent Codes</span>
             <div id="recent-codes-list">
-                <div style="font-size: 0.75rem; color: var(--slate-400); text-align: center; padding: 12px 0;">No recent codes generated.</div>
+                <div style="font-size: 0.8rem; color: #64748b; text-align: center; padding: 16px 0; font-weight: 600;">No recent codes generated.</div>
             </div>
         </div>
 
@@ -320,11 +226,11 @@
 
     <!-- FIXED BOTTOM NAVIGATION -->
     <nav class="mobile-nav no-print">
-        <a href="/dashboard/" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
-        <a href="/dashboard/services/" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span>Services</span></a>
-        <a href="/dashboard/fund/" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
-        <a href="/dashboard/orders/" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>My Orders</span></a>
-        <a href="/dashboard/account/" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
+        <a href="/dashboard/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+        <a href="/dashboard/services/index.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span>Services</span></a>
+        <a href="/dashboard/fund/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
+        <a href="/dashboard/orders/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>Orders</span></a>
+        <a href="/dashboard/account/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
     </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -333,6 +239,17 @@
         let currentRawCode = '';
         let countdownInterval = null;
         let currentUser = null;
+
+        // 🚀 SMART ROUTING
+        const backBtn = document.getElementById('smart-back-btn');
+        if (backBtn) {
+            const referrer = document.referrer || '';
+            if (referrer.includes('/dashboard/services/')) {
+                backBtn.href = '/dashboard/services/index.html';
+            } else {
+                backBtn.href = '/dashboard/index.html';
+            }
+        }
 
         function showToast(msg) {
             const t = document.getElementById('toast');
@@ -391,7 +308,6 @@
             const stateEmpty = document.getElementById('state-empty');
             const stateActive = document.getElementById('state-active');
 
-            // Strictly limited to fetching the 3 most recent codes to keep the UI clean
             const { data: codes, error } = await window.db
                 .from('pay_ids')
                 .select('*')
@@ -427,7 +343,7 @@
             btnGen.disabled = true;
             btnRegen.disabled = true;
             btnGen.textContent = 'Generating...';
-            btnRegen.textContent = '...';
+            btnRegen.textContent = 'Wait...';
 
             try {
                 const newCode = generateSecure6DigitCode();
@@ -500,7 +416,6 @@
             const container = document.getElementById('recent-codes-list');
             const nowMs = Date.now();
 
-            // Explicitly slice to maximum of 3 items just to be absolutely safe
             container.innerHTML = codes.slice(0, 3).map(item => {
                 const isExpired = item.status === 'ACTIVE' && new Date(item.expires_at).getTime() <= nowMs;
                 const displayStatus = isExpired ? 'EXPIRED' : item.status;

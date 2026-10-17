@@ -59,17 +59,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
         const pwdInput = document.getElementById('password');
+        const confirmPwdInput = document.getElementById('confirm-password');
         const pwdHint = document.getElementById('pwd-hint');
+        const pwdMatchHint = document.getElementById('pwd-match-hint');
 
+        // Check Strength
         pwdInput.addEventListener('input', () => {
             if (pwdRegex.test(pwdInput.value)) {
                 pwdHint.textContent = "✓ Password is strong";
                 pwdHint.className = "password-hint valid";
             } else {
-                pwdHint.textContent = "Must contain an uppercase letter, lowercase letter, and a number (min 8 chars).";
+                pwdHint.textContent = "Min 8 chars, 1 uppercase, 1 lowercase, 1 number.";
                 pwdHint.className = "password-hint invalid";
             }
+            checkMatch(); 
         });
+
+        // Check Match
+        const checkMatch = () => {
+            if (!confirmPwdInput.value) {
+                pwdMatchHint.textContent = "";
+                pwdMatchHint.className = "password-hint";
+                return;
+            }
+            if (confirmPwdInput.value === pwdInput.value) {
+                pwdMatchHint.textContent = "✓ Passwords match";
+                pwdMatchHint.className = "password-hint valid";
+            } else {
+                pwdMatchHint.textContent = "Passwords do not match.";
+                pwdMatchHint.className = "password-hint invalid";
+            }
+        };
+
+        confirmPwdInput.addEventListener('input', checkMatch);
 
         signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -79,9 +101,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             regPhone = document.getElementById('phone').value.trim();
             regEmail = document.getElementById('email').value.trim();
             const pwd = pwdInput.value;
+            const confirmPwd = confirmPwdInput.value;
 
-            if (!/^\d{11}$/.test(regPhone)) return showError('Enter a valid 11-digit phone number (numbers only).');
+            if (!/^\d{11}$/.test(regPhone)) return showError('Enter a valid 11-digit phone number.');
             if (!pwdRegex.test(pwd)) return showError('Password must contain at least one uppercase letter, one lowercase letter, and one number.');
+            if (pwd !== confirmPwd) return showError('Passwords do not match. Please try again.');
 
             btn.disabled = true;
             btn.textContent = 'Creating account...';
@@ -101,8 +125,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             const signupHeader = document.getElementById('signup-header');
-            signupHeader.innerHTML = `<h1>Check your email</h1><p>We sent a 6-digit code to <strong id="safe-reg-email"></strong></p>`;
+            signupHeader.innerHTML = `<h1>Check your email</h1><p>We sent a 6-digit code to <strong id="safe-reg-email" style="color: var(--text-main);"></strong></p>`;
             document.getElementById('safe-reg-email').textContent = regEmail; 
+
+            // Save the email securely to localStorage to persist across tab reloads
+            localStorage.setItem('bryt_pending_email', regEmail);
 
             signupForm.style.display = 'none';
             document.getElementById('signup-otp-form').style.display = 'block';
@@ -113,10 +140,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             const btn = document.getElementById('verify-signup-btn');
             const token = document.getElementById('signup-otp-code').value.trim();
             
+            // Retrieve the email securely in case the variables cleared
+            const verifyEmail = regEmail || localStorage.getItem('bryt_pending_email');
+            
+            if (!verifyEmail) {
+                showError('Session lost. Please refresh and try signing up again.');
+                return;
+            }
+
             btn.disabled = true;
             btn.textContent = 'Verifying...';
 
-            const { data, error } = await window.db.auth.verifyOtp({ email: regEmail, token, type: 'signup' });
+            const { data, error } = await window.db.auth.verifyOtp({ email: verifyEmail, token, type: 'signup' });
 
             if (error || !data.session) {
                 showError(`Verification failed: ${error?.message || 'Invalid code'}`);
@@ -125,25 +160,26 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
+            // 🚀 THE FIX: Pull the metadata directly from the secure Supabase session!
             const user = data.session.user;
+            const secureFullName = user.user_metadata?.full_name || regName;
+            const securePhone = user.user_metadata?.phone_number || regPhone;
             
             try {
                 const { error: profileError } = await window.db.from('profiles').upsert({ 
                     id: user.id, 
-                    full_name: regName, 
-                    phone_number: regPhone,
-                    email: regEmail 
+                    full_name: secureFullName, 
+                    phone_number: securePhone,
+                    email: user.email 
                 });
 
-                if (profileError) console.error("Failed to save phone number to profiles:", profileError);
-
+                if (profileError) console.error("Failed to save profile:", profileError);
                 await window.db.from('wallets').upsert({ user_id: user.id, balance: 0.00 });
 
-                // 🚀 TRIGGER WELCOME EMAIL ONLY UPON VERIFIED OTP
-                // Invoking this without await ensures user redirection is immediate
-                window.db.functions.invoke('send-welcome-email', {
-                    body: {}
-                }).catch(err => console.error("Welcome email error:", err));
+                window.db.functions.invoke('send-welcome-email', { body: {} }).catch(err => console.error(err));
+                
+                // Clear the temp email
+                localStorage.removeItem('bryt_pending_email');
 
             } catch (err) {
                 console.error("Database error during profile creation:", err);
@@ -264,7 +300,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             resetEmailForm.style.display = 'none';
             resetPwdForm.style.display = 'block';
             
-            authTitle.innerHTML = `<h1>Enter Code</h1><p>Sent to <strong id="safe-recovery-email"></strong></p>`;
+            authTitle.innerHTML = `<h1>Enter Code</h1><p>Sent to <strong id="safe-recovery-email" style="color: var(--text-main);"></strong></p>`;
             document.getElementById('safe-recovery-email').textContent = recoveryEmail; 
             
             showSuccess('Reset code sent to your email.');

@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session } } = await window.db.auth.getSession();
-    if (!session) { window.location.href = '/auth/login.html'; return; }
+    if (!session) { window.location.href = '/auth/login.html'; return; } // Ensure it says login.html
 
     const user = session.user;
     const container = document.getElementById('notifications-container');
@@ -70,7 +70,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
         });
 
-        // Show the 'Mark All Read' button if there's at least one unread message
         if (unreadCount > 0) {
             markAllBtn.style.display = 'block';
         }
@@ -83,7 +82,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const btn = card.querySelector('.btn-action-read');
             if (btn) btn.remove();
             
-            // Check if there are any unread messages left
             const remainingUnread = document.querySelectorAll('.notif-card.unread').length;
             if (remainingUnread === 0) markAllBtn.style.display = 'none';
         }

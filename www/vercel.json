@@ -1,0 +1,22 @@
+{
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, payvessel-http-signature, HTTP_PAYVESSEL_HTTP_SIGNATURE" }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/payvessel-webhook",
+      "destination": "https://yivxlmjaiczsnxakumof.supabase.co/functions/v1/payvessel-webhook"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "https://yivxlmjaiczsnxakumof.supabase.co/functions/v1/$1"
+    }
+  ]
+}

@@ -2,114 +2,151 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>All Services — BRYT Pay</title>
     
+    <!-- Anti-Flash Dark Mode Script -->
+    <script>
+        if (localStorage.getItem('bryt_theme') === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+        }
+    </script>
+
     <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#1D5ED0">
+    <meta name="theme-color" content="#ffffff">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../../assets/css/main.css">
 
     <style>
-        .services-header { margin-bottom: 20px; }
-        .services-header h1 { font-size: 1.35rem; font-weight: 800; color: var(--bryt-navy); margin: 0 0 2px 0; }
-        .services-header p { font-size: 0.75rem; color: var(--text-muted); margin: 0; }
+        :root {
+            --bryt-primary: #1D5ED0;
+            --bryt-navy: #0B1220;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-main: #0B1220;
+            --border-light: #f1f5f9;
+        }
 
-        .services-full-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 28px; }
-        @media (max-width: 480px) { .services-full-grid { gap: 8px; } }
+        /* FIX: Added Dark Theme Variables to mute the borders */
+        html.dark-theme {
+            --bryt-navy: #ffffff;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --border-light: #334155;
+        }
 
-        .service-full-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; text-decoration: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); position: relative; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .service-full-card:hover { border-color: var(--bryt-primary); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(29, 94, 208, 0.08); }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 80px !important;
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
 
-        .service-full-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
-        .service-full-icon svg { width: 18px; height: 18px; }
-        .service-full-title { font-size: 0.72rem; font-weight: 800; color: var(--bryt-navy); line-height: 1.2; }
+        /* Topbar Header */
+        .app-topbar { 
+            display: flex; align-items: center; gap: 16px; padding: 16px 20px; 
+            background: var(--card-bg); position: sticky; top: 0; z-index: 100; 
+            border-bottom: 1px solid var(--border-light); transition: background 0.3s, border 0.3s; 
+        }
+        .smart-back { 
+            color: var(--text-main); display: flex; align-items: center; 
+            text-decoration: none; padding: 4px; margin-left: -4px;
+        }
+        .page-title { font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0; }
 
-        .badge-soon { position: absolute; top: 6px; right: 6px; background: #f1f5f9; color: #64748b; font-size: 0.55rem; font-weight: 800; padding: 2px 4px; border-radius: 4px; text-transform: uppercase; }
+        .main-content { padding: 24px 20px; }
+
+        /* Small 4-Grid Layout (Matches Dashboard exactly) */
+        .utility-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 10px; }
+        .utility-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; gap: 8px; position: relative; }
+        .utility-icon { 
+            width: 52px; height: 52px; background: var(--card-bg); border-radius: 14px; 
+            display: flex; align-items: center; justify-content: center; color: var(--bryt-primary); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border-light); 
+            transition: background 0.3s, border 0.3s; 
+        }
+        .utility-icon svg { width: 24px; height: 24px; }
+        .utility-label { font-size: 0.7rem; font-weight: 700; color: var(--text-main); text-align: center; }
+
+        /* Future Feature Badge */
+        .badge-soon { 
+            position: absolute; top: -8px; right: -4px; background: #e2e8f0; color: #64748b; 
+            font-size: 0.55rem; font-weight: 800; padding: 2px 6px; border-radius: 6px; 
+            text-transform: uppercase; z-index: 2; border: 2px solid var(--bg-color); 
+        }
+        html.dark-theme .badge-soon { background: #334155; color: #94a3b8; border-color: var(--bg-color); }
+
+        /* Native Bottom Nav */
+        .mobile-nav { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: var(--card-bg) !important; z-index: 9999 !important; border-top: 1px solid var(--border-light) !important; display: flex !important; justify-content: space-around !important; padding: 12px 0 10px 0 !important; transition: background 0.3s, border 0.3s; }
+        .mobile-nav .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none; transition: color 0.2s; }
+        .mobile-nav .nav-item span { font-size: 0.65rem; font-weight: 800; }
+        .mobile-nav .nav-item svg { width: 22px; height: 22px; }
+        .mobile-nav .nav-item.active { color: var(--bryt-primary); }
     </style>
 </head>
 <body>
 
-    <main class="app-container" style="max-width: 520px;">
-        <header class="services-header">
-            <a href="/dashboard/index.html" style="text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:700; display:inline-flex; align-items:center; gap:6px; margin-bottom: 12px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                Dashboard
-            </a>
-            <h1>All Services</h1>
-            <p>Select any service to begin</p>
-        </header>
+    <header class="app-topbar">
+        <a href="/dashboard/index.html" class="smart-back">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </a>
+        <h1 class="page-title">All Services</h1>
+    </header>
 
-        <section class="services-full-grid">
-            <a href="/dashboard/airtime/index.html" class="service-full-card">
-                <div class="service-full-icon" style="background: #F0F6FF; color: var(--bryt-primary);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                </div>
-                <span class="service-full-title">Airtime</span>
+    <main class="main-content">
+        <section class="utility-grid">
+            <a href="/dashboard/airtime/index.html" class="utility-item">
+                <div class="utility-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+                <span class="utility-label">Airtime</span>
             </a>
-
-            <a href="/dashboard/data/index.html" class="service-full-card">
-                <div class="service-full-icon" style="background: #F0F6FF; color: var(--bryt-primary);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-                </div>
-                <span class="service-full-title">Data Bundles</span>
+            <a href="/dashboard/data/index.html" class="utility-item">
+                <div class="utility-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div>
+                <span class="utility-label">Data</span>
             </a>
-
-            <a href="/dashboard/jamb/index.html" class="service-full-card">
-                <div class="service-full-icon" style="background: #F0F6FF; color: var(--bryt-primary);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                </div>
-                <span class="service-full-title">JAMB Services</span>
+            <a href="/dashboard/jamb/index.html" class="utility-item">
+                <div class="utility-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
+                <span class="utility-label">JAMB</span>
             </a>
-
-            <a href="/dashboard/nin/index.html" class="service-full-card">
-                <div class="service-full-icon" style="background: #F0F6FF; color: var(--bryt-primary);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                </div>
-                <span class="service-full-title">NIN Services</span>
+            <a href="/dashboard/nin/index.html" class="utility-item">
+                <div class="utility-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
+                <span class="utility-label">NIN</span>
             </a>
-
-            <a href="/dashboard/education/index.html" class="service-full-card">
-                <div class="service-full-icon" style="background: #F0F6FF; color: var(--bryt-primary);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                </div>
-                <span class="service-full-title">Education PINs</span>
+            <a href="/dashboard/education/index.html" class="utility-item">
+                <div class="utility-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+                <span class="utility-label">Education</span>
             </a>
-
-            <a href="/dashboard/tv/index.html" class="service-full-card">
-                <div class="service-full-icon" style="background: #F0F6FF; color: var(--bryt-primary);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
-                </div>
-                <span class="service-full-title">Cable TV</span>
+            <a href="/dashboard/tv/index.html" class="utility-item">
+                <div class="utility-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg></div>
+                <span class="utility-label">Cable TV</span>
             </a>
-
-            <a href="/dashboard/exam-certs/index.html" class="service-full-card">
-                <div class="service-full-icon" style="background: #F0F6FF; color: var(--bryt-primary);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
-                </div>
-                <span class="service-full-title">Exam Certs</span>
+            <a href="/dashboard/pay-id/index.html" class="utility-item">
+                <div class="utility-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
+                <span class="utility-label">Pay ID</span>
             </a>
-
-            <div class="service-full-card" style="opacity: 0.6; cursor: not-allowed;">
+            
+            <!-- Inactive Module -->
+            <div class="utility-item" style="opacity: 0.5; cursor: not-allowed;">
                 <span class="badge-soon">Soon</span>
-                <div class="service-full-icon" style="background: #f8fafc; color: #94a3b8;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-                </div>
-                <span class="service-full-title">Electricity</span>
+                <div class="utility-icon" style="color: #94a3b8; background: transparent;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg></div>
+                <span class="utility-label">Electricity</span>
             </div>
         </section>
     </main>
 
-    <!-- Bottom Navigation -->
+    <!-- Native Bottom Nav -->
     <nav class="mobile-nav no-print">
         <a href="/dashboard/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
         <a href="/dashboard/services/index.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span>Services</span></a>
         <a href="/dashboard/fund/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
-        <a href="/dashboard/orders/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>My Orders</span></a>
+        <a href="/dashboard/orders/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>Orders</span></a>
         <a href="/dashboard/account/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
     </nav>
 
-    <!-- Global Interceptor for Mobile Runtime -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../assets/js/supabase-client.js"></script>
 </body>

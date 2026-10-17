@@ -8,16 +8,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     let selectedPrice = 0;
     let isReprint = false;
 
-    // 🚀 THE FIX: Smart Back Button Logic
+    // 🚀 SMART ROUTING
     const backBtn = document.getElementById('smart-back-btn');
     if (backBtn) {
-        const referrer = document.referrer;
+        const referrer = document.referrer || '';
         if (referrer.includes('/dashboard/services/')) {
-            backBtn.href = '/dashboard/services/';
-            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Services`;
+            backBtn.href = '/dashboard/services/index.html';
         } else {
-            backBtn.href = '/dashboard/';
-            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Dashboard`;
+            backBtn.href = '/dashboard/index.html';
         }
     }
 
@@ -54,19 +52,59 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const userBalanceEl = document.getElementById('user-balance');
     const serviceModal = document.getElementById('service-modal');
+    const modalCloseTrigger = document.getElementById('modal-close-trigger');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
     const modalTitle = document.getElementById('modal-service-title');
     const modalPayAmt = document.getElementById('modal-pay-amt');
+    
     const reprintGroup = document.getElementById('reprint-group');
-    const reprintTypeSelect = document.getElementById('reprint-type');
+    const reprintTypeInput = document.getElementById('reprint-type');
     const jambForm = document.getElementById('jamb-form');
+    
+    const noticeBox = document.getElementById('dynamic-service-notice');
+    const noticeText = document.getElementById('dynamic-notice-text');
     
     const fullNameInput = document.getElementById('full-name');
     const jambRegInput = document.getElementById('jamb-reg');
     const jambYearInput = document.getElementById('jamb-year');
     const whatsappInput = document.getElementById('whatsapp');
     const emailInput = document.getElementById('email');
-    const btnCancel = document.getElementById('modal-cancel');
     const btnSubmit = document.getElementById('modal-submit');
+
+    // 🚀 NEW CUSTOM SELECT LOGIC
+    const reprintSelectWrapper = document.getElementById('reprint-select-wrapper');
+    const reprintSelectTrigger = document.getElementById('reprint-select-trigger');
+    const reprintSelectText = document.getElementById('reprint-select-text');
+
+    if (reprintSelectTrigger) {
+        reprintSelectTrigger.addEventListener('click', () => {
+            reprintSelectWrapper.classList.toggle('open');
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#reprint-select-wrapper')) {
+                reprintSelectWrapper.classList.remove('open');
+            }
+        });
+
+        document.querySelectorAll('#reprint-options-list .custom-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                reprintTypeInput.value = opt.getAttribute('data-value');
+                reprintSelectText.textContent = opt.textContent;
+                reprintSelectText.style.opacity = '1';
+                reprintSelectWrapper.classList.remove('open');
+            });
+        });
+    }
+
+    // UPDATED NOTICES
+    const notices = {
+        "Admission Letter": "Ensure you have accepted your admission before placing this service.",
+        "Original Result": "Get your official JAMB Original Result (with passport photo) required for institutional clearance.",
+        "JAMB Reprinting": "Reprint official JAMB documents: Exam Slips, Registration Slips, or Change of Course/Institution.",
+        "Admission Status": "Check your live JAMB Admission Status. You'll receive a downloadable screenshot of your portal.",
+        "O-Level Result Check": "Use this service to verify that your O-Level result is on your JAMB portal. A proof screenshot will be delivered to your app and email."
+    };
 
     window.goToStep = function(stepNum) {
         document.querySelectorAll('.modal-step').forEach(el => el.classList.remove('active'));
@@ -87,6 +125,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
+        // Ensure custom dropdown is selected if required
+        if (isReprint && !reprintTypeInput.value && currentStep === 1) {
+            showToast('Please select a reprint document type.', 'error');
+            isValid = false;
+        }
+
         if (isValid) goToStep(nextStep);
     };
 
@@ -99,6 +143,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     await loadBalance();
 
+    function closeModal() {
+        serviceModal.classList.remove('active');
+        setTimeout(() => {
+            serviceModal.style.display = 'none';
+        }, 400); 
+    }
+
+    modalCloseTrigger.addEventListener('click', closeModal);
+    if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
+    
+    serviceModal.addEventListener('click', (e) => {
+        if (e.target === serviceModal) closeModal();
+    });
+
     document.querySelectorAll('.service-card').forEach(card => {
         card.addEventListener('click', () => {
             selectedService = card.getAttribute('data-service');
@@ -108,22 +166,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             modalTitle.textContent = selectedService;
             modalPayAmt.textContent = `₦${selectedPrice.toLocaleString()}`;
             
+            if (notices[selectedService]) {
+                noticeText.textContent = notices[selectedService];
+                noticeBox.style.display = 'block';
+            } else {
+                noticeBox.style.display = 'none';
+            }
+
             if (isReprint) {
                 reprintGroup.style.display = 'block';
-                reprintTypeSelect.required = true;
+                reprintTypeInput.value = '';
+                reprintSelectText.textContent = 'Select a document...';
+                reprintSelectText.style.opacity = '0.6';
             } else {
                 reprintGroup.style.display = 'none';
-                reprintTypeSelect.required = false;
+                reprintTypeInput.value = 'Not Applicable'; // bypass hidden input requirement
             }
 
             jambForm.reset();
             goToStep(1);
+            
             serviceModal.style.display = 'flex';
+            setTimeout(() => serviceModal.classList.add('active'), 10);
         });
-    });
-
-    btnCancel.addEventListener('click', () => {
-        serviceModal.style.display = 'none';
     });
 
     jambForm.addEventListener('submit', async (e) => {
@@ -135,7 +200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const whatsapp = whatsappInput.value.trim();
         const email = emailInput.value.trim();
         
-        const finalServiceName = isReprint ? `Reprint: ${reprintTypeSelect.value}` : selectedService;
+        const finalServiceName = isReprint ? `Reprint: ${reprintTypeInput.value}` : selectedService;
 
         if (whatsapp.length !== 11 || !/^\d+$/.test(whatsapp)) {
             showToast('Please enter a valid 11-digit phone number.', 'error');
@@ -163,7 +228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error) throw error;
 
-            serviceModal.style.display = 'none';
+            closeModal();
             document.getElementById('service-selection-view').style.display = 'none';
             
             document.getElementById('success-ref').textContent = data.order_reference;

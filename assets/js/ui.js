@@ -1,16 +1,15 @@
 document.addEventListener('DOMContentLoaded', async () => {
     
-    // 🚀 NEW: Support Dropdown Logic
+    // Support Dropdown Logic
     const supportTrigger = document.getElementById('support-trigger');
     const supportMenu = document.getElementById('support-menu');
     if (supportTrigger && supportMenu) {
         supportTrigger.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevents the document click listener from firing immediately
+            e.stopPropagation();
             const isMenuOpen = supportMenu.style.display === 'block';
             supportMenu.style.display = isMenuOpen ? 'none' : 'block';
         });
 
-        // Close menu if clicked outside
         document.addEventListener('click', (e) => {
             if (!supportTrigger.contains(e.target) && !supportMenu.contains(e.target)) {
                 supportMenu.style.display = 'none';
@@ -30,6 +29,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     let userAccountId = '';
 
     let isBalanceHidden = localStorage.getItem('brytpay_balance_hidden') === 'true';
+
+    // 🚀 NEW: Coming Soon Toast Logic
+    const sendMoneyBtn = document.getElementById('btn-send-money');
+    if (sendMoneyBtn) {
+        sendMoneyBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const toast = document.getElementById('coming-soon-toast');
+            if(toast) {
+                toast.style.display = 'flex';
+                setTimeout(() => toast.style.display = 'none', 2500);
+            }
+        });
+    }
 
     async function checkUnreadNotifications() {
         const notifDot = document.getElementById('notif-dot');
@@ -124,11 +136,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (hidden) {
             balanceAmount.textContent = '••••••••';
             if (balanceCurrency) balanceCurrency.style.display = 'none';
-            if (toggleBtn) toggleBtn.textContent = 'Show';
+            if (toggleBtn) toggleBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
         } else {
             balanceAmount.textContent = formatCurrency(currentBalance);
             if (balanceCurrency) balanceCurrency.style.display = 'inline';
-            if (toggleBtn) toggleBtn.textContent = 'Hide';
+            if (toggleBtn) toggleBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
         }
     }
 
@@ -224,16 +236,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         else if (raw.includes('nabteb')) logoFile = 'nabteb-logo.png';
 
         if (logoFile) {
-            return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 50%; background: #ffffff; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; padding: 4px;"><img src="../assets/img/${logoFile}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" onerror="this.parentElement.innerHTML='💼'"></div>`;
+            return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: #ffffff; border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; padding: 4px;"><img src="../assets/img/${logoFile}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" onerror="this.parentElement.innerHTML='💼'"></div>`;
         }
 
         if (isCreditTx(tx)) {
-            return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 50%; background: #ecfdf5; color: #10b981; border: 1px solid #bbf7d0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </div>`;
         }
 
-        return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: var(--bg-color); color: #64748b; border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
         </div>`;
     };
@@ -264,34 +276,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const st = (tx.status || '').toLowerCase();
             let displayStatus = 'Successful';
-            let statusStyle = 'background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;';
+            let statusStyle = 'background: rgba(16, 185, 129, 0.1); color: #16a34a; border: 1px solid rgba(16, 185, 129, 0.2);';
 
             if (st === 'pending' || st === 'processing') {
                 displayStatus = 'Pending';
-                statusStyle = 'background: #fef9c3; color: #a16207; border: 1px solid #fef08a;';
+                statusStyle = 'background: rgba(234, 179, 8, 0.1); color: #ca8a04; border: 1px solid rgba(234, 179, 8, 0.2);';
             } else if (st === 'failed' || st === 'reversed' || st === 'cancelled') {
                 displayStatus = 'Failed';
-                statusStyle = 'background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;';
+                statusStyle = 'background: rgba(239, 68, 68, 0.1); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.2);';
             } else if (st === 'refunded') {
                 displayStatus = 'Refunded'; 
-                statusStyle = 'background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;'; 
+                statusStyle = 'background: rgba(16, 185, 129, 0.1); color: #16a34a; border: 1px solid rgba(16, 185, 129, 0.2);'; 
             }
 
             const sign = isCredit ? '+' : '-';
-            const amountColor = isCredit ? '#10b981' : '#0B1220';
+            const amountColor = isCredit ? '#10b981' : 'var(--text-main)';
 
             container.innerHTML += `
-                <div class="tx-row" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid #f1f5f9; gap: 10px; cursor: pointer;" onclick="window.location.href='/dashboard/receipt/index.html?id=${tx.id}'">
+                <div class="tx-row" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--border-light); gap: 10px; cursor: pointer;" onclick="window.location.href='/dashboard/receipt/index.html?id=${tx.id}'">
                     <div class="tx-left" style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
                         ${brandLogo}
                         <div style="min-width: 0; flex: 1;">
-                            <div style="font-weight: 700; font-size: 0.82rem; color: #0B1220; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">${serviceName}</div>
-                            <div style="font-size: 0.68rem; color: #64748b; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px;">${date} · Ref: ${formatRef(tx.reference || tx.external_reference)}</div>
+                            <div style="font-weight: 800; font-size: 0.82rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">${serviceName}</div>
+                            <div style="font-size: 0.65rem; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px;">${date} · Ref: ${formatRef(tx.reference || tx.external_reference)}</div>
                         </div>
                     </div>
                     <div class="tx-right" style="text-align: right; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
-                        <div style="font-weight: 800; font-size: 0.9rem; color: ${amountColor}; letter-spacing: -0.3px; white-space: nowrap;">${sign}₦${formatCurrency(parseFloat(tx.amount))}</div>
-                        <span style="display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 12px; text-transform: capitalize; ${statusStyle}">${displayStatus}</span>
+                        <div style="font-weight: 800; font-size: 0.88rem; color: ${amountColor}; letter-spacing: -0.3px; white-space: nowrap;">${sign}₦${formatCurrency(parseFloat(tx.amount))}</div>
+                        <span style="display: inline-block; font-size: 0.62rem; font-weight: 800; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.4px; ${statusStyle}">${displayStatus}</span>
                     </div>
                 </div>
             `;
@@ -312,28 +324,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const btnAllow = document.getElementById('btn-allow-push');
         const btnDeny = document.getElementById('btn-deny-push');
 
-        if (!consentUI) {
-            console.warn("Push Modal: The HTML element #push-consent-ui is missing.");
-            return;
-        }
-
-        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-            console.warn("Push Modal: Browser blocked Push API.");
-            return;
-        }
+        if (!consentUI) return;
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
 
         const dismissedUntil = localStorage.getItem('bryt_push_dismissed_until');
-        if (dismissedUntil && Date.now() < parseInt(dismissedUntil)) {
-            console.log("Push Modal: Hidden because user clicked 'Maybe Later' recently.");
-            return;
-        }
+        if (dismissedUntil && Date.now() < parseInt(dismissedUntil)) return;
+        if (Notification.permission === 'granted' || Notification.permission === 'denied') return;
 
-        if (Notification.permission === 'granted' || Notification.permission === 'denied') {
-            console.log("Push Modal: Hidden because permissions are already set.");
-            return;
-        }
-
-        console.log("Push Modal: Triggering modal display in 1.5s...");
         setTimeout(() => {
             consentUI.classList.add('active');
         }, 1500);
@@ -349,7 +346,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             try {
                 const permission = await Notification.requestPermission();
-                
                 if (permission !== 'granted') {
                     consentUI.classList.remove('active');
                     return; 
@@ -372,28 +368,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                     applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
                 });
 
-                const { error: insertError } = await window.db.from('push_subscriptions').insert({
+                await window.db.from('push_subscriptions').insert({
                     user_id: user.id,
                     subscription: subscription
                 });
 
-                if (insertError && !insertError.message.includes('duplicate key')) {
-                    throw new Error(insertError.message);
-                }
-
                 btnAllow.textContent = "Connected! ✓";
                 btnAllow.style.background = "#10b981";
                 
-                setTimeout(() => {
-                    consentUI.classList.remove('active');
-                }, 1000);
+                setTimeout(() => { consentUI.classList.remove('active'); }, 1000);
 
-            } catch (err) {
-                console.error("Push setup failed:", err);
-                btnAllow.textContent = "Failed. Try again.";
-                btnAllow.disabled = false;
-                alert(`Setup failed: ${err.message}`);
-            }
+            } catch (err) {}
         });
     }
 

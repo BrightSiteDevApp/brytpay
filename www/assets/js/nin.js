@@ -5,16 +5,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const user = session.user;
     let currentBalance = 0;
 
-    // 🚀 THE FIX: Smart Back Button Logic
+    // 🚀 SMART ROUTING
     const backBtn = document.getElementById('smart-back-btn');
     if (backBtn) {
-        const referrer = document.referrer;
+        const referrer = document.referrer || '';
         if (referrer.includes('/dashboard/services/')) {
-            backBtn.href = '/dashboard/services/';
-            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Services`;
+            backBtn.href = '/dashboard/services/index.html';
         } else {
-            backBtn.href = '/dashboard/';
-            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Dashboard`;
+            backBtn.href = '/dashboard/index.html';
         }
     }
     
@@ -60,8 +58,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const userBalanceEl = document.getElementById('user-balance');
     const serviceModal = document.getElementById('service-modal');
+    const modalCloseTrigger = document.getElementById('modal-close-trigger');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
     const labelIdentifier = document.getElementById('label-identifier');
     const inputIdentifier = document.getElementById('nin-identifier');
+    const successOverlay = document.getElementById('success-overlay');
     
     window.goToStep = function(stepNum) {
         document.querySelectorAll('.modal-step').forEach(el => el.classList.remove('active'));
@@ -107,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     tabNin.addEventListener('click', () => {
         tabNin.classList.add('active'); tabPhone.classList.remove('active');
         activeType = 'NIN_NUMBER';
-        labelIdentifier.textContent = 'National Identity Number (NIN) *';
+        labelIdentifier.textContent = 'National Identity Number (NIN)';
         inputIdentifier.placeholder = 'Enter the 11-digit NIN';
         updateCardPrices();
     });
@@ -115,9 +116,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     tabPhone.addEventListener('click', () => {
         tabPhone.classList.add('active'); tabNin.classList.remove('active');
         activeType = 'PHONE_NUMBER';
-        labelIdentifier.textContent = 'Linked Phone Number *';
+        labelIdentifier.textContent = 'Linked Phone Number';
         inputIdentifier.placeholder = 'Enter the registered phone number';
         updateCardPrices();
+    });
+
+    // 🚀 Slide-Down Fix for Modal
+    function closeModal() {
+        serviceModal.classList.remove('active');
+        setTimeout(() => {
+            serviceModal.style.display = 'none';
+        }, 400); 
+    }
+
+    if (modalCloseTrigger) modalCloseTrigger.addEventListener('click', closeModal);
+    if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
+    serviceModal.addEventListener('click', (e) => {
+        if (e.target === serviceModal) closeModal();
     });
 
     document.querySelectorAll('.service-card').forEach(card => {
@@ -132,12 +147,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             document.getElementById('nin-form').reset();
             goToStep(1);
+            
             serviceModal.style.display = 'flex';
+            setTimeout(() => serviceModal.classList.add('active'), 10);
         });
-    });
-
-    document.querySelectorAll('.btn-cancel-modal').forEach(btn => {
-        btn.addEventListener('click', () => serviceModal.style.display = 'none');
     });
 
     document.getElementById('nin-form').addEventListener('submit', async (e) => {
@@ -154,7 +167,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const btnSubmit = document.getElementById('modal-submit');
-        
         btnSubmit.disabled = true; 
         btnSubmit.textContent = 'Processing...';
 
@@ -171,16 +183,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error) throw error;
 
-            serviceModal.style.display = 'none';
-            document.getElementById('service-selection-view').style.display = 'none';
-            document.querySelector('.info-notice-box').style.display = 'none';
-            
-            document.getElementById('success-ref').textContent = data.order_reference;
-            document.getElementById('success-service').textContent = selectedService;
-            document.getElementById('success-candidate').textContent = fullName;
-            document.getElementById('nin-success-card').style.display = 'block';
+            closeModal();
 
-            await loadBalance(); 
+            // Trigger Fullscreen Checkmark Animation
+            successOverlay.classList.add('active');
+            
+            // Reload page smoothly after 1.5s
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
 
         } catch (err) {
             showToast(`Order could not be completed: ${err.message || 'Server error'}`, 'error');

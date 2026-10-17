@@ -7,16 +7,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     let selectedType = 'sme-data';
     let selectedLogo = 'mtn-logo.png';
 
-    // 🚀 THE FIX: Smart Back Button Logic
+    // 🚀 SMART ROUTING: Explicitly define back targets based on where they came from
     const backBtn = document.getElementById('smart-back-btn');
     if (backBtn) {
-        const referrer = document.referrer;
+        const referrer = document.referrer || '';
         if (referrer.includes('/dashboard/services/')) {
-            backBtn.href = '/dashboard/services/';
-            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Services`;
+            backBtn.href = '/dashboard/services/index.html';
         } else {
-            backBtn.href = '/dashboard/';
-            backBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Dashboard`;
+            backBtn.href = '/dashboard/index.html';
         }
     }
 
@@ -110,6 +108,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modalCancel = document.getElementById('modal-cancel');
     const modalConfirm = document.getElementById('modal-confirm');
     const modalLogo = document.getElementById('modal-network-logo');
+    
+    const successOverlay = document.getElementById('success-overlay');
 
     const networkPrefixes = {
         '0803': 'mtn', '0806': 'mtn', '0703': 'mtn', '0706': 'mtn', '0813': 'mtn', '0816': 'mtn', '0810': 'mtn', '0814': 'mtn', '0903': 'mtn', '0906': 'mtn', '0913': 'mtn', '0916': 'mtn', '0704': 'mtn', '0702': 'mtn',
@@ -153,9 +153,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (hiddenPlanInput.value) {
             const [, priceStr] = hiddenPlanInput.value.split('|');
             const amt = parseFloat(priceStr);
-            submitBtn.innerHTML = `Proceed to Pay ₦${amt.toLocaleString('en-NG')} <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+            submitBtn.innerHTML = `Pay ₦${amt.toLocaleString('en-NG')} <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
         } else {
-            submitBtn.innerHTML = `Proceed <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+            submitBtn.innerHTML = `Proceed <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
         }
     }
 
@@ -255,9 +255,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (error) throw new Error(error.message);
             if (resData && resData.success === false) throw new Error(resData.message);
 
-            showToast(resData.message || `Success! Data sent to ${phone}.`, "success");
+            // 🚀 SUCCESS! Trigger Fullscreen Checkmark Animation
             confirmModal.style.display = 'none';
-            setTimeout(() => window.location.reload(), 2000);
+            successOverlay.classList.add('active');
+            
+            // Exactly 1.5s later, reload the page to clear the form without leaving
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
 
         } catch (err) {
             showToast(err.message, "error");
