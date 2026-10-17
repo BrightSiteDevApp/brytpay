@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await fetchTransaction();
 
-    downloadPdfBtn.addEventListener('click', () => {
+   downloadPdfBtn.addEventListener('click', () => {
         downloadPdfBtn.disabled = true;
         const originalText = downloadPdfBtn.innerHTML;
         downloadPdfBtn.textContent = 'Saving PDF...';
@@ -260,11 +260,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
-        html2pdf().set(opt).from(element).save().then(() => {
-            if (copyBtn) copyBtn.style.display = 'flex';
-            downloadPdfBtn.disabled = false;
-            downloadPdfBtn.innerHTML = originalText;
-        });
+        if (window.Capacitor) {
+            // NATIVE ANDROID HANDLING
+            html2pdf().set(opt).from(element).toPdf().output('datauristring').then(async (pdfBase64) => {
+                try {
+                    const base64Data = pdfBase64.split(',')[1];
+                    const savedFile = await window.Capacitor.Plugins.Filesystem.writeFile({
+                        path: `BRYT_Receipt_${txId.substring(0,8)}.pdf`,
+                        data: base64Data,
+                        directory: 'CACHE'
+                    });
+                    await window.Capacitor.Plugins.Share.share({
+                        title: 'BRYT Pay Receipt',
+                        url: savedFile.uri
+                    });
+                } catch (err) {
+                    alert('Failed to save PDF natively.');
+                } finally {
+                    if (copyBtn) copyBtn.style.display = 'flex';
+                    downloadPdfBtn.disabled = false;
+                    downloadPdfBtn.innerHTML = originalText;
+                }
+            });
+        } else {
+            // STANDARD WEB HANDLING
+            html2pdf().set(opt).from(element).save().then(() => {
+                if (copyBtn) copyBtn.style.display = 'flex';
+                downloadPdfBtn.disabled = false;
+                downloadPdfBtn.innerHTML = originalText;
+            });
+        }
     });
 
     downloadImgBtn.addEventListener('click', async () => {
@@ -279,10 +304,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         try {
             const canvas = await html2canvas(element, { scale: 3, useCORS: true });
-            const link = document.createElement('a');
-            link.download = `BRYT_Receipt_${txId.substring(0,8)}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+            
+            if (window.Capacitor) {
+                // NATIVE ANDROID HANDLING
+                const base64Data = canvas.toDataURL('image/png').split(',')[1];
+                const savedFile = await window.Capacitor.Plugins.Filesystem.writeFile({
+                    path: `BRYT_Receipt_${txId.substring(0,8)}.png`,
+                    data: base64Data,
+                    directory: 'CACHE'
+                });
+                await window.Capacitor.Plugins.Share.share({
+                    title: 'BRYT Pay Receipt',
+                    url: savedFile.uri
+                });
+            } else {
+                // STANDARD WEB HANDLING
+                const link = document.createElement('a');
+                link.download = `BRYT_Receipt_${txId.substring(0,8)}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
         } catch (err) {
             alert('Failed to generate image. Please try PDF.');
         } finally {

@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const amountColor = isCredit ? '#10b981' : '#0B1220';
 
             container.innerHTML += `
-                <div class="tx-row" onclick="window.location.href='/dashboard/receipt/?id=${tx.id}'">
+                <div class="tx-row" onclick="window.location.href='/dashboard/receipt/index.html?id=${tx.id}'">
                     <div class="tx-left">
                         ${brandLogo}
                         <div class="tx-info">
