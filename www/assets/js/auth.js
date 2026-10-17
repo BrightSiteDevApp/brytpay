@@ -108,8 +108,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (pwd !== confirmPwd) return showError('Passwords do not match. Please try again.');
 
             btn.disabled = true;
-            btn.textContent = 'Creating account...';
+            btn.textContent = 'Checking...';
             if (errorEl) errorEl.style.display = 'none';
+
+            // 🚀 SMART CHECK: Verify if email exists BEFORE trying to sign up
+            try {
+                const { data: emailExists } = await window.db.rpc('check_email_exists', { lookup_email: regEmail });
+                if (emailExists) {
+                    showError('This Email Address is already registered. Please sign in instead.');
+                    btn.disabled = false;
+                    btn.textContent = 'Create Account';
+                    return;
+                }
+            } catch (err) {
+                console.warn("RPC Check skipped.", err);
+            }
+
+            btn.textContent = 'Creating account...';
 
             const { data, error } = await window.db.auth.signUp({
                 email: regEmail,
@@ -118,7 +133,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             if (error) {
-                showError(error.message);
+                let customErrorMsg = error.message;
+                if (customErrorMsg.includes('Database error saving new user') || customErrorMsg.includes('duplicate key')) {
+                    customErrorMsg = 'This Phone Number is already registered. Please sign in instead.';
+                }
+                
+                showError(customErrorMsg);
                 btn.disabled = false;
                 btn.textContent = 'Create Account';
                 return;
@@ -128,8 +148,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             signupHeader.innerHTML = `<h1>Check your email</h1><p>We sent a 6-digit code to <strong id="safe-reg-email" style="color: var(--text-main);"></strong></p>`;
             document.getElementById('safe-reg-email').textContent = regEmail; 
 
-            // Save the email securely to localStorage to persist across tab reloads
             localStorage.setItem('bryt_pending_email', regEmail);
+            localStorage.setItem('bryt_pending_name', regName);
+            localStorage.setItem('bryt_pending_phone', regPhone);
 
             signupForm.style.display = 'none';
             document.getElementById('signup-otp-form').style.display = 'block';
@@ -140,7 +161,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const btn = document.getElementById('verify-signup-btn');
             const token = document.getElementById('signup-otp-code').value.trim();
             
-            // Retrieve the email securely in case the variables cleared
             const verifyEmail = regEmail || localStorage.getItem('bryt_pending_email');
             
             if (!verifyEmail) {
@@ -160,29 +180,48 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            // 🚀 THE FIX: Pull the metadata directly from the secure Supabase session!
             const user = data.session.user;
-            const secureFullName = user.user_metadata?.full_name || regName;
-            const securePhone = user.user_metadata?.phone_number || regPhone;
+            const secureFullName = regName || localStorage.getItem('bryt_pending_name') || user.user_metadata?.full_name || '';
+            const securePhone = regPhone || localStorage.getItem('bryt_pending_phone') || user.user_metadata?.phone_number || '';
             
             try {
-                const { error: profileError } = await window.db.from('profiles').upsert({ 
-                    id: user.id, 
-                    full_name: secureFullName, 
-                    phone_number: securePhone,
-                    email: user.email 
-                });
+                let { data: updatedRows, error: profileError } = await window.db
+                    .from('profiles')
+                    .update({ 
+                        full_name: secureFullName, 
+                        phone_number: securePhone,
+                        email: user.email 
+                    })
+                    .eq('id', user.id)
+                    .select();
 
-                if (profileError) console.error("Failed to save profile:", profileError);
+                if (!profileError && (!updatedRows || updatedRows.length === 0)) {
+                    const upsertRes = await window.db
+                        .from('profiles')
+                        .upsert({ 
+                            id: user.id, 
+                            full_name: secureFullName, 
+                            phone_number: securePhone,
+                            email: user.email 
+                        })
+                        .select();
+                    updatedRows = upsertRes.data;
+                    profileError = upsertRes.error;
+                }
+
+                if (profileError || !updatedRows || updatedRows.length === 0 || !updatedRows[0].phone_number) {
+                    console.error("Profile Setup Error:", profileError);
+                }
+
                 await window.db.from('wallets').upsert({ user_id: user.id, balance: 0.00 });
-
                 window.db.functions.invoke('send-welcome-email', { body: {} }).catch(err => console.error(err));
                 
-                // Clear the temp email
                 localStorage.removeItem('bryt_pending_email');
+                localStorage.removeItem('bryt_pending_name');
+                localStorage.removeItem('bryt_pending_phone');
 
             } catch (err) {
-                console.error("Database error during profile creation:", err);
+                console.error("Unexpected Profile Error: ", err);
             }
 
             handleSmartRedirect();
@@ -286,6 +325,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             const btn = document.getElementById('send-otp-btn');
 
             btn.disabled = true;
+            btn.textContent = 'Checking...';
+
+            // 🚀 SMART CHECK: Verify if email exists using our custom database function
+            try {
+                const { data: emailExists } = await window.db.rpc('check_email_exists', { lookup_email: recoveryEmail });
+                if (!emailExists) {
+                    showError('This email address is not found in our database.');
+                    btn.disabled = false;
+                    btn.textContent = 'Send 6-Digit Code';
+                    return;
+                }
+            } catch (err) {
+                console.warn("RPC Check skipped.", err);
+            }
+
             btn.textContent = 'Sending...';
 
             const { error } = await window.db.auth.resetPasswordForEmail(recoveryEmail);

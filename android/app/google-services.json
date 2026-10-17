@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "452504999597",
+    "project_id": "bryt-pay",
+    "storage_bucket": "bryt-pay.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:452504999597:android:86213f4cfbc87a01255824",
+        "android_client_info": {
+          "package_name": "com.brytdigitalservices.brytpay"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwJhJ8mR3BWTOfYamSQCOr04N9bGxMwmo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
