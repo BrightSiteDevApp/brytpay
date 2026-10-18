@@ -27,10 +27,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const user = session.user;
     let currentBalance = 0;
     let userAccountId = '';
-
     let isBalanceHidden = localStorage.getItem('brytpay_balance_hidden') === 'true';
 
-    // 🚀 NEW: Coming Soon Toast Logic
+    // Coming Soon Toast Logic
     const sendMoneyBtn = document.getElementById('btn-send-money');
     if (sendMoneyBtn) {
         sendMoneyBtn.addEventListener('click', (e) => {
@@ -57,22 +56,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (error || !data) return;
 
             const localRead = JSON.parse(localStorage.getItem('bryt_read_notifs') || '[]');
-            
             const hasUnread = data.some(notif => {
-                if (notif.user_id === null) {
-                    return !localRead.includes(notif.id);
-                }
+                if (notif.user_id === null) return !localRead.includes(notif.id);
                 return true; 
             });
 
-            if (hasUnread) {
-                notifDot.classList.add('active');
-            } else {
-                notifDot.classList.remove('active');
-            }
-        } catch (err) {
-            console.error("Error checking notifications:", err);
-        }
+            if (hasUnread) notifDot.classList.add('active');
+            else notifDot.classList.remove('active');
+        } catch (err) {}
     }
 
     const hour = new Date().getHours();
@@ -83,8 +74,68 @@ document.addEventListener('DOMContentLoaded', async () => {
         else greetingTime.textContent = 'Good evening,';
     }
 
+    // ==========================================
+    // 🚀 MANDATORY PIN SETUP LOGIC
+    // ==========================================
+    function initPinSetup() {
+        const overlay = document.getElementById('pin-setup-overlay');
+        const dots = document.querySelectorAll('.pin-dot');
+        const keypadBtns = document.querySelectorAll('.keypad-btn');
+        const saveBtn = document.getElementById('btn-save-pin');
+        let currentPin = '';
+
+        if (!overlay) return;
+        overlay.classList.add('active');
+
+        function updateDots() {
+            dots.forEach((dot, idx) => {
+                if (idx < currentPin.length) dot.classList.add('filled');
+                else dot.classList.remove('filled');
+            });
+            saveBtn.disabled = currentPin.length !== 4;
+        }
+
+        keypadBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const val = btn.getAttribute('data-val');
+                if (val === 'back') {
+                    currentPin = currentPin.slice(0, -1);
+                } else {
+                    if (currentPin.length < 4) currentPin += val;
+                }
+                updateDots();
+            });
+        });
+
+        saveBtn.addEventListener('click', async () => {
+            if (currentPin.length !== 4) return;
+            
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = 'Saving...';
+            
+            // Save PIN to Supabase Profiles Table
+            const { error } = await window.db.from('profiles').update({ transaction_pin: currentPin }).eq('id', user.id);
+            
+            if (error) {
+                alert('Connection error. Please try again.');
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = 'Save PIN';
+            } else {
+                saveBtn.style.background = '#10b981';
+                saveBtn.innerHTML = 'PIN Saved! ✓';
+                
+                // Hide overlay after success
+                setTimeout(() => {
+                    overlay.classList.remove('active');
+                }, 1000);
+            }
+        });
+    }
+
+    // 🚀 LOAD PROFILE & TRIGGER PIN CHECK
     async function loadProfile() {
-        const { data } = await window.db.from('profiles').select('full_name, account_id').eq('id', user.id).single();
+        // Now fetching transaction_pin from the database
+        const { data } = await window.db.from('profiles').select('full_name, account_id, transaction_pin').eq('id', user.id).single();
         const greetingEl = document.getElementById('user-greeting');
         const displayIdEl = document.getElementById('display-account-id');
         
@@ -96,6 +147,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (displayIdEl && data.account_id) {
                 userAccountId = data.account_id;
                 displayIdEl.textContent = userAccountId;
+            }
+
+            // SMART CHECK: If they don't have a PIN saved in the DB, lock the screen!
+            if (!data.transaction_pin) {
+                initPinSetup();
             }
         }
     }
@@ -156,9 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const s = (tx.service_type || '').toLowerCase();
         const p = (tx.provider || tx.recipient || '').toLowerCase();
         const t = (tx.type || '').toLowerCase();
-        return t === 'credit' || 
-               s.includes('fund') || s.includes('deposit') || s.includes('topup') ||
-               p.includes('paystack') || p.includes('flutterwave') || p.includes('topup');
+        return t === 'credit' || s.includes('fund') || s.includes('deposit') || s.includes('topup') || p.includes('paystack') || p.includes('flutterwave') || p.includes('topup');
     };
 
     const formatRef = (ref) => {
@@ -169,17 +223,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const getCleanTitle = (tx) => {
         if (isCreditTx(tx)) return 'WALLET FUNDING';
-
         const txType = (tx.type || '').toLowerCase();
         const srvType = (tx.service_type || '').toLowerCase();
         const provider = (tx.provider || tx.network_or_operator || '').toUpperCase();
         const notes = (tx.admin_notes || '').toLowerCase();
         const ref = (tx.reference || tx.external_reference || '').toUpperCase();
 
-        if (srvType.includes('certificate')) {
-            return srvType.toUpperCase();
-        }
-
+        if (srvType.includes('certificate')) return srvType.toUpperCase();
         if (srvType.includes('education') || srvType.includes('waec') || srvType.includes('neco') || srvType.includes('nabteb') || txType.includes('education')) {
             let examName = provider;
             if (!examName || examName === 'SELF' || examName.includes('VTPASS') || examName.includes('CHEAPDATAHUB')) {
@@ -191,12 +241,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return `${examName} PIN PURCHASE`;
         }
 
-        if (ref.startsWith('JMB_') || txType === 'jamb_order' || srvType.includes('jamb') || srvType.includes('admission')) {
-            return tx.service_type ? tx.service_type.toUpperCase() : 'JAMB SERVICE';
-        }
-        if (ref.startsWith('NIN_') || txType === 'nin_order' || srvType.includes('nin') || srvType.includes('slip')) {
-            return tx.service_type ? tx.service_type.toUpperCase() : 'NIN SERVICE';
-        }
+        if (ref.startsWith('JMB_') || txType === 'jamb_order' || srvType.includes('jamb') || srvType.includes('admission')) return tx.service_type ? tx.service_type.toUpperCase() : 'JAMB SERVICE';
+        if (ref.startsWith('NIN_') || txType === 'nin_order' || srvType.includes('nin') || srvType.includes('slip')) return tx.service_type ? tx.service_type.toUpperCase() : 'NIN SERVICE';
 
         if (srvType.includes('airtime') || txType.includes('airtime')) {
             let net = srvType.replace(/airtime/gi, '').trim().toUpperCase();
@@ -218,7 +264,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const getTransactionIcon = (tx) => {
         const raw = `${tx.type || ''} ${tx.service_type || ''} ${tx.recipient || ''} ${tx.provider || ''} ${tx.admin_notes || ''} ${tx.reference || ''}`.toLowerCase();
-
         let logoFile = null;
         if (raw.includes('cbt')) logoFile = 'brytcbtsim-logo.png';
         else if (raw.includes('dgm')) logoFile = 'brytdgm-logo.png';
@@ -235,31 +280,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         else if (raw.includes('neco')) logoFile = 'neco-logo.png';
         else if (raw.includes('nabteb')) logoFile = 'nabteb-logo.png';
 
-        if (logoFile) {
-            return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: #ffffff; border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; padding: 4px;"><img src="../assets/img/${logoFile}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" onerror="this.parentElement.innerHTML='💼'"></div>`;
-        }
-
-        if (isCreditTx(tx)) {
-            return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </div>`;
-        }
-
-        return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: var(--bg-color); color: #64748b; border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-        </div>`;
+        if (logoFile) return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: #ffffff; border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; padding: 4px;"><img src="../assets/img/${logoFile}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" onerror="this.parentElement.innerHTML='💼'"></div>`;
+        if (isCreditTx(tx)) return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>`;
+        
+        return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: var(--bg-color); color: #64748b; border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>`;
     };
 
     async function loadTransactions() {
         const container = document.getElementById('transactions-container');
         if (!container) return; 
 
-        const { data, error } = await window.db
-            .from('transactions')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(5); 
+        const { data, error } = await window.db.from('transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(5); 
 
         if (error || !data || data.length === 0) {
             container.innerHTML = '<div class="empty-state" style="padding: 2rem; text-align: center; color: #94a3b8; font-size: 0.85rem;">No recent activity found.</div>';
@@ -331,9 +362,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (dismissedUntil && Date.now() < parseInt(dismissedUntil)) return;
         if (Notification.permission === 'granted' || Notification.permission === 'denied') return;
 
-        setTimeout(() => {
-            consentUI.classList.add('active');
-        }, 1500);
+        setTimeout(() => { consentUI.classList.add('active'); }, 1500);
 
         btnDeny.addEventListener('click', () => {
             consentUI.classList.remove('active');
@@ -343,16 +372,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnAllow.addEventListener('click', async () => {
             btnAllow.textContent = "Connecting...";
             btnAllow.disabled = true;
-
             try {
                 const permission = await Notification.requestPermission();
-                if (permission !== 'granted') {
-                    consentUI.classList.remove('active');
-                    return; 
-                }
-
+                if (permission !== 'granted') { consentUI.classList.remove('active'); return; }
                 const registration = await navigator.serviceWorker.ready;
-                
                 const VAPID_PUBLIC_KEY = "BLfbGDEa2tl28dIanGQ5KffDXg9rEuSdyI49VurFSGZyef8h1Gg3B-uf6-B6BuBZfYz1bCt0VPiybjqodHC5gKk";
                 const urlBase64ToUint8Array = (base64String) => {
                     const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -362,22 +385,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     for (let i = 0; i < rawData.length; ++i) { outputArray[i] = rawData.charCodeAt(i); }
                     return outputArray;
                 };
-
-                const subscription = await registration.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-                });
-
-                await window.db.from('push_subscriptions').insert({
-                    user_id: user.id,
-                    subscription: subscription
-                });
-
+                const subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
+                await window.db.from('push_subscriptions').insert({ user_id: user.id, subscription: subscription });
                 btnAllow.textContent = "Connected! ✓";
                 btnAllow.style.background = "#10b981";
-                
                 setTimeout(() => { consentUI.classList.remove('active'); }, 1000);
-
             } catch (err) {}
         });
     }

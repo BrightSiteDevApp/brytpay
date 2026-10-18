@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Security Settings — BRYT Pay</title>
+    
+    <script>
+        if (localStorage.getItem('bryt_theme') === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+        }
+    </script>
+
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        :root {
+            --bryt-primary: #1D5ED0;
+            --bryt-navy: #0B1220;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-main: #0B1220;
+            --border-light: #f1f5f9;
+        }
+
+        html.dark-theme {
+            --bryt-navy: #ffffff;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --border-light: #334155;
+        }
+
+        * { box-sizing: border-box; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 80px !important; font-family: system-ui, -apple-system, sans-serif; margin: 0; overflow-x: hidden; transition: 0.3s; }
+
+        .app-topbar { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: var(--card-bg); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-light); }
+        .smart-back { color: var(--text-main); display: flex; align-items: center; text-decoration: none; padding: 4px; margin-left: -4px; }
+        .page-title { font-size: 1.15rem; font-weight: 800; margin: 0; }
+
+        .main-content { padding: 16px 20px; max-width: 480px; margin: 0 auto; width: 100%; }
+
+        .tabs { display: flex; background: var(--border-light); border-radius: 10px; padding: 4px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; text-align: center; padding: 10px; font-size: 0.8rem; font-weight: 800; color: #64748b; background: transparent; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .tab-btn.active { background: var(--card-bg); color: var(--bryt-primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+        .sec-card { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 16px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); display: none; animation: fadeIn 0.3s ease; }
+        .sec-card.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-weight: 800; font-size: 0.7rem; color: #64748b; margin-bottom: 6px; text-transform: uppercase; }
+        
+        /* Slimmer Input Fields */
+        .form-input { width: 100%; padding: 12px; border: 1px solid var(--border-light); border-radius: 10px; font-size: 0.9rem; outline: none; background: var(--bg-color); color: var(--text-main); font-family: inherit; font-weight: 700; transition: 0.2s; letter-spacing: 1px; }
+        .form-input:focus { border-color: var(--bryt-primary); background: var(--card-bg); }
+        
+        .btn-primary { background: var(--bryt-primary); color: #ffffff; width: 100%; padding: 14px; border-radius: 10px; font-weight: 800; font-size: 0.95rem; border: none; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
+        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn-text { background: transparent; color: var(--bryt-primary); width: 100%; padding: 10px; border: none; font-weight: 800; font-size: 0.8rem; margin-top: 8px; cursor: pointer; }
+
+        .status-banner { display: none; padding: 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; margin-bottom: 16px; text-align: center; }
+        .status-success { background: rgba(34, 197, 94, 0.1); color: #10b981; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .status-error { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        /* 🚀 FIXED FLOATING TOAST ALERTS */
+        .bryt-toast {
+            position: fixed; top: 20px; left: 16px; right: 16px; margin: 0 auto;
+            background: var(--card-bg); color: var(--text-main); padding: 14px 16px;
+            border-radius: 12px; font-size: 0.85rem; font-weight: 700; z-index: 9999999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-left: 4px solid var(--bryt-primary);
+            display: flex; align-items: flex-start; gap: 10px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0; pointer-events: none; max-width: 400px; line-height: 1.4;
+            transform: translateY(-100px); /* Hides it completely off top screen */
+        }
+        .bryt-toast.show { transform: translateY(0); opacity: 1; }
+        .bryt-toast.error { border-left-color: #ef4444; }
+        .bryt-toast.success { border-left-color: #10b981; }
+        #toast-icon { flex-shrink: 0; margin-top: 2px; }
+
+        .otp-modal-overlay { position: fixed; inset: 0; background: rgba(11, 18, 32, 0.9); backdrop-filter: blur(4px); z-index: 99999; display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
+        .otp-modal-overlay.active { display: flex; opacity: 1; }
+        .otp-card { background: var(--card-bg); width: 90%; max-width: 340px; border-radius: 16px; padding: 20px; text-align: center; transform: translateY(20px); transition: 0.3s; }
+        .otp-modal-overlay.active .otp-card { transform: translateY(0); }
+
+        .mobile-nav { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: var(--card-bg) !important; z-index: 9999 !important; border-top: 1px solid var(--border-light) !important; display: flex !important; justify-content: space-around !important; padding: 12px 0 10px 0 !important; transition: 0.3s; }
+        .mobile-nav .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none; }
+        .mobile-nav .nav-item span { font-size: 0.65rem; font-weight: 800; }
+        .mobile-nav .nav-item svg { width: 22px; height: 22px; }
+        .mobile-nav .nav-item.active { color: var(--bryt-primary); }
+    </style>
+</head>
+<body>
+
+    <!-- 🚀 FIXED BRYT TOAST -->
+    <div id="bryt-toast" class="bryt-toast">
+        <span id="toast-icon"></span>
+        <span id="toast-message"></span>
+    </div>
+
+    <header class="app-topbar">
+        <a href="/dashboard/account/index.html" class="smart-back">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </a>
+        <h1 class="page-title">Security Settings</h1>
+    </header>
+
+    <main class="main-content">
+        <div class="tabs">
+            <button class="tab-btn active" id="tab-pin">Change PIN</button>
+            <button class="tab-btn" id="tab-pass">Change Password</button>
+        </div>
+
+        <div class="sec-card active" id="sec-pin">
+            <div id="pin-status" class="status-banner"></div>
+            <div class="form-group">
+                <label class="form-label">Current PIN</label>
+                <input type="password" id="old-pin" class="form-input" placeholder="••••" maxlength="4" inputmode="numeric" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">New PIN</label>
+                <input type="password" id="new-pin" class="form-input" placeholder="••••" maxlength="4" inputmode="numeric" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Confirm New PIN</label>
+                <input type="password" id="confirm-pin" class="form-input" placeholder="••••" maxlength="4" inputmode="numeric" required>
+            </div>
+            <button id="btn-update-pin" class="btn-primary">Update Transaction PIN</button>
+            <button id="btn-forgot-pin" class="btn-text">I forgot my PIN</button>
+        </div>
+
+        <div class="sec-card" id="sec-pass">
+            <div id="pass-status" class="status-banner"></div>
+            <div class="form-group">
+                <label class="form-label">Current Password</label>
+                <input type="password" id="old-pass" class="form-input" placeholder="Enter current password" style="letter-spacing: normal;" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" id="new-pass" class="form-input" placeholder="Min 8 chars, 1 uppercase, 1 number" style="letter-spacing: normal;" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Confirm New Password</label>
+                <input type="password" id="confirm-pass" class="form-input" placeholder="Confirm new password" style="letter-spacing: normal;" required>
+            </div>
+            <button id="btn-update-pass" class="btn-primary">Update Password</button>
+            <button id="btn-forgot-pass" class="btn-text">I forgot my Password</button>
+        </div>
+    </main>
+
+    <div class="otp-modal-overlay" id="otp-modal">
+        <div class="otp-card">
+            <div style="background: rgba(29, 94, 208, 0.1); color: var(--bryt-primary); width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h3 id="modal-title" style="margin: 0 0 6px; font-size: 1.1rem; font-weight: 800;">Recovery</h3>
+            <p style="font-size: 0.8rem; color: #64748b; line-height: 1.4; margin-bottom: 20px;" id="otp-desc">Click below to send a secure 6-digit recovery code to your registered email.</p>
+            
+            <div id="otp-step-1">
+                <button id="btn-send-otp" class="btn-primary" style="margin-top: 0;">Send Recovery Code</button>
+            </div>
+            
+            <div id="otp-step-2" style="display: none;">
+                <input type="text" id="otp-code" class="form-input" placeholder="Enter 6-digit code" maxlength="6" inputmode="numeric" style="text-align: center; margin-bottom: 12px; letter-spacing: 4px;">
+                
+                <input type="password" id="reset-new-pin" class="form-input" placeholder="Enter New 4-Digit PIN" maxlength="4" inputmode="numeric" style="text-align: center; margin-bottom: 12px; display: none;">
+                <input type="password" id="reset-new-pass" class="form-input" placeholder="New Password (8+ chars, 1 Cap, 1 Num)" style="text-align: center; margin-bottom: 12px; display: none; letter-spacing: normal;">
+                
+                <button id="btn-verify-otp" class="btn-primary" style="margin-top: 0;">Verify & Reset</button>
+            </div>
+            
+            <button id="btn-close-otp" class="btn-text" style="color: #64748b;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="mobile-nav no-print">
+        <a href="/dashboard/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+        <a href="/dashboard/services/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span>Services</span></a>
+        <a href="/dashboard/fund/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
+        <a href="/dashboard/orders/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>Orders</span></a>
+        <a href="/dashboard/account/index.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../assets/js/supabase-client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await window.db.auth.getSession();
+            if (!session) return window.location.href = '/auth/login.html';
+            const user = session.user;
+
+            let toastTimeout;
+            const showAppToast = (msg, isError = false) => {
+                const toast = document.getElementById('bryt-toast');
+                const icon = document.getElementById('toast-icon');
+                const message = document.getElementById('toast-message');
+                
+                clearTimeout(toastTimeout);
+                
+                toast.className = `bryt-toast ${isError ? 'error' : 'success'} show`;
+                icon.innerHTML = isError 
+                    ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
+                    : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+                message.textContent = msg;
+
+                toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
+            };
+
+            const validatePassword = (pass) => {
+                if (pass.length < 8) return "Password must be at least 8 characters.";
+                if (!/[A-Z]/.test(pass)) return "Password must contain at least 1 uppercase letter.";
+                if (!/[0-9]/.test(pass)) return "Password must contain at least 1 number.";
+                return null;
+            };
+
+            const tabPin = document.getElementById('tab-pin');
+            const tabPass = document.getElementById('tab-pass');
+            const secPin = document.getElementById('sec-pin');
+            const secPass = document.getElementById('sec-pass');
+
+            tabPin.addEventListener('click', () => {
+                tabPin.classList.add('active'); tabPass.classList.remove('active');
+                secPin.classList.add('active'); secPass.classList.remove('active');
+            });
+            tabPass.addEventListener('click', () => {
+                tabPass.classList.add('active'); tabPin.classList.remove('active');
+                secPass.classList.add('active'); secPin.classList.remove('active');
+            });
+
+            const showStatus = (boxId, type, msg) => {
+                const box = document.getElementById(boxId);
+                box.className = `status-banner status-${type}`;
+                box.textContent = msg;
+                box.style.display = 'block';
+                setTimeout(() => box.style.display = 'none', 4000);
+            };
+
+            // STANDARD CHANGE PASSWORD
+            document.getElementById('btn-update-pass').addEventListener('click', async () => {
+                const oldPass = document.getElementById('old-pass').value;
+                const pass1 = document.getElementById('new-pass').value;
+                const pass2 = document.getElementById('confirm-pass').value;
+                const btn = document.getElementById('btn-update-pass');
+
+                if (!oldPass) return showStatus('pass-status', 'error', 'Please enter your current password.');
+                
+                const passError = validatePassword(pass1);
+                if (passError) return showStatus('pass-status', 'error', passError);
+                if (pass1 !== pass2) return showStatus('pass-status', 'error', 'New passwords do not match.');
+
+                btn.disabled = true; btn.textContent = 'Verifying...';
+
+                const { error: verifyError } = await window.db.auth.signInWithPassword({ email: user.email, password: oldPass });
+                if (verifyError) {
+                    showStatus('pass-status', 'error', 'Incorrect current password.');
+                    btn.disabled = false; btn.textContent = 'Update Password';
+                    return;
+                }
+
+                btn.textContent = 'Updating...';
+                const { error } = await window.db.auth.updateUser({ password: pass1 });
+                
+                if (error) {
+                    showStatus('pass-status', 'error', error.message);
+                } else {
+                    showAppToast('Password updated successfully!');
+                    document.getElementById('old-pass').value = ''; document.getElementById('new-pass').value = ''; document.getElementById('confirm-pass').value = '';
+                }
+                btn.disabled = false; btn.textContent = 'Update Password';
+            });
+
+            // STANDARD CHANGE PIN
+            document.getElementById('btn-update-pin').addEventListener('click', async () => {
+                const oldPin = document.getElementById('old-pin').value;
+                const newPin = document.getElementById('new-pin').value;
+                const confirmPin = document.getElementById('confirm-pin').value;
+                const btn = document.getElementById('btn-update-pin');
+
+                if (oldPin.length !== 4 || newPin.length !== 4) return showStatus('pin-status', 'error', 'PIN must be exactly 4 digits.');
+                if (newPin !== confirmPin) return showStatus('pin-status', 'error', 'New PINs do not match.');
+
+                btn.disabled = true; btn.textContent = 'Verifying...';
+
+                const { data: profile } = await window.db.from('profiles').select('transaction_pin').eq('id', user.id).single();
+                if (!profile || profile.transaction_pin !== oldPin) {
+                    showStatus('pin-status', 'error', 'Incorrect Current PIN.');
+                    btn.disabled = false; btn.textContent = 'Update Transaction PIN';
+                    return;
+                }
+
+                const { error } = await window.db.from('profiles').update({ transaction_pin: newPin }).eq('id', user.id);
+                if (error) showStatus('pin-status', 'error', 'Error updating PIN.');
+                else {
+                    showAppToast('PIN updated successfully!');
+                    document.getElementById('old-pin').value = ''; document.getElementById('new-pin').value = ''; document.getElementById('confirm-pin').value = '';
+                }
+                btn.disabled = false; btn.textContent = 'Update Transaction PIN';
+            });
+
+            // SMART FORGOT RECOVERY MODAL LOGIC
+            const otpModal = document.getElementById('otp-modal');
+            const step1 = document.getElementById('otp-step-1');
+            const step2 = document.getElementById('otp-step-2');
+            const otpDesc = document.getElementById('otp-desc');
+            const btnSendOtp = document.getElementById('btn-send-otp');
+            const btnVerifyOtp = document.getElementById('btn-verify-otp');
+            
+            let currentResetMode = ''; 
+
+            document.getElementById('btn-forgot-pin').addEventListener('click', () => {
+                currentResetMode = 'pin';
+                document.getElementById('modal-title').textContent = 'Reset PIN';
+                document.getElementById('reset-new-pin').style.display = 'block';
+                document.getElementById('reset-new-pass').style.display = 'none';
+                otpModal.classList.add('active');
+            });
+
+            document.getElementById('btn-forgot-pass').addEventListener('click', () => {
+                currentResetMode = 'password';
+                document.getElementById('modal-title').textContent = 'Reset Password';
+                document.getElementById('reset-new-pin').style.display = 'none';
+                document.getElementById('reset-new-pass').style.display = 'block';
+                otpModal.classList.add('active');
+            });
+
+            document.getElementById('btn-close-otp').addEventListener('click', () => {
+                otpModal.classList.remove('active');
+                step1.style.display = 'block'; step2.style.display = 'none';
+                otpDesc.textContent = 'Click below to send a secure 6-digit recovery code to your registered email.';
+                document.getElementById('otp-code').value = '';
+                document.getElementById('reset-new-pin').value = '';
+                document.getElementById('reset-new-pass').value = '';
+            });
+
+            // SEND CODE (Enforces 1/Day Rule)
+            btnSendOtp.addEventListener('click', async () => {
+                btnSendOtp.disabled = true; btnSendOtp.textContent = 'Sending...';
+                
+                try {
+                    const todayStr = new Date().toISOString().split('T')[0];
+
+                    if (currentResetMode === 'pin') {
+                        const { data, error } = await window.db.functions.invoke('reset-pin', { body: { action: 'send' } });
+                        if (error) throw error;
+                        if (data && data.error) throw new Error(data.error);
+                    } else {
+                        const { data: pData } = await window.db.from('profiles').select('last_pass_reset_date').eq('id', user.id).single();
+                        if (pData && pData.last_pass_reset_date === todayStr) {
+                            throw new Error("Daily limit reached. You can only reset your password once per day.");
+                        }
+                        const { error } = await window.db.auth.resetPasswordForEmail(user.email);
+                        if (error) throw error;
+                        
+                        await window.db.from('profiles').update({ last_pass_reset_date: todayStr }).eq('id', user.id);
+                    }
+
+                    step1.style.display = 'none'; step2.style.display = 'block';
+                    otpDesc.innerHTML = `<span style="color: #10b981; font-weight: bold;">Code sent!</span> Enter the 6-digit code below along with your new ${currentResetMode === 'pin' ? 'PIN.' : 'Password.'}`;
+                } catch (err) {
+                    showAppToast(err.message || 'Error sending code.', true);
+                }
+                
+                btnSendOtp.disabled = false; btnSendOtp.textContent = 'Send Recovery Code';
+            });
+
+            // VERIFY CODE
+            btnVerifyOtp.addEventListener('click', async () => {
+                const otp = document.getElementById('otp-code').value;
+                if (otp.length !== 6) return showAppToast("Please enter the 6-digit code from your email.", true);
+                
+                btnVerifyOtp.disabled = true; btnVerifyOtp.textContent = 'Verifying...';
+                
+                try {
+                    if (currentResetMode === 'pin') {
+                        const newPin = document.getElementById('reset-new-pin').value;
+                        if (newPin.length !== 4) throw new Error("Your new PIN must be exactly 4 digits.");
+                        
+                        const { data, error } = await window.db.functions.invoke('reset-pin', { body: { action: 'verify', otp, newPin } });
+                        if (error) throw error;
+                        if (data && data.error) throw new Error(data.error);
+                        
+                        showAppToast("Success! Your transaction PIN has been reset.");
+                    } else {
+                        const newPass = document.getElementById('reset-new-pass').value;
+                        const passError = validatePassword(newPass);
+                        if (passError) throw new Error(passError);
+                        
+                        const { error: otpErr } = await window.db.auth.verifyOtp({ email: user.email, token: otp, type: 'recovery' });
+                        if (otpErr) throw otpErr;
+
+                        const { error: passErr } = await window.db.auth.updateUser({ password: newPass });
+                        if (passErr) throw passErr;
+                        
+                        showAppToast("Success! Your password has been reset.");
+                    }
+                    document.getElementById('btn-close-otp').click(); 
+                } catch (err) {
+                    showAppToast(err.message || 'Error verifying code.', true);
+                }
+                
+                btnVerifyOtp.disabled = false; btnVerifyOtp.textContent = 'Verify & Reset';
+            });
+        });
+    </script>
+</body>
+</html>
