@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         // Execute Download & Installation
+        // Execute Download & Installation
         btnNow.addEventListener('click', async () => {
             if (btnNow.classList.contains('loading')) return;
             
@@ -113,11 +114,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 // 2. Apply and Reload instantly
                 await CapacitorUpdater.set({ id: update.id });
+                
             } catch (err) {
+                // NEW: This will show you exactly WHY it failed on the phone!
                 btnNow.classList.remove('loading');
                 btnNow.style.background = '#ef4444';
-                btnText.textContent = 'Update Failed. Try Again.';
+                
+                // Show a short error on the button
+                btnText.textContent = 'Failed (Tap to see error)';
                 btnLater.style.display = 'block';
+                
+                // Show a detailed native popup with the exact error message
+                alert("OTA UPDATE ERROR: " + (err.message || JSON.stringify(err)));
             }
         });
     }
