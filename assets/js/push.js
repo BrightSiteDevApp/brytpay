@@ -1,9 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Only run this if the app is running natively in Capacitor
     if (window.Capacitor && window.Capacitor.Plugins.PushNotifications) {
         const { PushNotifications } = window.Capacitor.Plugins;
 
-        // 🚀 1. CUSTOM BRYT PAY TOAST INJECTOR
+        // 1. CUSTOM BRYT PAY TOAST INJECTOR
         const showPushToast = (msg, isError = false) => {
             let toast = document.getElementById('push-setup-toast');
             if (!toast) {
@@ -33,13 +32,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <span>${msg}</span>
             `;
 
-            // Slide down
             setTimeout(() => {
                 toast.style.transform = 'translateY(0)';
                 toast.style.opacity = '1';
             }, 100);
 
-            // Slide up and hide
             setTimeout(() => {
                 toast.style.transform = 'translateY(-100px)';
                 toast.style.opacity = '0';
@@ -52,6 +49,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (permStatus.receive === 'prompt') {
                 permStatus = await PushNotifications.requestPermissions();
+                
+                // 🚀 FIX: Only show the toast if they explicitly clicked "Allow" right now
+                if (permStatus.receive === 'granted') {
+                    showPushToast("Notifications have been turned on!");
+                }
             }
 
             if (permStatus.receive === 'granted') {
@@ -59,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         };
 
-        // 3. Listen for the generated device token
+        // 3. Listen for the generated device token and silently save it
         PushNotifications.addListener('registration', async (token) => {
             console.log('Push token received: ', token.value);
             
@@ -74,20 +76,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (error) {
                     console.error("Token Save Error: ", error.message);
-                } else {
-                    // Check if we already notified them in the past to prevent spam
-                    const hasBeenNotified = localStorage.getItem('bryt_push_activated');
-                    if (!hasBeenNotified) {
-                        showPushToast("Notifications have been turned on!");
-                        localStorage.setItem('bryt_push_activated', 'true');
-                    }
                 }
             }
         });
 
-        // 🚀 4. NEW: Listen for notifications when the app is OPEN (Foreground)
+        // 4. Listen for notifications when the app is OPEN (Foreground)
         PushNotifications.addListener('pushNotificationReceived', (notification) => {
-            // Displays the incoming notification beautifully at the top of the screen
             showPushToast(`🔔 ${notification.title}: ${notification.body}`);
         });
 

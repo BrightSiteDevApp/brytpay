@@ -20,6 +20,7 @@
     "@capacitor/filesystem": "^8.1.5",
     "@capacitor/push-notifications": "^8.1.3",
     "@capacitor/share": "^8.0.3",
+    "@capgo/capacitor-updater": "^8.53.0",
     "@otakit/capacitor-updater": "^3.3.0"
   },
   "devDependencies": {

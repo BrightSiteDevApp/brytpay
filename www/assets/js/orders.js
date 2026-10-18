@@ -21,7 +21,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const s = (tx.service_type || '').toLowerCase();
         const p = (tx.provider || tx.recipient || '').toLowerCase();
         const t = (tx.type || '').toLowerCase();
-        return t === 'credit' || s.includes('fund') || s.includes('deposit') || p.includes('paystack') || p.includes('flutterwave');
+        
+        // Check metadata for P2P transfers
+        const isMetadataCredit = tx.metadata && tx.metadata.transaction_type === 'credit';
+        
+        return isMetadataCredit || t === 'credit' || s.includes('fund') || s.includes('deposit') || p.includes('paystack') || p.includes('flutterwave');
     };
 
     const formatRef = (ref) => {

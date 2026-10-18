@@ -1,25 +1,28 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session } } = await window.db.auth.getSession();
-    if (!session) { window.location.href = '/auth/login.html'; return; } // Ensure it says login.html
+    if (!session) { window.location.href = '/auth/login.html'; return; }
 
     const user = session.user;
     const container = document.getElementById('notifications-container');
     const markAllBtn = document.getElementById('mark-all-read');
 
-    // Mapped exactly to the new CSS classes in index.html
     const getIconInfo = (type) => {
         if (type === 'alert') return { class: 'type-alert', svg: '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>' };
         if (type === 'success') return { class: 'type-success', svg: '<polyline points="20 6 9 17 4 12"></polyline>' };
-        // Default (Info/System)
         return { class: 'type-system', svg: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path>' };
     };
 
-    const timeAgo = (dateStr) => {
-        const diff = Math.floor((new Date() - new Date(dateStr)) / 1000);
-        if (diff < 60) return 'Just now';
-        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-        if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-        return `${Math.floor(diff / 86400)}d ago`;
+    // 🚀 NEW: Formats date to show exact Day, Month, Year, and Time
+    const formatExactDate = (dateStr) => {
+        const dateObj = new Date(dateStr);
+        return dateObj.toLocaleString('en-US', { 
+            month: 'short', 
+            day: 'numeric', 
+            year: 'numeric', 
+            hour: 'numeric', 
+            minute: '2-digit', 
+            hour12: true 
+        });
     };
 
     async function loadNotifications() {
@@ -62,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <h4 class="notif-title">${notif.title}</h4>
                         <p class="notif-text">${notif.message}</p>
                         <div class="notif-footer">
-                            <span class="notif-time">${timeAgo(notif.created_at)}</span>
+                            <span class="notif-time">${formatExactDate(notif.created_at)}</span>
                             ${isUnread ? `<button class="btn-action-read" onclick="markAsRead('${notif.id}',${isGlobal})">Mark as read</button>` : ''}
                         </div>
                     </div>

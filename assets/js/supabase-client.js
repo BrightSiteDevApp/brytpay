@@ -46,3 +46,26 @@ if (window.Capacitor !== undefined) {
         }
     });
 }
+
+// Automatically hide bottom navigation while typing
+const inputs = document.querySelectorAll('input, select, textarea');
+const navBar = document.querySelector('.mobile-nav');
+
+if (navBar) {
+    inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+            navBar.style.display = 'none';
+        });
+        input.addEventListener('blur', () => {
+            navBar.style.display = 'flex';
+        });
+    });
+}
+
+// Automatically load global network guard across all pages
+if (!document.getElementById('bryt-network-guard-script')) {
+    const netGuardScript = document.createElement('script');
+    netGuardScript.id = 'bryt-network-guard-script';
+    netGuardScript.src = '/assets/js/network-guard.js';
+    document.head.appendChild(netGuardScript);
+}

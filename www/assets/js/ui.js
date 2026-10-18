@@ -29,19 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let userAccountId = '';
     let isBalanceHidden = localStorage.getItem('brytpay_balance_hidden') === 'true';
 
-    // Coming Soon Toast Logic
-    const sendMoneyBtn = document.getElementById('btn-send-money');
-    if (sendMoneyBtn) {
-        sendMoneyBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const toast = document.getElementById('coming-soon-toast');
-            if(toast) {
-                toast.style.display = 'flex';
-                setTimeout(() => toast.style.display = 'none', 2500);
-            }
-        });
-    }
-
     async function checkUnreadNotifications() {
         const notifDot = document.getElementById('notif-dot');
         if (!notifDot) return;
@@ -212,7 +199,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const s = (tx.service_type || '').toLowerCase();
         const p = (tx.provider || tx.recipient || '').toLowerCase();
         const t = (tx.type || '').toLowerCase();
-        return t === 'credit' || s.includes('fund') || s.includes('deposit') || s.includes('topup') || p.includes('paystack') || p.includes('flutterwave') || p.includes('topup');
+        
+        // NEW: Check if the transaction metadata marks this as a credit
+        const isMetadataCredit = tx.metadata && tx.metadata.transaction_type === 'credit';
+        
+        return isMetadataCredit || t === 'credit' || s.includes('fund') || s.includes('deposit') || s.includes('topup') || p.includes('paystack') || p.includes('flutterwave') || p.includes('topup');
     };
 
     const formatRef = (ref) => {

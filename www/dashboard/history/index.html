@@ -56,10 +56,20 @@
         .page-title { font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0; }
         .page-subtitle { font-size: 0.75rem; color: #64748b; margin: 0; font-weight: 600; }
 
+        /* Statement Button */
+        .btn-statement { display: flex; align-items: center; gap: 6px; background: rgba(29, 94, 208, 0.1); color: var(--bryt-primary); padding: 8px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 800; text-decoration: none; transition: 0.2s; }
+        .btn-statement:active { transform: scale(0.95); }
+
         .main-content { padding: 20px; max-width: 540px; margin: 0 auto; }
 
+        /* Live Search Bar */
+        .search-box { position: relative; margin-bottom: 16px; }
+        .search-box svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; width: 18px; height: 18px; }
+        .search-box input { width: 100%; padding: 14px 14px 14px 40px; border-radius: 12px; border: 1.5px solid var(--border-light); background: var(--card-bg); color: var(--text-main); font-family: inherit; font-size: 0.9rem; font-weight: 600; outline: none; transition: 0.2s; box-sizing: border-box; }
+        .search-box input:focus { border-color: var(--bryt-primary); }
+
         /* Filter Tabs */
-        .filter-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+        .filter-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
         .filter-tabs::-webkit-scrollbar { display: none; }
         
         .filter-btn { 
@@ -105,24 +115,37 @@
 <body>
 
     <header class="app-topbar">
-        <div class="app-topbar-left">
+        <div class="app-topbar-left" style="display: flex; align-items: center; gap: 12px;">
             <a id="smart-back-btn" class="smart-back">
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </a>
-            <div>
-                <h1 class="page-title">Transaction History</h1>
-                <p class="page-subtitle">All your top-ups & payments</p>
-            </div>
+            <h1 class="page-title">History</h1>
         </div>
+        
+        <!-- Statement Button -->
+        <a href="/dashboard/statement/index.html" class="btn-statement">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            Statement
+        </a>
     </header>
 
     <main class="main-content">
+        <!-- Live Search Input -->
+        <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="tx-search" placeholder="Search reference or service..." autocomplete="off">
+        </div>
+
+        <!-- Expanded Filter Chips -->
         <div class="filter-tabs">
             <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="credit">Credits In</button>
+            <button class="filter-btn" data-filter="debit">Debits Out</button>
+            <button class="filter-btn" data-filter="airtime">Airtime</button>
+            <button class="filter-btn" data-filter="data">Data</button>
             <button class="filter-btn" data-filter="successful">Successful</button>
-            <button class="filter-btn" data-filter="pending">Pending</button>
             <button class="filter-btn" data-filter="failed">Failed</button>
         </div>
 

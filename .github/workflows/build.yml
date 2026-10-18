@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     name: Generate Signed Android App Bundle and APK
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout Source Code
@@ -24,7 +24,7 @@ jobs:
         run: npx cap sync android
 
       - name: Setup Java JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           java-version: '21'

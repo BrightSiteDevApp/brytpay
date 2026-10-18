@@ -216,17 +216,18 @@
         </section>
 
         <!-- Slim Pill Action Buttons -->
-        <section class="action-row">
-            <a href="#" id="btn-send-money" class="slim-action-btn btn-send">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                Send Money
-            </a>
-            <a href="/dashboard/fund/index.html" class="slim-action-btn btn-add">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Add Money
-            </a>
-        </section>
-
+       <section class="action-row">
+    <!-- UPDATED: Links to your new send page and removes the old ID -->
+    <a href="/dashboard/send/index.html" class="slim-action-btn btn-send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        Send Money
+    </a>
+    
+    <a href="/dashboard/fund/index.html" class="slim-action-btn btn-add">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Add Money
+    </a>
+</section>
         <!-- Expanded 8-Grid Utility Section -->
         <div class="section-header">
             <h2 class="section-title">Utility</h2>
@@ -291,6 +292,7 @@
     <script src="../assets/js/push.js"></script>
     <script src="../../assets/js/brands.js"></script>
     <script src="../../assets/js/ui.js"></script>
+    <script src="../../assets/js/updater.js"></script>
 
     <!-- NATIVE PULL TO REFRESH & DARK MODE SCRIPT -->
     <script>

@@ -355,3 +355,13 @@ body:not(.landing-page) .push-consent-overlay {
     left: 0 !important;
     right: 0 !important;
 }
+
+/* Automatically hide bottom nav when the keyboard shrinks the screen */
+@media (max-height: 520px) {
+    .mobile-nav {
+        display: none !important;
+    }
+    body {
+        padding-bottom: 20px !important;
+    }
+}
