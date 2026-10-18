@@ -60,36 +60,56 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // 2. Live Recipient Lookup Engine
+    // 2. Live Recipient Lookup Engine (Uses Secure RPC)
     recipientInput.addEventListener('input', (e) => {
         clearTimeout(typingTimer);
         const val = e.target.value.trim();
         nameBadge.style.display = 'none';
         currentRecipient = null;
 
-        if (val.length >= 4) {
+        const shouldSearch = (searchMode === 'id' && val.length >= 4) || 
+                             (searchMode === 'email' && val.includes('@') && val.length >= 5);
+
+        if (shouldSearch) {
+            nameBadge.textContent = 'Checking...';
+            nameBadge.className = 'name-badge';
+            nameBadge.style.display = 'inline-block';
+
             typingTimer = setTimeout(async () => {
-                const query = window.db.from('profiles').select('id, full_name, account_id, email').neq('id', user.id);
-                
-                if (searchMode === 'email') query.eq('email', val.toLowerCase());
-                else query.eq('account_id', val.toUpperCase());
+                try {
+                    const { data, error } = await window.db.rpc('bryt_lookup_recipient', {
+                        search_query: val,
+                        search_type: searchMode
+                    });
 
-                const { data, error } = await query.maybeSingle();
+                    if (error || !data || !data.found) {
+                        nameBadge.textContent = 'Not found';
+                        nameBadge.className = 'name-badge error';
+                        currentRecipient = null;
+                        return;
+                    }
 
-                if (data) {
+                    // Prevent users from transferring to themselves
+                    if (data.id === user.id) {
+                        nameBadge.textContent = "That's you!";
+                        nameBadge.className = 'name-badge error';
+                        currentRecipient = null;
+                        return;
+                    }
+
+                    // Recipient verified
                     currentRecipient = data;
                     nameBadge.textContent = `✓ ${data.full_name}`;
                     nameBadge.className = 'name-badge success';
-                    nameBadge.style.display = 'inline-block';
-                } else {
+                } catch (err) {
                     nameBadge.textContent = 'Not found';
                     nameBadge.className = 'name-badge error';
-                    nameBadge.style.display = 'inline-block';
+                    currentRecipient = null;
                 }
-            }, 500);
+            }, 350);
         }
     });
-
+    
     // 3. Open Security Modal
     form.addEventListener('submit', (e) => {
         e.preventDefault();
