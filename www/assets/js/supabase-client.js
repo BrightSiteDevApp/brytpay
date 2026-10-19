@@ -69,3 +69,14 @@ if (!document.getElementById('bryt-network-guard-script')) {
     netGuardScript.src = '/assets/js/network-guard.js';
     document.head.appendChild(netGuardScript);
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+    if (window.Capacitor && window.Capacitor.Plugins.OtaKit) {
+        try {
+            await window.Capacitor.Plugins.OtaKit.notifyAppReady();
+            console.log("OtaKit: App is ready and stable.");
+        } catch (e) {
+            console.error('OtaKit Ready Signal Failed:', e);
+        }
+    }
+});

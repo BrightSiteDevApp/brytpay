@@ -18,9 +18,6 @@
     },
     "OtaKit": {
       "appId": "fe23ea6b-d0da-4a11-8ce8-f4034194d918"
-    },
-    "CapacitorUpdater": {
-      "autoUpdate": "none"
     }
   }
 }

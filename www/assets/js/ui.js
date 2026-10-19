@@ -391,3 +391,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadTransactions();
     managePushConsent();
 });
+
