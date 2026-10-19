@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 🛑 This is your current version. Bump this string in your code 
         // immediately before you zip your files for a new update!
-        const CURRENT_APP_VERSION = '1.0.0'; 
+        const CURRENT_APP_VERSION = '1.1.0'; 
 
         try {
             // 1. Notify plugin that app booted successfully to prevent boot loops
