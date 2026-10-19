@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 🛑 This is your current version. Bump this string in your code 
         // immediately before you zip your files for a new update!
-        const CURRENT_APP_VERSION = '1.1.0'; 
+        const CURRENT_APP_VERSION = '1.0.0'; 
 
         try {
             // 1. Notify plugin that app booted successfully to prevent boot loops
@@ -93,7 +93,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         // Execute Download & Installation
-        // Execute Download & Installation
         btnNow.addEventListener('click', async () => {
             if (btnNow.classList.contains('loading')) return;
             
@@ -104,10 +103,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const { CapacitorUpdater } = window.Capacitor.Plugins;
                 
-                // 1. Download the Zip to the device
+                // THE FIX: Clean the URL and append a cache-busting timestamp
+                const cleanUrl = zipUrl.trim() + "?t=" + Date.now();
+                const cleanVersion = newVersion.trim();
+
+                // 1. Download the Zip to the device using the fresh URL
                 const update = await CapacitorUpdater.download({
-                    url: zipUrl,
-                    version: newVersion
+                    url: cleanUrl,
+                    version: cleanVersion
                 });
 
                 btnText.textContent = 'Restarting App...';
@@ -116,15 +119,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await CapacitorUpdater.set({ id: update.id });
                 
             } catch (err) {
-                // NEW: This will show you exactly WHY it failed on the phone!
+                // Show exact error reason on the phone
                 btnNow.classList.remove('loading');
                 btnNow.style.background = '#ef4444';
                 
-                // Show a short error on the button
                 btnText.textContent = 'Failed (Tap to see error)';
                 btnLater.style.display = 'block';
                 
-                // Show a detailed native popup with the exact error message
                 alert("OTA UPDATE ERROR: " + (err.message || JSON.stringify(err)));
             }
         });
