@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             // 1. Notify plugin that app booted successfully to prevent boot loops
-            await CapacitorUpdater.notifyAppReady();
+            await CapacitorUpdater.notifyAppReady(); //[cite: 5]
 
             // 2. Fetch the latest version from Supabase
             const { data, error } = await window.db
@@ -97,17 +97,37 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (btnNow.classList.contains('loading')) return;
             
             btnNow.classList.add('loading');
-            btnText.textContent = 'Downloading...';
+            btnText.textContent = 'Checking Network...';
             btnLater.style.display = 'none';
 
             try {
                 const { CapacitorUpdater } = window.Capacitor.Plugins;
                 
-                // THE FIX: Clean the URL and append a cache-busting timestamp
-                const cleanUrl = zipUrl.trim() + "?t=" + Date.now();
+                // Clean URLs, strictly removing query parameters to prevent Android crash
+                const cleanUrl = zipUrl.trim();
                 const cleanVersion = newVersion.trim();
 
-                // 1. Download the Zip to the device using the fresh URL
+                // DIAGNOSTIC CHECK: Pre-flight ping to see exactly what Supabase says
+                try {
+                    const testResponse = await fetch(cleanUrl, { method: 'HEAD' });
+                    if (!testResponse.ok) {
+                        alert(`NETWORK BLOCKED: Supabase rejected the connection with Status ${testResponse.status}. It is not a zip error.`);
+                        btnNow.classList.remove('loading');
+                        btnText.textContent = 'Retry Download';
+                        btnLater.style.display = 'block';
+                        return;
+                    }
+                } catch (netErr) {
+                    alert(`NETWORK CRASH: The app cannot reach the internet/Supabase. Error: ${netErr.message}`);
+                    btnNow.classList.remove('loading');
+                    btnText.textContent = 'Retry Download';
+                    btnLater.style.display = 'block';
+                    return;
+                }
+
+                btnText.textContent = 'Downloading...';
+
+                // 1. Download the Zip to the device using the raw URL
                 const update = await CapacitorUpdater.download({
                     url: cleanUrl,
                     version: cleanVersion
@@ -122,7 +142,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Show exact error reason on the phone
                 btnNow.classList.remove('loading');
                 btnNow.style.background = '#ef4444';
-                
                 btnText.textContent = 'Failed (Tap to see error)';
                 btnLater.style.display = 'block';
                 
