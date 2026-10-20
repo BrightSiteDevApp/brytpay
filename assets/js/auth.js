@@ -291,10 +291,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             loginEmailForOtp = email;
 
             // 🚀 PLAY STORE TEST ACCOUNT BYPASS
-            // Keep session active, do not call signOut(), and do not send email OTP
             if (TEST_REVIEWER_EMAILS.includes(email.toLowerCase())) {
-                sessionStorage.setItem('bryt_test_email', email);
-                sessionStorage.setItem('bryt_test_pass', password);
+                // Changed to localStorage for Capacitor mobile persistence
+                localStorage.setItem('bryt_test_email', email);
+                localStorage.setItem('bryt_test_pass', password);
+                
                 loginForm.style.display = 'none';
                 loginOtpForm.style.display = 'block';
                 authTitle.innerHTML = `<h1>Two-Step Login</h1><p>Enter your 6-digit security code.</p>`;
@@ -323,7 +324,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             e.preventDefault();
             const btn = document.getElementById('verify-login-btn');
             const token = document.getElementById('login-otp-code').value.trim();
-            const currentEmail = (loginEmailForOtp || sessionStorage.getItem('bryt_test_email') || '').toLowerCase();
+            
+            // Checking localStorage instead of sessionStorage
+            const currentEmail = (loginEmailForOtp || localStorage.getItem('bryt_test_email') || '').toLowerCase();
 
             btn.disabled = true;
             btn.textContent = 'Authenticating...';
@@ -332,7 +335,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (TEST_REVIEWER_EMAILS.includes(currentEmail) && token === TEST_OTP) {
                 const { data: sessData } = await window.db.auth.getSession();
                 if (!sessData?.session) {
-                    const savedPass = sessionStorage.getItem('bryt_test_pass') || '123456';
+                    const savedPass = localStorage.getItem('bryt_test_pass') || '123456';
                     const { error: reAuthErr } = await window.db.auth.signInWithPassword({
                         email: currentEmail,
                         password: savedPass
@@ -344,14 +347,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                         return;
                     }
                 }
-                sessionStorage.removeItem('bryt_test_email');
-                sessionStorage.removeItem('bryt_test_pass');
+                
+                // Cleanup persistent storage
+                localStorage.removeItem('bryt_test_email');
+                localStorage.removeItem('bryt_test_pass');
                 handleSmartRedirect();
                 return;
             }
 
             // Normal User OTP Verification
-            const { error } = await window.db.auth.verifyOtp({ email: loginEmailForOtp, token, type: 'email' });
+            const { error } = await window.db.auth.verifyOtp({ email: currentEmail || loginEmailForOtp, token, type: 'email' });
 
             if (error) {
                 showError('Invalid or expired code.');
