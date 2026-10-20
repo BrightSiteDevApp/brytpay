@@ -12,17 +12,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const amountInput = document.getElementById('amount');
     const form = document.getElementById('send-form');
     
-    const confirmModal = document.getElementById('confirm-modal');
+    // Custom Pin Modal Elements
+    const pinModal = document.getElementById('pin-modal-overlay');
     const modalRecipient = document.getElementById('modal-recipient');
     const modalAmount = document.getElementById('modal-amount');
-    const pinInput = document.getElementById('transfer-pin');
     const confirmBtn = document.getElementById('modal-confirm');
     const cancelBtn = document.getElementById('modal-cancel');
     const successOverlay = document.getElementById('success-overlay');
+    
+    const pinDots = document.querySelectorAll('.pin-dot');
+    const keypadBtns = document.querySelectorAll('.keypad-btn');
 
     let currentRecipient = null;
     let typingTimer;
     let searchMode = 'id'; // Default search mode
+    let currentPin = '';
 
     const showToast = (msg, isError = false) => {
         const toast = document.getElementById('bryt-toast');
@@ -110,7 +114,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
     
-    // 3. Open Security Modal
+    // 3. Pin Keypad UI Updates
+    function updatePinUI() {
+        pinDots.forEach((dot, idx) => {
+            if (idx < currentPin.length) dot.classList.add('filled');
+            else dot.classList.remove('filled');
+        });
+        confirmBtn.disabled = currentPin.length !== 4;
+    }
+
+    keypadBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const val = btn.getAttribute('data-val');
+            if (val === 'back') {
+                currentPin = currentPin.slice(0, -1);
+            } else if (val) {
+                if (currentPin.length < 4) currentPin += val;
+            }
+            updatePinUI();
+        });
+    });
+
+    // 4. Open Security Modal
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         const amount = parseFloat(amountInput.value);
@@ -120,16 +145,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         modalRecipient.textContent = currentRecipient.full_name;
         modalAmount.textContent = `₦${amount.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
-        pinInput.value = '';
-        confirmModal.style.display = 'flex';
+        
+        currentPin = '';
+        updatePinUI();
+        pinModal.classList.add('active');
     });
 
-    cancelBtn.addEventListener('click', () => confirmModal.style.display = 'none');
+    cancelBtn.addEventListener('click', () => {
+        pinModal.classList.remove('active');
+        currentPin = '';
+        updatePinUI();
+    });
 
-    // 4. Execute Atomic Transfer (Supabase RPC)
+    // 5. Execute Atomic Transfer (Supabase RPC)
     confirmBtn.addEventListener('click', async () => {
-        const pin = pinInput.value.trim();
-        if (pin.length !== 4) return showToast('Please enter your 4-digit PIN.', true);
+        if (currentPin.length !== 4) return showToast('Please enter your 4-digit PIN.', true);
 
         confirmBtn.disabled = true;
         confirmBtn.textContent = 'Sending...';
@@ -139,13 +169,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 sender_uuid: user.id,
                 recipient_identifier: recipientInput.value.trim(),
                 transfer_amount: parseFloat(amountInput.value),
-                sender_pin: pin
+                sender_pin: currentPin
             });
 
             if (error) throw new Error(error.message);
             if (data && !data.success) throw new Error(data.message);
 
-            confirmModal.style.display = 'none';
+            pinModal.classList.remove('active');
             successOverlay.classList.add('active');
             setTimeout(() => { window.location.href = '/dashboard/index.html'; }, 2000);
 
@@ -153,7 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             showToast(err.message, true);
             confirmBtn.disabled = false;
             confirmBtn.textContent = 'Send Money';
-            confirmModal.style.display = 'none';
+            pinModal.classList.remove('active');
         }
     });
 });

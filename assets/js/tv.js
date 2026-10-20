@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     let selectedNetwork = 'dstv';
     let selectedLogo = 'dstv-logo.png';
     let verifiedCustomerName = null;
+    let currentBalance = 0;
+    let userPin = '';
+    let currentPinInput = '';
 
     // 🚀 SMART ROUTING
     const backBtn = document.getElementById('smart-back-btn');
@@ -94,13 +97,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     const selectText = document.getElementById('custom-select-text');
     const optionsList = document.getElementById('custom-options-list');
 
-    const confirmModal = document.getElementById('confirm-modal');
+    // PIN Bottom Sheet Elements
+    const pinModal = document.getElementById('pin-modal-overlay');
+    const pinDots = document.querySelectorAll('.pin-dot');
+    const keypadBtns = document.querySelectorAll('.keypad-btn');
+    const btnCancel = document.getElementById('modal-cancel');
+    const btnConfirm = document.getElementById('modal-confirm');
+
     const successOverlay = document.getElementById('success-overlay');
 
-    const { data: walletData } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
-    if (walletData) {
-        document.getElementById('user-balance').textContent = `₦${parseFloat(walletData.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+    async function loadProfileAndBalance() {
+        const { data: wallet } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
+        if (wallet) {
+            currentBalance = parseFloat(wallet.balance);
+            document.getElementById('user-balance').textContent = `₦${currentBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+        }
+
+        const { data: profile } = await window.db.from('profiles').select('transaction_pin').eq('id', user.id).single();
+        if (profile && profile.transaction_pin) {
+            userPin = profile.transaction_pin;
+        }
     }
+    await loadProfileAndBalance();
 
     selectTrigger.addEventListener('click', () => {
         selectWrapper.classList.toggle('open');
@@ -217,58 +235,91 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // 🚀 CUSTOM PIN LOGIC
+    function updatePinUI() {
+        pinDots.forEach((dot, idx) => {
+            if (idx < currentPinInput.length) dot.classList.add('filled');
+            else dot.classList.remove('filled');
+        });
+        btnConfirm.disabled = currentPinInput.length !== 4;
+    }
+
+    keypadBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const val = btn.getAttribute('data-val');
+            if (val === 'back') {
+                currentPinInput = currentPinInput.slice(0, -1);
+            } else if (val) {
+                if (currentPinInput.length < 4) currentPinInput += val;
+            }
+            updatePinUI();
+        });
+    });
+
     document.getElementById('tv-form').addEventListener('submit', (e) => {
         e.preventDefault();
 
         if (!verifiedCustomerName) return showToast("Please verify the Account first.", "error");
         if (!hiddenPlanInput.value) return showToast("Please select a package.", "error");
 
-        const [plan_code, priceStr, label] = hiddenPlanInput.value.split('|');
+        const [, priceStr, label] = hiddenPlanInput.value.split('|');
+        const amount = parseFloat(priceStr);
+
+        if (amount > currentBalance) {
+            return showToast(`Insufficient balance. Requires ₦${amount.toLocaleString()}.`, "error");
+        }
 
         document.getElementById('modal-network-logo').src = `../../assets/img/${selectedLogo}`;
         document.getElementById('modal-name').textContent = verifiedCustomerName;
         document.getElementById('modal-plan').textContent = label;
-        document.getElementById('modal-amount').textContent = `₦${parseFloat(priceStr).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+        document.getElementById('modal-amount').textContent = `₦${amount.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
         
-        confirmModal.style.display = 'flex';
+        currentPinInput = '';
+        updatePinUI();
+        pinModal.classList.add('active');
     });
 
-    document.getElementById('modal-cancel').addEventListener('click', () => confirmModal.style.display = 'none');
+    btnCancel.addEventListener('click', () => {
+        pinModal.classList.remove('active');
+        currentPinInput = '';
+        updatePinUI();
+    });
 
-    document.getElementById('modal-confirm').addEventListener('click', async () => {
-        const [plan_code, priceStr, label] = hiddenPlanInput.value.split('|');
-        const btn = document.getElementById('modal-confirm');
-        btn.disabled = true; 
-        document.getElementById('modal-cancel').disabled = true;
-        btn.textContent = 'Processing...';
+    btnConfirm.addEventListener('click', async () => {
+        if (!userPin) return showToast('Please set your 4-digit PIN in your security settings first.', 'error');
+        if (currentPinInput !== userPin) return showToast('Incorrect PIN. Try again.', 'error');
+
+        const [plan_code] = hiddenPlanInput.value.split('|');
+        btnConfirm.disabled = true; 
+        btnCancel.disabled = true;
+        btnConfirm.textContent = 'Processing...';
 
         try {
             const { data: resData, error } = await window.db.functions.invoke('vend-tv-swift', {
                 body: { 
                     network: selectedNetwork, 
                     smartcard: smartcardInput.value.trim(), 
-                    plan_id: parseInt(plan_code)
+                    plan_id: parseInt(plan_code),
+                    pin: currentPinInput
                 }
             });
 
             if (error) throw new Error(error.message);
             if (resData && !resData.success) throw new Error(resData.message);
 
-            // 🚀 SUCCESS! Trigger Fullscreen Animation
-            confirmModal.style.display = 'none';
+            pinModal.classList.remove('active');
             successOverlay.classList.add('active');
             
-            // Exactly 1.5s later, reload the page 
             setTimeout(() => {
                 window.location.reload();
             }, 1500);
 
         } catch (err) {
             showToast(err.message, "error");
-            btn.disabled = false; 
-            document.getElementById('modal-cancel').disabled = false;
-            btn.textContent = 'Pay Now';
-            confirmModal.style.display = 'none';
+            btnConfirm.disabled = false; 
+            btnCancel.disabled = false;
+            btnConfirm.textContent = 'Pay Now';
+            pinModal.classList.remove('active');
         }
     });
 });

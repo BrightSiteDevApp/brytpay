@@ -75,6 +75,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             return net ? `${net} DATA BUNDLE` : 'DATA BUNDLE';
         }
 
+        // 🚀 BANK TRANSFER FIX
+        if (srvType === 'bank_transfer') return `TRANSFER TO ${provider}`;
+
         let clean = (tx.service_type || tx.recipient || 'PAYMENT').replace(/vtpass/gi, '').replace(/external_checkout/gi, '').replace(/[:\-_]/g, ' ').trim().toUpperCase();
         if (clean === 'SELF') clean = (tx.provider || 'PAYMENT').toUpperCase();
         return clean;
@@ -105,6 +108,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>`;
         }
         
+        // 🚀 BANK TRANSFER FIX: Paper Jet (Send) Icon instead of generic gray box
+        if (raw.includes('bank_transfer') || raw.includes('transfer')) return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: rgba(29, 94, 208, 0.1); color: var(--bryt-primary); border: 1px solid rgba(29, 94, 208, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></div>`;
+
         return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>`;
     };
 
@@ -123,6 +129,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (s.includes('data') || t.includes('data')) return 'data';
         if (s.includes('tv') || p.includes('dstv') || p.includes('gotv') || p.includes('startimes')) return 'tv';
         
+        // 🚀 ROUTE OUTBOUND TRANSFERS TO THE NEW CATEGORY
+        if (s.includes('bank_transfer') || s.includes('transfer')) return 'transfers';
+
         return 'other';
     };
 
@@ -152,7 +161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (error || !data) return;
         allTransactions = data;
 
-        const counts = { education: 0, certificates: 0, jamb: 0, airtime: 0, data: 0, nin: 0, tv: 0, funding: 0 };
+        const counts = { education: 0, certificates: 0, jamb: 0, airtime: 0, data: 0, nin: 0, tv: 0, funding: 0, transfers: 0 };
         
         allTransactions.forEach(tx => {
             const cat = determineCategory(tx);

@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     let selectedService = '';
     let selectedPrice = 0;
     let isReprint = false;
+    let userPin = '';
+    let currentPinInput = '';
 
     // 🚀 SMART ROUTING
     const backBtn = document.getElementById('smart-back-btn');
@@ -53,9 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userBalanceEl = document.getElementById('user-balance');
     const serviceModal = document.getElementById('service-modal');
     const modalCloseTrigger = document.getElementById('modal-close-trigger');
-    const modalCancelBtn = document.getElementById('modal-cancel-btn');
     const modalTitle = document.getElementById('modal-service-title');
-    const modalPayAmt = document.getElementById('modal-pay-amt');
     
     const reprintGroup = document.getElementById('reprint-group');
     const reprintTypeInput = document.getElementById('reprint-type');
@@ -69,12 +69,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const jambYearInput = document.getElementById('jamb-year');
     const whatsappInput = document.getElementById('whatsapp');
     const emailInput = document.getElementById('email');
-    const btnSubmit = document.getElementById('modal-submit');
 
-    // 🚀 NEW CUSTOM SELECT LOGIC
+    // Custom Select Logic
     const reprintSelectWrapper = document.getElementById('reprint-select-wrapper');
     const reprintSelectTrigger = document.getElementById('reprint-select-trigger');
     const reprintSelectText = document.getElementById('reprint-select-text');
+
+    // PIN Bottom Sheet Elements
+    const pinDots = document.querySelectorAll('.pin-dot');
+    const keypadBtns = document.querySelectorAll('.keypad-btn');
+    const btnSubmitPin = document.getElementById('modal-submit-pin');
 
     if (reprintSelectTrigger) {
         reprintSelectTrigger.addEventListener('click', () => {
@@ -97,7 +101,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // UPDATED NOTICES
     const notices = {
         "Admission Letter": "Ensure you have accepted your admission before placing this service.",
         "Original Result": "Get your official JAMB Original Result (with passport photo) required for institutional clearance.",
@@ -111,6 +114,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelectorAll('.dot').forEach(el => el.classList.remove('active'));
         document.getElementById(`step-${stepNum}`).classList.add('active');
         document.getElementById(`dot-${stepNum}`).classList.add('active');
+        
+        if (stepNum === 3) {
+            currentPinInput = '';
+            updatePinUI();
+        }
     };
 
     window.validateAndGoToStep = function(currentStep, nextStep) {
@@ -125,34 +133,41 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
-        // Ensure custom dropdown is selected if required
         if (isReprint && !reprintTypeInput.value && currentStep === 1) {
             showToast('Please select a reprint document type.', 'error');
             isValid = false;
         }
 
+        if (currentStep === 2 && currentBalance < selectedPrice) {
+            showToast(`Insufficient balance. You need at least ₦${selectedPrice.toLocaleString()} to process this request.`, 'error');
+            return;
+        }
+
         if (isValid) goToStep(nextStep);
     };
 
-    async function loadBalance() {
-        const { data } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
-        if (data) {
-            currentBalance = parseFloat(data.balance);
+    async function loadProfileAndBalance() {
+        const { data: wallet } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
+        if (wallet) {
+            currentBalance = parseFloat(wallet.balance);
             userBalanceEl.textContent = `₦${currentBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
         }
+        
+        const { data: profile } = await window.db.from('profiles').select('transaction_pin').eq('id', user.id).single();
+        if (profile && profile.transaction_pin) {
+            userPin = profile.transaction_pin;
+        }
     }
-    await loadBalance();
+    await loadProfileAndBalance();
 
     function closeModal() {
         serviceModal.classList.remove('active');
         setTimeout(() => {
             serviceModal.style.display = 'none';
-        }, 400); 
+        }, 300); 
     }
 
     modalCloseTrigger.addEventListener('click', closeModal);
-    if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
-    
     serviceModal.addEventListener('click', (e) => {
         if (e.target === serviceModal) closeModal();
     });
@@ -164,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             isReprint = card.getAttribute('data-type') === 'reprint';
 
             modalTitle.textContent = selectedService;
-            modalPayAmt.textContent = `₦${selectedPrice.toLocaleString()}`;
+            document.getElementById('modal-pay-amt-pin').textContent = `₦${selectedPrice.toLocaleString()}`;
             
             if (notices[selectedService]) {
                 noticeText.textContent = notices[selectedService];
@@ -180,7 +195,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 reprintSelectText.style.opacity = '0.6';
             } else {
                 reprintGroup.style.display = 'none';
-                reprintTypeInput.value = 'Not Applicable'; // bypass hidden input requirement
+                reprintTypeInput.value = 'Not Applicable';
             }
 
             jambForm.reset();
@@ -191,8 +206,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    jambForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    // 🚀 CUSTOM PIN LOGIC
+    function updatePinUI() {
+        pinDots.forEach((dot, idx) => {
+            if (idx < currentPinInput.length) dot.classList.add('filled');
+            else dot.classList.remove('filled');
+        });
+        btnSubmitPin.disabled = currentPinInput.length !== 4;
+    }
+
+    keypadBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const val = btn.getAttribute('data-val');
+            if (val === 'back') {
+                currentPinInput = currentPinInput.slice(0, -1);
+            } else if (val) {
+                if (currentPinInput.length < 4) currentPinInput += val;
+            }
+            updatePinUI();
+        });
+    });
+
+    // Handle dummy form submits natively to block reload, rely entirely on button
+    jambForm.addEventListener('submit', (e) => e.preventDefault());
+
+    btnSubmitPin.addEventListener('click', async () => {
+        if (!userPin) return showToast('Please set your 4-digit PIN in your security settings first.', 'error');
+        if (currentPinInput !== userPin) return showToast('Incorrect PIN. Try again.', 'error');
 
         const fullName = fullNameInput.value.trim();
         const jambReg = jambRegInput.value.trim().toUpperCase();
@@ -202,18 +242,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const finalServiceName = isReprint ? `Reprint: ${reprintTypeInput.value}` : selectedService;
 
-        if (whatsapp.length !== 11 || !/^\d+$/.test(whatsapp)) {
-            showToast('Please enter a valid 11-digit phone number.', 'error');
-            return;
-        }
-
-        if (currentBalance < selectedPrice) {
-            showToast(`Insufficient balance. You need at least ₦${selectedPrice.toLocaleString()} to process this request.`, 'error');
-            return;
-        }
-
-        btnSubmit.disabled = true;
-        btnSubmit.textContent = 'Processing...';
+        btnSubmitPin.disabled = true;
+        btnSubmitPin.textContent = 'Processing...';
 
         try {
             const { data, error } = await window.db.rpc('process_jamb_order', {
@@ -236,13 +266,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('success-candidate').textContent = fullName;
             document.getElementById('jamb-success-card').style.display = 'block';
 
-            await loadBalance(); 
+            await loadProfileAndBalance(); 
 
         } catch (err) {
             showToast(`Order could not be completed: ${err.message || 'Server error'}`, 'error');
         } finally {
-            btnSubmit.disabled = false;
-            btnSubmit.innerHTML = `Pay ₦${selectedPrice.toLocaleString()}`;
+            btnSubmitPin.disabled = false;
+            btnSubmitPin.innerHTML = 'Pay Now';
         }
     });
 });

@@ -75,6 +75,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!net && !provider.includes('CHEAPDATAHUB') && !provider.includes('VTPASS')) net = provider;
             return net ? `${net} DATA BUNDLE` : 'DATA BUNDLE';
         }
+        
+        // 🚀 BANK TRANSFER FIX
+        if (srvType === 'bank_transfer') return `TRANSFER TO ${provider}`;
+        
         let clean = (tx.service_type || tx.recipient || 'PAYMENT').replace(/vtpass/gi, '').replace(/external_checkout/gi, '').replace(/[:\-_]/g, ' ').trim().toUpperCase();
         if (clean === 'SELF') clean = (tx.provider || 'PAYMENT').toUpperCase();
         return clean;
@@ -101,6 +105,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (logoFile) return `<div class="tx-brand" style="background: #ffffff; border: 1px solid var(--border-light);"><img src="../../assets/img/${logoFile}" alt="Logo" onerror="this.parentElement.innerHTML='💼'"></div>`;
         if (isCreditTx(tx)) return `<div class="tx-brand" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>`;
         
+        // 🚀 BANK TRANSFER FIX
+        // 🚀 BANK TRANSFER FIX: Paper Jet (Send) Icon instead of padlock
+        if (raw.includes('bank_transfer') || raw.includes('transfer')) return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: rgba(29, 94, 208, 0.1); color: var(--bryt-primary); border: 1px solid rgba(29, 94, 208, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></div>`;
+
         return `<div class="tx-brand" style="background: var(--bg-color); color: #64748b; border: 1px solid var(--border-light);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>`;
     };
 
@@ -108,14 +116,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.innerHTML = '';
 
         const filteredTx = allTransactions.filter(tx => {
-            // 1. Check Search Match
             const cleanTitle = getCleanTitle(tx).toLowerCase();
             const ref = (tx.reference || tx.external_reference || '').toLowerCase();
             const isSearchMatch = currentSearch === '' || cleanTitle.includes(currentSearch) || ref.includes(currentSearch);
             
             if (!isSearchMatch) return false;
 
-            // 2. Check Filter Match
             const st = (tx.status || '').toLowerCase();
             const isCredit = isCreditTx(tx) || st === 'refunded';
 
@@ -179,13 +185,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    // Live Search Listener
     searchInput.addEventListener('input', (e) => {
         currentSearch = e.target.value.toLowerCase().trim();
         renderTransactions();
     });
 
-    // Filter Chips Listeners
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>JAMB Services — BRYT Pay</title>
     
-    <!-- Anti-Flash Dark Mode Script -->
     <script>
         if (localStorage.getItem('bryt_theme') === 'dark') {
             document.documentElement.classList.add('dark-theme');
@@ -71,52 +70,67 @@
         .service-card { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 16px; padding: 16px 12px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
         .service-card:active { transform: scale(0.98); background: var(--bg-color); }
         
-        /* FIXED: Dark Mode Compatible Icon Container */
         .service-icon-container { width: 48px; height: 48px; background: var(--bg-color); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; padding: 6px; border: 1px solid var(--border-light); transition: background 0.3s, border 0.3s; }
         .service-icon { width: 100%; height: 100%; object-fit: contain; }
         
         .service-title { font-size: 0.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 6px; line-height: 1.2; }
         .service-price { font-size: 0.75rem; color: var(--bryt-primary); font-weight: 800; background: rgba(29, 94, 208, 0.08); padding: 4px 12px; border-radius: 8px; }
 
-        /* Bottom-Up Modal Container */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(11, 18, 32, 0.8); backdrop-filter: blur(4px); z-index: 10000; display: none; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        /* 🚀 COMPACT MODAL CONTAINER */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(11, 18, 32, 0.95); z-index: 10000; display: none; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity 0.25s ease; }
         .modal-overlay.active { display: flex; opacity: 1; }
-        .modal-sheet { background: var(--card-bg); border-top-left-radius: 24px; border-top-right-radius: 24px; width: 100%; max-width: 480px; padding: 24px 20px 40px 20px; border-top: 1px solid var(--border-light); transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1); max-height: 90vh; overflow-y: auto; }
+        .modal-sheet { background: var(--card-bg); border-radius: 24px 24px 0 0; width: 100%; max-width: 480px; padding: 16px 20px 20px; border-top: 1px solid var(--border-light); transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.15); max-height: 85vh; overflow-y: auto; box-sizing: border-box; }
         .modal-overlay.active .modal-sheet { transform: translateY(0); }
         
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .modal-title { font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0; }
-        .btn-close-modal { background: var(--bg-color); border: none; color: #64748b; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .sheet-handle { width: 36px; height: 4px; background: #e2e8f0; border-radius: 10px; margin: 0 auto 12px; }
+        html.dark-theme .sheet-handle { background: #334155; }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .modal-title { font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin: 0; }
+        .btn-close-modal { background: var(--bg-color); border: none; color: #64748b; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
         .modal-step { display: none; animation: fadeIn 0.3s ease; }
         .modal-step.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .step-indicators { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; }
+        .step-indicators { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-light); transition: 0.3s; }
         .dot.active { background: var(--bryt-primary); width: 24px; border-radius: 4px; }
 
         /* Dynamic Service Note Inside Modal */
-        .dynamic-notice { background: var(--bg-color); border: 1px solid var(--border-light); border-left: 3px solid var(--bryt-primary); border-radius: 12px; padding: 12px; margin-bottom: 20px; display: none; }
+        .dynamic-notice { background: var(--bg-color); border: 1px solid var(--border-light); border-left: 3px solid var(--bryt-primary); border-radius: 12px; padding: 10px 12px; margin-bottom: 16px; display: none; }
         .dynamic-notice-title { font-size: 0.65rem; font-weight: 800; color: var(--bryt-primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
         .dynamic-notice-text { font-size: 0.75rem; color: #64748b; line-height: 1.4; font-weight: 600; margin: 0; }
 
         /* Custom Dropdown */
-        .custom-select-wrapper { position: relative; user-select: none; margin-top: 8px; }
-        .custom-select-trigger { background: var(--bg-color); border: 1.5px solid var(--border-light); padding: 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: var(--text-main); font-size: 0.95rem; font-weight: 700; transition: 0.2s; }
-        .custom-select-trigger svg { transition: transform 0.2s; color: #64748b; width: 18px; height: 18px; }
+        .custom-select-wrapper { position: relative; user-select: none; margin-top: 6px; }
+        .custom-select-trigger { background: var(--bg-color); border: 1.5px solid var(--border-light); padding: 12px 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: var(--text-main); font-size: 0.85rem; font-weight: 700; transition: 0.2s; }
+        .custom-select-trigger svg { transition: transform 0.2s; color: #64748b; width: 16px; height: 16px; }
         .custom-select-wrapper.open .custom-select-trigger { border-color: var(--bryt-primary); background: var(--card-bg); }
         .custom-select-wrapper.open .custom-select-trigger svg { transform: rotate(180deg); color: var(--bryt-primary); }
-        .custom-options { position: absolute; display: none; top: calc(100% + 4px); left: 0; right: 0; background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 12px; z-index: 20; max-height: 200px; overflow-y: auto; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); padding: 6px; }
+        .custom-options { position: absolute; display: none; top: calc(100% + 4px); left: 0; right: 0; background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 12px; z-index: 20; max-height: 180px; overflow-y: auto; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); padding: 6px; }
         .custom-select-wrapper.open .custom-options { display: block; }
-        .custom-option { padding: 12px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; color: var(--text-main); font-weight: 600; transition: background 0.15s; }
+        .custom-option { padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; color: var(--text-main); font-weight: 600; transition: background 0.15s; }
         .custom-option:hover { background: rgba(29, 94, 208, 0.05); color: var(--bryt-primary); }
 
         /* Forms */
         .form-group label { font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px; display: block; }
-        .form-input { width: 100%; padding: 14px; border: 1.5px solid var(--border-light); border-radius: 12px; font-size: 0.95rem; font-weight: 700; color: var(--text-main); outline: none; transition: 0.2s; background: var(--bg-color); box-sizing: border-box; }
+        .form-input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border-light); border-radius: 12px; font-size: 0.9rem; font-weight: 700; color: var(--text-main); outline: none; transition: 0.2s; background: var(--bg-color); box-sizing: border-box; }
         .form-input:focus { border-color: var(--bryt-primary); background: var(--card-bg); }
-        .input-row { display: flex; gap: 12px; margin-bottom: 16px; }
+        .input-row { display: flex; gap: 10px; margin-bottom: 12px; }
+
+        /* 🚀 COMPACT PIN KEYPAD */
+        .pin-display { display: flex; justify-content: center; gap: 12px; margin: 10px 0 16px; }
+        .pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #cbd5e1; transition: 0.2s; }
+        .pin-dot.filled { background: var(--bryt-primary); border-color: var(--bryt-primary); transform: scale(1.15); }
+
+        .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 16px; max-width: 260px; margin: 0 auto 12px; }
+        .keypad-btn { background: transparent; border: none; font-size: 1.35rem; font-weight: 800; color: var(--text-main); height: 48px; width: 48px; margin: 0 auto; cursor: pointer; border-radius: 50%; transition: background 0.15s; display: flex; align-items: center; justify-content: center; user-select: none; touch-action: manipulation; }
+        .keypad-btn:active { background: rgba(29, 94, 208, 0.12); }
+        
+        .forgot-pin-wrap { margin: 4px 0 12px; text-align: center; }
+        .forgot-pin-link { font-size: 0.75rem; font-weight: 700; color: var(--bryt-primary); text-decoration: none; }
+        .forgot-pin-link:active { opacity: 0.7; }
 
         /* Success Card State */
         .success-card { background: var(--card-bg); border-radius: 20px; padding: 32px 20px; text-align: center; border: 1px solid var(--border-light); display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
@@ -150,7 +164,7 @@
 
     <header class="app-topbar">
         <div class="app-topbar-left">
-            <a href="/dashboard/index.html" class="smart-back">
+            <a href="/dashboard/index.html" class="smart-back" id="smart-back-btn">
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
@@ -236,6 +250,7 @@
     <!-- Bottom-Up Service Modal -->
     <div id="service-modal" class="modal-overlay">
         <div class="modal-sheet">
+            <div class="sheet-handle"></div>
             <div class="modal-header">
                 <h3 class="modal-title" id="modal-service-title">Service Request</h3>
                 <button type="button" class="btn-close-modal" id="modal-close-trigger">
@@ -246,10 +261,11 @@
             <div class="step-indicators">
                 <div class="dot active" id="dot-1"></div>
                 <div class="dot" id="dot-2"></div>
+                <div class="dot" id="dot-3"></div>
             </div>
 
             <form id="jamb-form">
-                <!-- PHASE 1 -->
+                <!-- PHASE 1: Details -->
                 <div id="step-1" class="modal-step active">
                     
                     <div id="dynamic-service-notice" class="dynamic-notice">
@@ -260,9 +276,8 @@
                         <p id="dynamic-notice-text" class="dynamic-notice-text"></p>
                     </div>
 
-                    <div class="form-group" id="reprint-group" style="display: none; margin-bottom: 16px;">
+                    <div class="form-group" id="reprint-group" style="display: none; margin-bottom: 12px;">
                         <label>Select Reprint Type</label>
-                        <!-- CUSTOM DROPDOWN UI -->
                         <div class="custom-select-wrapper" id="reprint-select-wrapper">
                             <div class="custom-select-trigger" id="reprint-select-trigger">
                                 <span id="reprint-select-text" style="opacity: 0.6;">Select a document...</span>
@@ -279,7 +294,7 @@
                         <input type="hidden" id="reprint-type" required>
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 16px;">
+                    <div class="form-group" style="margin-bottom: 12px;">
                         <label>Candidate Full Name</label>
                         <input type="text" id="full-name" class="form-input" placeholder="Enter full name" required>
                     </div>
@@ -295,24 +310,62 @@
                         </div>
                     </div>
 
-                    <button type="button" onclick="validateAndGoToStep(1, 2)" style="width: 100%; padding: 14px; border-radius: 12px; background: var(--bryt-primary); color: #fff; border: none; font-weight: 800; font-size: 0.9rem; cursor: pointer; margin-top: 10px;">Next Step</button>
+                    <button type="button" onclick="validateAndGoToStep(1, 2)" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bryt-primary); color: #fff; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer; margin-top: 8px;">Next Step</button>
                 </div>
 
-                <!-- PHASE 2 -->
+                <!-- PHASE 2: Contact Info -->
                 <div id="step-2" class="modal-step">
-                    <div class="form-group" style="margin-bottom: 16px;">
+                    <div class="form-group" style="margin-bottom: 12px;">
                         <label>Active Phone Number</label>
                         <input type="tel" id="whatsapp" class="form-input" placeholder="08012345678" maxlength="11" required>
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 24px;">
+                    <div class="form-group" style="margin-bottom: 16px;">
                         <label>Email Address</label>
                         <input type="email" id="email" class="form-input" placeholder="candidate@example.com" required>
                     </div>
 
                     <div style="display: flex; gap: 8px;">
-                        <button type="button" id="modal-cancel-btn" style="flex: 1; padding: 14px; border-radius: 12px; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-light); font-weight: 700; font-size: 0.9rem; cursor: pointer;">Cancel</button>
-                        <button type="submit" id="modal-submit" style="flex: 1.5; padding: 14px; border-radius: 12px; background: var(--bryt-primary); color: #fff; border: none; font-weight: 800; font-size: 0.9rem; cursor: pointer;">Pay <span id="modal-pay-amt">₦0</span></button>
+                        <button type="button" id="modal-cancel-btn" onclick="goToStep(1)" style="flex: 1; padding: 12px; border-radius: 12px; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-light); font-weight: 700; font-size: 0.85rem; cursor: pointer;">Back</button>
+                        <button type="button" onclick="validateAndGoToStep(2, 3)" style="flex: 1.5; padding: 12px; border-radius: 12px; background: var(--bryt-primary); color: #fff; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer;">Proceed</button>
+                    </div>
+                </div>
+
+                <!-- 🚀 PHASE 3: PIN KEYPAD -->
+                <div id="step-3" class="modal-step">
+                    <div style="text-align: center; margin-bottom: 12px;">
+                        <h4 style="margin: 0 0 4px; font-size: 1.05rem; font-weight: 800;">Authorize Payment</h4>
+                        <p style="margin: 0; font-size: 0.75rem; color: #64748b;">Enter 4-digit PIN to confirm <strong style="color: #10b981;" id="modal-pay-amt-pin">₦0</strong></p>
+                    </div>
+
+                    <div class="pin-display">
+                        <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+                    </div>
+
+                    <div class="pin-keypad">
+                        <button type="button" class="keypad-btn" data-val="1">1</button>
+                        <button type="button" class="keypad-btn" data-val="2">2</button>
+                        <button type="button" class="keypad-btn" data-val="3">3</button>
+                        <button type="button" class="keypad-btn" data-val="4">4</button>
+                        <button type="button" class="keypad-btn" data-val="5">5</button>
+                        <button type="button" class="keypad-btn" data-val="6">6</button>
+                        <button type="button" class="keypad-btn" data-val="7">7</button>
+                        <button type="button" class="keypad-btn" data-val="8">8</button>
+                        <button type="button" class="keypad-btn" data-val="9">9</button>
+                        <div></div>
+                        <button type="button" class="keypad-btn" data-val="0">0</button>
+                        <button type="button" class="keypad-btn" data-val="back">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
+                        </button>
+                    </div>
+
+                    <div class="forgot-pin-wrap">
+                        <a href="/dashboard/security/index.html" class="forgot-pin-link">Forgot PIN?</a>
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" onclick="goToStep(2)" style="flex: 1; padding: 12px; border-radius: 12px; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-light); font-weight: 700; font-size: 0.85rem; cursor: pointer;">Back</button>
+                        <button type="button" id="modal-submit-pin" disabled style="flex: 1.5; padding: 12px; border-radius: 12px; background: var(--bryt-primary); color: #ffffff; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer;">Pay Now</button>
                     </div>
                 </div>
             </form>

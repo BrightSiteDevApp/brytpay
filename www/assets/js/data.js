@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     let selectedNetwork = 'mtn';
     let selectedType = 'sme-data';
     let selectedLogo = 'mtn-logo.png';
+    let currentBalance = 0;
+    let currentPin = '';
 
     // 🚀 SMART ROUTING: Explicitly define back targets based on where they came from
     const backBtn = document.getElementById('smart-back-btn');
@@ -101,13 +103,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const submitBtn = document.getElementById('submit-btn');
     const carrierIndicator = document.getElementById('carrier-indicator');
     
-    const confirmModal = document.getElementById('confirm-modal');
+    // PIN Bottom Sheet Elements
+    const pinModal = document.getElementById('pin-modal-overlay');
     const modalPlan = document.getElementById('modal-plan');
     const modalPhone = document.getElementById('modal-phone');
     const modalAmount = document.getElementById('modal-amount');
     const modalCancel = document.getElementById('modal-cancel');
     const modalConfirm = document.getElementById('modal-confirm');
     const modalLogo = document.getElementById('modal-network-logo');
+    const pinDots = document.querySelectorAll('.pin-dot');
+    const keypadBtns = document.querySelectorAll('.keypad-btn');
     
     const successOverlay = document.getElementById('success-overlay');
 
@@ -139,7 +144,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function fetchBalance() {
         const { data } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
         if (data) {
-            document.getElementById('user-balance').textContent = `₦${parseFloat(data.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+            currentBalance = parseFloat(data.balance);
+            document.getElementById('user-balance').textContent = `₦${currentBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
         }
     }
     await fetchBalance();
@@ -220,6 +226,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
+    // 🚀 KEYPAD LOGIC
+    function updatePinUI() {
+        pinDots.forEach((dot, idx) => {
+            if (idx < currentPin.length) dot.classList.add('filled');
+            else dot.classList.remove('filled');
+        });
+        modalConfirm.disabled = currentPin.length !== 4;
+    }
+
+    keypadBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const val = btn.getAttribute('data-val');
+            if (val === 'back') {
+                currentPin = currentPin.slice(0, -1);
+            } else if (val) {
+                if (currentPin.length < 4) currentPin += val;
+            }
+            updatePinUI();
+        });
+    });
+
     document.getElementById('data-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const phone = phoneInput.value.trim();
@@ -230,16 +257,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (phone.length !== 11 || !/^[0-9]+$/.test(phone)) return showToast("Please enter a valid 11-digit phone number.", "error");
 
+        const amount = parseFloat(priceStr);
+        if (amount > currentBalance) {
+            showToast('Insufficient wallet balance.', 'error');
+            return;
+        }
+
         modalLogo.src = `../../assets/img/${selectedLogo}`;
         modalPlan.textContent = label;
         modalPhone.textContent = phone;
-        modalAmount.textContent = `₦${parseFloat(priceStr).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
-        confirmModal.style.display = 'flex';
+        modalAmount.textContent = `₦${amount.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+        
+        currentPin = '';
+        updatePinUI();
+        pinModal.classList.add('active');
     });
 
-    modalCancel.addEventListener('click', () => confirmModal.style.display = 'none');
+    modalCancel.addEventListener('click', () => {
+        pinModal.classList.remove('active');
+        currentPin = '';
+        updatePinUI();
+    });
 
     modalConfirm.addEventListener('click', async () => {
+        if (currentPin.length !== 4) return showToast('Enter your 4-digit PIN.', 'error');
+
         const phone = phoneInput.value.trim();
         const [plan_code, priceStr, network] = hiddenPlanInput.value.split('|');
 
@@ -249,14 +291,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             const { data: resData, error } = await window.db.functions.invoke('vend-data-swift', {
-                body: { network: network, plan_code: plan_code, phone: phone }
+                body: { 
+                    network: network, 
+                    plan_code: plan_code, 
+                    phone: phone,
+                    pin: currentPin 
+                }
             });
 
             if (error) throw new Error(error.message);
             if (resData && resData.success === false) throw new Error(resData.message);
 
             // 🚀 SUCCESS! Trigger Fullscreen Checkmark Animation
-            confirmModal.style.display = 'none';
+            pinModal.classList.remove('active');
             successOverlay.classList.add('active');
             
             // Exactly 1.5s later, reload the page to clear the form without leaving
@@ -269,7 +316,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             modalConfirm.disabled = false; 
             modalCancel.disabled = false;
             modalConfirm.textContent = 'Pay Now';
-            confirmModal.style.display = 'none';
+            pinModal.classList.remove('active');
         }
     });
 });

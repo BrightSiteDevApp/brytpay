@@ -1,5 +1,15 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // ==========================================
+    // 🚀 TEST & REVIEWER OVERRIDE CONFIG
+    // ==========================================
+    const TEST_REVIEWER_EMAILS = [
+        'test@gmail.com',
+        'test@brytpay.name.ng',
+        'test@brytpay.com'
+    ];
+    const TEST_OTP = '123456';
+
+    // ==========================================
     // 🛡️ SMART REDIRECT HELPER (Anti-Open Redirect)
     // ==========================================
     const handleSmartRedirect = () => {
@@ -102,16 +112,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             regEmail = document.getElementById('email').value.trim();
             const pwd = pwdInput.value;
             const confirmPwd = confirmPwdInput.value;
+            const isTestAccount = TEST_REVIEWER_EMAILS.includes(regEmail.toLowerCase());
 
             if (!/^\d{11}$/.test(regPhone)) return showError('Enter a valid 11-digit phone number.');
-            if (!pwdRegex.test(pwd)) return showError('Password must contain at least one uppercase letter, one lowercase letter, and one number.');
+            if (!isTestAccount && !pwdRegex.test(pwd)) return showError('Password must contain at least one uppercase letter, one lowercase letter, and one number.');
             if (pwd !== confirmPwd) return showError('Passwords do not match. Please try again.');
 
             btn.disabled = true;
             btn.textContent = 'Checking...';
             if (errorEl) errorEl.style.display = 'none';
 
-            // 🚀 SMART CHECK: Verify if email exists BEFORE trying to sign up
             try {
                 const { data: emailExists } = await window.db.rpc('check_email_exists', { lookup_email: regEmail });
                 if (emailExists) {
@@ -160,7 +170,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             e.preventDefault();
             const btn = document.getElementById('verify-signup-btn');
             const token = document.getElementById('signup-otp-code').value.trim();
-            
             const verifyEmail = regEmail || localStorage.getItem('bryt_pending_email');
             
             if (!verifyEmail) {
@@ -207,10 +216,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         .select();
                     updatedRows = upsertRes.data;
                     profileError = upsertRes.error;
-                }
-
-                if (profileError || !updatedRows || updatedRows.length === 0 || !updatedRows[0].phone_number) {
-                    console.error("Profile Setup Error:", profileError);
                 }
 
                 await window.db.from('wallets').upsert({ user_id: user.id, balance: 0.00 });
@@ -283,6 +288,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
+            loginEmailForOtp = email;
+
+            // 🚀 PLAY STORE TEST ACCOUNT BYPASS
+            // Keep session active, do not call signOut(), and do not send email OTP
+            if (TEST_REVIEWER_EMAILS.includes(email.toLowerCase())) {
+                sessionStorage.setItem('bryt_test_email', email);
+                sessionStorage.setItem('bryt_test_pass', password);
+                loginForm.style.display = 'none';
+                loginOtpForm.style.display = 'block';
+                authTitle.innerHTML = `<h1>Two-Step Login</h1><p>Enter your 6-digit security code.</p>`;
+                btn.disabled = false;
+                btn.textContent = 'Sign In';
+                return;
+            }
+
+            // Normal User Flow
             await window.db.auth.signOut();
             const { error: otpError } = await window.db.auth.signInWithOtp({ email });
 
@@ -293,7 +314,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            loginEmailForOtp = email;
             loginForm.style.display = 'none';
             loginOtpForm.style.display = 'block';
             authTitle.innerHTML = `<h1>Two-Step Login</h1><p>Check your email for the security code.</p>`;
@@ -303,10 +323,34 @@ document.addEventListener('DOMContentLoaded', async () => {
             e.preventDefault();
             const btn = document.getElementById('verify-login-btn');
             const token = document.getElementById('login-otp-code').value.trim();
+            const currentEmail = (loginEmailForOtp || sessionStorage.getItem('bryt_test_email') || '').toLowerCase();
 
             btn.disabled = true;
             btn.textContent = 'Authenticating...';
 
+            // 🚀 PLAY STORE TEST ACCOUNT OTP BYPASS
+            if (TEST_REVIEWER_EMAILS.includes(currentEmail) && token === TEST_OTP) {
+                const { data: sessData } = await window.db.auth.getSession();
+                if (!sessData?.session) {
+                    const savedPass = sessionStorage.getItem('bryt_test_pass') || '123456';
+                    const { error: reAuthErr } = await window.db.auth.signInWithPassword({
+                        email: currentEmail,
+                        password: savedPass
+                    });
+                    if (reAuthErr) {
+                        showError(reAuthErr.message);
+                        btn.disabled = false;
+                        btn.textContent = 'Verify & Sign In';
+                        return;
+                    }
+                }
+                sessionStorage.removeItem('bryt_test_email');
+                sessionStorage.removeItem('bryt_test_pass');
+                handleSmartRedirect();
+                return;
+            }
+
+            // Normal User OTP Verification
             const { error } = await window.db.auth.verifyOtp({ email: loginEmailForOtp, token, type: 'email' });
 
             if (error) {
@@ -327,7 +371,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             btn.disabled = true;
             btn.textContent = 'Checking...';
 
-            // 🚀 SMART CHECK: Verify if email exists using our custom database function
             try {
                 const { data: emailExists } = await window.db.rpc('check_email_exists', { lookup_email: recoveryEmail });
                 if (!emailExists) {

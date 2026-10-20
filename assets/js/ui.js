@@ -61,9 +61,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         else greetingTime.textContent = 'Good evening,';
     }
 
-    // ==========================================
-    // 🚀 MANDATORY PIN SETUP LOGIC
-    // ==========================================
     function initPinSetup() {
         const overlay = document.getElementById('pin-setup-overlay');
         const dots = document.querySelectorAll('.pin-dot');
@@ -100,7 +97,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             saveBtn.disabled = true;
             saveBtn.innerHTML = 'Saving...';
             
-            // Save PIN to Supabase Profiles Table
             const { error } = await window.db.from('profiles').update({ transaction_pin: currentPin }).eq('id', user.id);
             
             if (error) {
@@ -111,7 +107,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 saveBtn.style.background = '#10b981';
                 saveBtn.innerHTML = 'PIN Saved! ✓';
                 
-                // Hide overlay after success
                 setTimeout(() => {
                     overlay.classList.remove('active');
                 }, 1000);
@@ -119,9 +114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // 🚀 LOAD PROFILE & TRIGGER PIN CHECK
     async function loadProfile() {
-        // Now fetching transaction_pin from the database
         const { data } = await window.db.from('profiles').select('full_name, account_id, transaction_pin').eq('id', user.id).single();
         const greetingEl = document.getElementById('user-greeting');
         const displayIdEl = document.getElementById('display-account-id');
@@ -136,7 +129,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 displayIdEl.textContent = userAccountId;
             }
 
-            // SMART CHECK: If they don't have a PIN saved in the DB, lock the screen!
             if (!data.transaction_pin) {
                 initPinSetup();
             }
@@ -200,7 +192,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const p = (tx.provider || tx.recipient || '').toLowerCase();
         const t = (tx.type || '').toLowerCase();
         
-        // NEW: Check if the transaction metadata marks this as a credit
         const isMetadataCredit = tx.metadata && tx.metadata.transaction_type === 'credit';
         
         return isMetadataCredit || t === 'credit' || s.includes('fund') || s.includes('deposit') || s.includes('topup') || p.includes('paystack') || p.includes('flutterwave') || p.includes('topup');
@@ -248,6 +239,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             return net ? `${net} DATA BUNDLE` : 'DATA BUNDLE';
         }
 
+        // 🚀 BANK TRANSFER FIX
+        if (srvType === 'bank_transfer') return `TRANSFER TO ${provider}`;
+
         let clean = (tx.service_type || tx.recipient || 'PAYMENT').replace(/vtpass/gi, '').replace(/external_checkout/gi, '').replace(/[:\-_]/g, ' ').trim().toUpperCase();
         if (clean === 'SELF') clean = (tx.provider || 'PAYMENT').toUpperCase();
         return clean;
@@ -274,6 +268,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (logoFile) return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: #ffffff; border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; padding: 4px;"><img src="../assets/img/${logoFile}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" onerror="this.parentElement.innerHTML='💼'"></div>`;
         if (isCreditTx(tx)) return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>`;
         
+        // 🚀 BANK TRANSFER FIX
+        // 🚀 BANK TRANSFER FIX: Paper Jet (Send) Icon instead of padlock
+        if (raw.includes('bank_transfer') || raw.includes('transfer')) return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: rgba(29, 94, 208, 0.1); color: var(--bryt-primary); border: 1px solid rgba(29, 94, 208, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></div>`;
+
         return `<div class="tx-brand" style="width: 36px; height: 36px; border-radius: 12px; background: var(--bg-color); color: #64748b; border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>`;
     };
 
@@ -391,4 +389,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadTransactions();
     managePushConsent();
 });
-

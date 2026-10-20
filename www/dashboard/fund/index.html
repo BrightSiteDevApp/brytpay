@@ -64,12 +64,12 @@
         .balance-amount { font-size: 1.4rem; font-weight: 800; color: var(--text-main); line-height: 1; }
         .balance-icon { width: 42px; height: 42px; background: #eff6ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--bryt-primary); }
 
-        /* Compact Account Cards */
-        .account-card { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 14px; margin-bottom: 16px; overflow: hidden; transition: 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .account-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px dashed var(--border-light); background: rgba(0,0,0,0.01); }
-        .account-brand { display: flex; align-items: center; gap: 8px; }
-        .account-logo { height: 18px; width: auto; max-width: 60px; object-fit: contain; }
-        .bank-name { font-weight: 800; font-size: 0.75rem; color: var(--text-main); text-transform: uppercase; }
+        /* Compact, Slimmer Account Cards */
+        .account-card { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 12px; margin-bottom: 12px; overflow: hidden; transition: 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .account-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 1px dashed var(--border-light); background: rgba(0,0,0,0.01); }
+        .account-brand { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+        .account-logo { height: 16px; width: auto; max-width: 50px; object-fit: contain; }
+        .bank-name { font-weight: 800; font-size: 0.7rem; color: var(--text-main); text-transform: uppercase; }
         
         .account-tag { font-size: 0.6rem; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
         .tag-active { background: #dcfce7; color: #15803d; }
@@ -77,15 +77,16 @@
         html.dark-theme .tag-active { background: rgba(21, 128, 61, 0.2); color: #4ade80; }
         html.dark-theme .tag-basic { background: rgba(51, 65, 85, 0.5); color: #cbd5e1; }
 
-        .account-body { padding: 16px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .acc-label { font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
-        .acc-name { font-size: 0.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
-        .account-num { font-size: 1.15rem; font-weight: 800; color: var(--bryt-primary); letter-spacing: 1px; font-family: monospace; line-height: 1; }
+        .account-body { padding: 12px 14px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .acc-label { font-size: 0.55rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; }
+        .acc-name { font-size: 0.75rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .account-num { font-size: 1.1rem; font-weight: 800; color: var(--bryt-primary); letter-spacing: 1px; font-family: monospace; line-height: 1; margin-top: 2px;}
         
-        .btn-copy { background: transparent; color: var(--text-main); padding: 8px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; border: 1px solid var(--border-light); display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-copy { background: transparent; color: var(--text-main); padding: 6px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; cursor: pointer; border: 1px solid var(--border-light); display: inline-flex; align-items: center; gap: 4px; transition: 0.2s; }
+        .btn-copy svg { width: 14px; height: 14px; }
         html.dark-theme .btn-copy { border-color: #334155; }
 
-        .account-footer { padding: 10px 16px; background: rgba(0,0,0,0.01); border-top: 1px dashed var(--border-light); font-size: 0.65rem; font-weight: 700; color: #64748b; display: flex; justify-content: space-between; align-items: center; }
+        .account-footer { padding: 8px 14px; background: rgba(0,0,0,0.01); border-top: 1px dashed var(--border-light); font-size: 0.65rem; font-weight: 700; color: #64748b; display: flex; justify-content: space-between; align-items: center; }
 
         /* Standalone KYC Prompt Card */
         .standalone-upgrade-card { background: rgba(29, 94, 208, 0.05); border: 1px solid var(--border-light); border-radius: 14px; padding: 16px; margin-bottom: 16px; text-align: left; display: none; }
@@ -189,16 +190,21 @@
             <!-- PalmPay (1) -->
             <div class="account-card" id="palmpay-card-1" style="display: none;">
                 <div class="account-header">
-                    <div class="account-brand">
-                        <img src="../../assets/img/palmpay-logo.png" alt="" class="account-logo">
-                        <span class="bank-name">PALMPAY (1)</span>
+                    <div>
+                        <div class="acc-label">BANK NAME:</div>
+                        <div class="account-brand">
+                            <img src="../../assets/img/palmpay-logo.png" alt="" class="account-logo">
+                            <span class="bank-name">PALMPAY</span>
+                        </div>
                     </div>
                     <span class="account-tag tag-active"><i class="fas fa-check-circle"></i> Verified</span>
                 </div>
                 <div class="account-body">
                     <div>
-                        <div class="acc-label">Account Name</div>
+                        <div class="acc-label">ACCOUNT NAME:</div>
                         <div class="acc-name" id="acc-name-topify">--</div>
+                        
+                        <div class="acc-label">ACCT NO:</div>
                         <div class="account-num" id="palmpay-no-1">0000000000</div>
                     </div>
                     <button class="btn-copy" onclick="copyAccountNumber('palmpay-no-1')">
@@ -215,16 +221,21 @@
             <!-- PalmPay (2) -->
             <div class="account-card" id="palmpay-card-2" style="display: none;">
                 <div class="account-header">
-                    <div class="account-brand">
-                        <img src="../../assets/img/palmpay-logo.png" alt="" class="account-logo">
-                        <span class="bank-name">PALMPAY (2)</span>
+                    <div>
+                        <div class="acc-label">BANK NAME:</div>
+                        <div class="account-brand">
+                            <img src="../../assets/img/palmpay-logo.png" alt="" class="account-logo">
+                            <span class="bank-name">PALMPAY</span>
+                        </div>
                     </div>
                     <span class="account-tag tag-active"><i class="fas fa-check-circle"></i> Verified</span>
                 </div>
                 <div class="account-body">
                     <div>
-                        <div class="acc-label">Account Name</div>
+                        <div class="acc-label">ACCOUNT NAME:</div>
                         <div class="acc-name">BRYT Pay (Nexpay)</div>
+                        
+                        <div class="acc-label">ACCT NO:</div>
                         <div class="account-num" id="palmpay-no-2">0000000000</div>
                     </div>
                     <button class="btn-copy" onclick="copyAccountNumber('palmpay-no-2')">
@@ -241,16 +252,21 @@
             <!-- Moniepoint -->
             <div class="account-card" id="moniepoint-card" style="display: none;">
                 <div class="account-header">
-                    <div class="account-brand">
-                        <img src="../../assets/img/moniepoint-logo.png" alt="" class="account-logo">
-                        <span class="bank-name">MONIEPOINT</span>
+                    <div>
+                        <div class="acc-label">BANK NAME:</div>
+                        <div class="account-brand">
+                            <img src="../../assets/img/moniepoint-logo.png" alt="" class="account-logo">
+                            <span class="bank-name">MONIEPOINT</span>
+                        </div>
                     </div>
                     <span class="account-tag tag-active"><i class="fas fa-check-circle"></i> Verified</span>
                 </div>
                 <div class="account-body">
                     <div>
-                        <div class="acc-label">Account Name</div>
+                        <div class="acc-label">ACCOUNT NAME:</div>
                         <div class="acc-name" id="acc-name-moniepoint">--</div>
+                        
+                        <div class="acc-label">ACCT NO:</div>
                         <div class="account-num" id="moniepoint-no">0000000000</div>
                     </div>
                     <button class="btn-copy" onclick="copyAccountNumber('moniepoint-no')">
@@ -267,16 +283,22 @@
             <!-- 9PSB -->
             <div class="account-card" id="psb9-card" style="display: none;">
                 <div class="account-header">
-                    <div class="account-brand">
-                        <img src="../../assets/img/9psb-logo.png" alt="" class="account-logo">
-                        <span class="bank-name">9PSB</span>
+                    <div>
+                        <div class="acc-label">BANK NAME:</div>
+                        <div class="account-brand">
+                            <img src="../../assets/img/9psb-logo.png" alt="" class="account-logo">
+                            <!-- Font size reduced specifically for this long name -->
+                            <span class="bank-name" style="font-size: 0.55rem;">9PSB (9 PAYMENT SERVICE BANK)</span>
+                        </div>
                     </div>
                     <span class="account-tag" id="psb9-badge"></span>
                 </div>
                 <div class="account-body">
                     <div>
-                        <div class="acc-label">Account Name</div>
+                        <div class="acc-label">ACCOUNT NAME:</div>
                         <div class="acc-name">PAYVESSEL/BRYT Pay</div>
+                        
+                        <div class="acc-label">ACCT NO:</div>
                         <div class="account-num" id="psb9-no">0000000000</div>
                     </div>
                     <button class="btn-copy" onclick="copyAccountNumber('psb9-no')">

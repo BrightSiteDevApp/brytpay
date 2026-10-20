@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const user = session.user;
     let currentBalance = 0;
+    let userPin = '';
+    let currentPinInput = '';
 
     // 🚀 SMART ROUTING
     const backBtn = document.getElementById('smart-back-btn');
@@ -64,11 +66,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const inputIdentifier = document.getElementById('nin-identifier');
     const successOverlay = document.getElementById('success-overlay');
     
+    // 🚀 PIN KEYPAD ELEMENTS
+    const pinDots = document.querySelectorAll('.pin-dot');
+    const keypadBtns = document.querySelectorAll('.keypad-btn');
+    const btnSubmitPin = document.getElementById('modal-submit-pin');
+    
     window.goToStep = function(stepNum) {
         document.querySelectorAll('.modal-step').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.dot').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.dot-nav').forEach(el => el.classList.remove('active'));
         document.getElementById(`step-${stepNum}`).classList.add('active');
         document.getElementById(`dot-${stepNum}`).classList.add('active');
+        
+        // Reset PIN if navigating to Step 3
+        if (stepNum === 3) {
+            currentPinInput = '';
+            updatePinUI();
+        }
     };
 
     window.validateAndGoToStep = function(currentStep, nextStep) {
@@ -83,17 +96,28 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
+        if (currentStep === 2 && currentBalance < selectedPrice) {
+            showToast(`Insufficient balance. You need at least ₦${selectedPrice.toLocaleString()} to process this request.`, 'error');
+            return;
+        }
+
         if (isValid) goToStep(nextStep);
     };
     
-    async function loadBalance() {
-        const { data } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
-        if (data) {
-            currentBalance = parseFloat(data.balance);
+    async function loadProfileAndBalance() {
+        const { data: wallet } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
+        if (wallet) {
+            currentBalance = parseFloat(wallet.balance);
             userBalanceEl.textContent = `₦${currentBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
         }
+        
+        // Securely fetch transaction PIN so it can be verified smoothly in JS
+        const { data: profile } = await window.db.from('profiles').select('transaction_pin').eq('id', user.id).single();
+        if (profile && profile.transaction_pin) {
+            userPin = profile.transaction_pin;
+        }
     }
-    await loadBalance();
+    await loadProfileAndBalance();
 
     const tabNin = document.getElementById('tab-nin-num');
     const tabPhone = document.getElementById('tab-phone-num');
@@ -121,18 +145,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateCardPrices();
     });
 
-    // 🚀 Slide-Down Fix for Modal
     function closeModal() {
         serviceModal.classList.remove('active');
         setTimeout(() => {
             serviceModal.style.display = 'none';
-        }, 400); 
+        }, 300); 
     }
 
     if (modalCloseTrigger) modalCloseTrigger.addEventListener('click', closeModal);
     if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
     serviceModal.addEventListener('click', (e) => {
         if (e.target === serviceModal) closeModal();
+    });
+
+    // 🚀 CUSTOM PIN LOGIC
+    function updatePinUI() {
+        pinDots.forEach((dot, idx) => {
+            if (idx < currentPinInput.length) dot.classList.add('filled');
+            else dot.classList.remove('filled');
+        });
+        btnSubmitPin.disabled = currentPinInput.length !== 4;
+    }
+
+    keypadBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const val = btn.getAttribute('data-val');
+            if (val === 'back') {
+                currentPinInput = currentPinInput.slice(0, -1);
+            } else if (val) {
+                if (currentPinInput.length < 4) currentPinInput += val;
+            }
+            updatePinUI();
+        });
     });
 
     document.querySelectorAll('.service-card').forEach(card => {
@@ -143,7 +187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('modal-service-title').textContent = selectedService;
             document.getElementById('modal-service-desc').textContent = card.getAttribute('data-desc');
             document.getElementById('modal-slip-preview').src = `../../assets/img/${card.getAttribute('data-img')}`;
-            document.getElementById('modal-pay-amt').textContent = `₦${selectedPrice.toLocaleString()}`;
+            document.getElementById('modal-pay-amt-pin').textContent = `₦${selectedPrice.toLocaleString()}`;
             
             document.getElementById('nin-form').reset();
             goToStep(1);
@@ -153,22 +197,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    document.getElementById('nin-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    // 🚀 FINAL SUBMIT (Triggered by PIN button)
+    btnSubmitPin.addEventListener('click', async () => {
+        if (!userPin) return showToast('Please set your 4-digit PIN in your security settings first.', 'error');
+        if (currentPinInput !== userPin) return showToast('Incorrect PIN. Try again.', 'error');
 
         const fullName = document.getElementById('full-name').value.trim();
         const identifierValue = inputIdentifier.value.trim();
         const whatsapp = document.getElementById('whatsapp').value.trim();
         const email = document.getElementById('email').value.trim();
         
-        if (currentBalance < selectedPrice) {
-            showToast(`Insufficient balance. You need at least ₦${selectedPrice.toLocaleString()} to process this request.`, 'error');
-            return;
-        }
-
-        const btnSubmit = document.getElementById('modal-submit');
-        btnSubmit.disabled = true; 
-        btnSubmit.textContent = 'Processing...';
+        btnSubmitPin.disabled = true; 
+        btnSubmitPin.textContent = 'Processing...';
 
         try {
             const { data, error } = await window.db.rpc('process_nin_order', {
@@ -184,11 +224,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (error) throw error;
 
             closeModal();
-
-            // Trigger Fullscreen Checkmark Animation
             successOverlay.classList.add('active');
             
-            // Reload page smoothly after 1.5s
             setTimeout(() => {
                 window.location.reload();
             }, 1500);
@@ -196,8 +233,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (err) {
             showToast(`Order could not be completed: ${err.message || 'Server error'}`, 'error');
         } finally {
-            btnSubmit.disabled = false; 
-            btnSubmit.innerHTML = `Pay ₦${selectedPrice.toLocaleString()}`;
+            btnSubmitPin.disabled = false; 
+            btnSubmitPin.innerHTML = 'Pay Now';
         }
     });
 });

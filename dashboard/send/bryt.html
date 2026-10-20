@@ -35,7 +35,7 @@
         .input-wrapper input { width: 100%; padding: 14px; border: 1.5px solid var(--border-light); border-radius: 12px; font-size: 0.95rem; font-weight: 700; color: var(--text-main); outline: none; background: var(--bg-color); }
         .input-wrapper input:focus { border-color: var(--bryt-primary); background: var(--card-bg); }
         
-        .name-badge { position: absolute; right: 12px; background: var(--bg-color); border: 1px solid var(--border-light); font-size: 0.7rem; font-weight: 800; padding: 6px 12px; border-radius: 8px; display: none; }
+        .name-badge { display: none; margin-top: -12px; margin-bottom: 20px; background: var(--bg-color); border: 1px solid var(--border-light); font-size: 0.75rem; font-weight: 800; padding: 8px 12px; border-radius: 8px; width: fit-content; max-width: 100%; word-break: break-word; }
         .name-badge.success { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
         .name-badge.error { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.2); }
 
@@ -44,20 +44,39 @@
         
         .btn-primary { width: 100%; padding: 14px; background: var(--bryt-primary); color: #fff; font-size: 0.9rem; border-radius: 12px; font-weight: 800; border: none; cursor: pointer; display: flex; justify-content: center; gap: 8px; }
         
-        /* Modals & Overlays */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(11, 18, 32, 0.8); backdrop-filter: blur(4px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 16px; }
-        .modal-card { background: var(--card-bg); border-radius: 16px; width: 100%; max-width: 360px; padding: 24px; border: 1px solid var(--border-light); text-align: center; }
-        .modal-breakdown { background: var(--bg-color); border-radius: 12px; padding: 14px; text-align: left; margin-bottom: 20px; border: 1px solid var(--border-light); }
-        .modal-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 8px; font-weight: 600; }
-        .pin-input { width: 100%; padding: 14px; text-align: center; letter-spacing: 12px; font-size: 1.4rem; font-weight: 800; border: 1.5px solid var(--border-light); border-radius: 12px; margin-bottom: 20px; outline: none; background: var(--bg-color); color: var(--text-main); }
-        .pin-input:focus { border-color: var(--bryt-primary); }
+        /* 🚀 COMPACT PIN KEYPAD OVERLAY */
+        .pin-modal-overlay { position: fixed; inset: 0; background: rgba(11, 18, 32, 0.95); z-index: 20000; display: none; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity 0.25s ease; }
+        .pin-modal-overlay.active { display: flex; opacity: 1; }
+        .pin-bottom-sheet { background: var(--card-bg); width: 100%; max-width: 480px; border-radius: 24px 24px 0 0; padding: 16px 20px 20px; text-align: center; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.15); box-sizing: border-box; }
+        .pin-modal-overlay.active .pin-bottom-sheet { transform: translateY(0); }
+        
+        .sheet-handle { width: 36px; height: 4px; background: #e2e8f0; border-radius: 10px; margin: 0 auto 12px; }
+        html.dark-theme .sheet-handle { background: #334155; }
+        
+        .modal-breakdown { background: var(--bg-color); border-radius: 12px; padding: 10px 12px; text-align: left; margin: 8px 0 12px; border: 1px solid var(--border-light); }
+        .modal-row { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 6px; font-weight: 600; align-items: center; }
+        .modal-row:last-child { margin-bottom: 0; }
+        
+        .pin-display { display: flex; justify-content: center; gap: 12px; margin: 10px 0 16px; }
+        .pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #cbd5e1; transition: 0.2s; }
+        .pin-dot.filled { background: var(--bryt-primary); border-color: var(--bryt-primary); transform: scale(1.15); }
 
-        .success-overlay { position: fixed; inset: 0; background: var(--card-bg); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 16px; max-width: 260px; margin: 0 auto 12px; }
+        .keypad-btn { background: transparent; border: none; font-size: 1.35rem; font-weight: 800; color: var(--text-main); height: 48px; width: 48px; margin: 0 auto; cursor: pointer; border-radius: 50%; transition: background 0.15s; display: flex; align-items: center; justify-content: center; user-select: none; touch-action: manipulation; }
+        .keypad-btn:active { background: rgba(29, 94, 208, 0.12); }
+        
+        .forgot-pin-wrap { margin: 4px 0 12px; text-align: center; }
+        .forgot-pin-link { font-size: 0.75rem; font-weight: 700; color: var(--bryt-primary); text-decoration: none; }
+        .forgot-pin-link:active { opacity: 0.7; }
+
+        .pin-actions { display: flex; gap: 10px; }
+
+        /* Success & Toast Overlays */
+        .success-overlay { position: fixed; inset: 0; background: var(--card-bg); z-index: 30000; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
         .success-overlay.active { display: flex; opacity: 1; }
         .success-circle { width: 80px; height: 80px; border-radius: 50%; background: #10b981; color: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; box-shadow: 0 0 0 10px rgba(16, 185, 129, 0.15); }
         .success-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
         
-        /* 🚀 UPDATED TOAST: Pushed down from top, properly padded, prevents text cut-off */
         .bryt-toast { position: fixed; top: 80px; left: 16px; right: 16px; margin: 0 auto; background: var(--card-bg); border: 1px solid var(--border-light); padding: 14px 16px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); display: flex; align-items: flex-start; gap: 12px; z-index: 999999; transform: translateY(-150px); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-left: 4px solid var(--bryt-primary); word-break: break-word; }
         .bryt-toast.show { transform: translateY(0); }
     </style>
@@ -103,8 +122,8 @@
                     <label id="input-label">2. Recipient ID</label>
                     <div class="input-wrapper">
                         <input type="text" id="recipient-id" placeholder="e.g. IQY5" autocomplete="off" required>
-                        <span id="name-badge" class="name-badge">Checking...</span>
                     </div>
+                    <div id="name-badge" class="name-badge">Checking...</div>
                 </div>
 
                 <div class="form-group">
@@ -123,19 +142,49 @@
         </div>
     </main>
 
-    <!-- Secure PIN Modal -->
-    <div id="confirm-modal" class="modal-overlay">
-        <div class="modal-card">
-            <h3 style="margin: 0 0 4px 0;">Authorize Transfer</h3>
-            <p style="font-size: 0.75rem; color: #64748b; margin-bottom: 20px;">Enter your 4-digit PIN to confirm.</p>
+    <!-- 🚀 COMPACT PIN KEYPAD MODAL -->
+    <div id="pin-modal-overlay" class="pin-modal-overlay">
+        <div class="pin-bottom-sheet">
+            <div class="sheet-handle"></div>
+            <h3 style="margin: 0 0 2px 0; font-size: 1.05rem; font-weight: 800;">Authorize Transfer</h3>
+            <p style="font-size: 0.7rem; color: #64748b; margin: 0;">Enter your 4-digit PIN to confirm.</p>
+            
             <div class="modal-breakdown">
                 <div class="modal-row"><span style="color: #64748b;">To:</span><strong id="modal-recipient">---</strong></div>
-                <div class="modal-row" style="padding-top: 12px; border-top: 1px dashed var(--border-light);"><span style="color: #64748b;">Amount:</span><strong id="modal-amount" style="color: #10b981; font-size: 1.1rem; font-weight: 800;">₦0.00</strong></div>
+                <div class="modal-row" style="padding-top: 8px; margin-top: 6px; border-top: 1px dashed var(--border-light);"><span style="color: #64748b;">Amount:</span><strong id="modal-amount" style="color: #10b981; font-size: 0.95rem; font-weight: 800;">₦0.00</strong></div>
             </div>
-            <input type="password" id="transfer-pin" class="pin-input" maxlength="4" placeholder="••••" autocomplete="off" inputmode="numeric">
-            <div style="display: flex; gap: 8px;">
-                <button type="button" id="modal-cancel" style="flex: 1; padding: 12px; border-radius: 12px; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-light); font-weight: 700; cursor: pointer;">Cancel</button>
-                <button type="button" id="modal-confirm" style="flex: 1.5; padding: 12px; border-radius: 12px; background: var(--bryt-primary); color: #ffffff; border: none; font-weight: 800; cursor: pointer;">Send Money</button>
+
+            <!-- PIN Dots Display -->
+            <div class="pin-display">
+                <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+            </div>
+
+            <!-- Custom Numeric Keypad -->
+            <div class="pin-keypad">
+                <button type="button" class="keypad-btn" data-val="1">1</button>
+                <button type="button" class="keypad-btn" data-val="2">2</button>
+                <button type="button" class="keypad-btn" data-val="3">3</button>
+                <button type="button" class="keypad-btn" data-val="4">4</button>
+                <button type="button" class="keypad-btn" data-val="5">5</button>
+                <button type="button" class="keypad-btn" data-val="6">6</button>
+                <button type="button" class="keypad-btn" data-val="7">7</button>
+                <button type="button" class="keypad-btn" data-val="8">8</button>
+                <button type="button" class="keypad-btn" data-val="9">9</button>
+                <div></div>
+                <button type="button" class="keypad-btn" data-val="0">0</button>
+                <button type="button" class="keypad-btn" data-val="back">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
+                </button>
+            </div>
+
+            <!-- Forgot PIN Link -->
+            <div class="forgot-pin-wrap">
+                <a href="/dashboard/security/index.html" class="forgot-pin-link">Forgot PIN?</a>
+            </div>
+
+            <div class="pin-actions">
+                <button type="button" id="modal-cancel" style="flex: 1; padding: 12px; border-radius: 12px; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-light); font-weight: 700; font-size: 0.85rem; cursor: pointer;">Cancel</button>
+                <button type="button" id="modal-confirm" style="flex: 1.5; padding: 12px; border-radius: 12px; background: var(--bryt-primary); color: #ffffff; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer;" disabled>Send Money</button>
             </div>
         </div>
     </div>

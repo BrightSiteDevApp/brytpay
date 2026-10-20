@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const p = (tx.provider || tx.recipient || '').toLowerCase();
         const t = (tx.type || '').toLowerCase();
         
-        // Check metadata for P2P transfers
         const isMetadataCredit = tx.metadata && tx.metadata.transaction_type === 'credit';
         
         return isMetadataCredit || t === 'credit' || s.includes('fund') || s.includes('deposit') || s.includes('topup') || p.includes('paystack') || p.includes('flutterwave') || p.includes('topup');
@@ -81,6 +80,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (raw.includes('nabteb')) return 'nabteb-logo.png';
         if (raw.includes('jmb_') || raw.includes('jamb') || raw.includes('admission') || raw.includes('result')) return 'jamb-logo.png';
         if (raw.includes('nin_') || raw.includes('nin') || raw.includes('slip')) return 'nimc-logo.png';
+        
+        // 🚀 BANK TRANSFER FIX
+        if (raw.includes('bank_transfer') || raw.includes('transfer')) return 'brytpay-logo.png';
         
         return 'brytpay-logo.png';
     };
@@ -129,7 +131,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const ref = (data.reference || data.external_reference || '').toUpperCase();
         const sharedRef = data.reference || data.external_reference || '';
 
-        // 🚀 SMART ROUTING LOGIC
         if (isCreditTx(data)) {
             displayService = 'WALLET FUNDING';
             displayProvider = 'FUNDING GATEWAY';
@@ -167,6 +168,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             displayService = net ? `${net} AIRTIME TOP-UP` : 'AIRTIME TOP-UP';
             displayProvider = net || 'BRYT PAY'; 
             displayRecipient = data.recipient;
+        
+        // 🚀 BANK TRANSFER FIX
+        } else if (rawService === 'bank_transfer') {
+            displayService = 'EXTERNAL BANK TRANSFER';
+            displayProvider = data.provider || 'BANK NETWORK';
+            displayRecipient = data.recipient;
+        
         } else {
             displayService = cleanStr(data.service_type);
             let prov = cleanStr(data.provider);
@@ -238,7 +246,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await fetchTransaction();
 
-    // The Receipt should force Dark Mode text to light temporarily so the image looks clean
     function prepForRender(element) {
         element.style.background = '#ffffff';
         element.style.color = '#0f172a';

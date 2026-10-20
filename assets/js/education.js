@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session } } = await window.db.auth.getSession();
     if (!session) { window.location.href = '/auth/login.html'; return; }
     const user = session.user;
+    let currentBalance = 0;
+    let userPin = '';
+    let currentPinInput = '';
 
     // 🚀 SMART BACK BUTTON ROUTING
     const backBtn = document.getElementById('smart-back-btn');
@@ -45,10 +48,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
-    const { data: walletData } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
-    if (walletData) {
-        document.getElementById('user-balance').textContent = `₦${parseFloat(walletData.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+    async function loadProfileAndBalance() {
+        const { data: wallet } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
+        if (wallet) {
+            currentBalance = parseFloat(wallet.balance);
+            document.getElementById('user-balance').textContent = `₦${currentBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+        }
+        
+        const { data: profile } = await window.db.from('profiles').select('transaction_pin').eq('id', user.id).single();
+        if (profile && profile.transaction_pin) {
+            userPin = profile.transaction_pin;
+        }
     }
+    await loadProfileAndBalance();
 
     const tabManual = document.getElementById('tab-manual');
     const tabAuto = document.getElementById('tab-auto');
@@ -82,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const optionsList = document.getElementById('custom-options-list');
     const hiddenQtyInput = document.getElementById('exam-quantity');
 
-    const confirmModal = document.getElementById('confirm-modal');
+    const pinModal = document.getElementById('pin-modal-overlay');
     const modalNetworkLogo = document.getElementById('modal-network-logo');
     const modalPlan = document.getElementById('modal-plan');
     const modalQty = document.getElementById('modal-qty');
@@ -90,6 +102,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnCancel = document.getElementById('modal-cancel');
     const btnConfirm = document.getElementById('modal-confirm');
     
+    // PIN KEYPAD ELEMENTS
+    const pinDots = document.querySelectorAll('.pin-dot');
+    const keypadBtns = document.querySelectorAll('.keypad-btn');
+
     const successOverlay = document.getElementById('success-overlay');
     const pinRevealBox = document.getElementById('pin-reveal-content');
     const liveDownloadBtn = document.getElementById('btn-download-receipt-live');
@@ -140,6 +156,92 @@ document.addEventListener('DOMContentLoaded', async () => {
             autoExamLogo = btn.getAttribute('data-logo');
             renderQtyDropdown();
         });
+    });
+
+    // 🚀 PIN KEYPAD LOGIC
+    function updatePinUI() {
+        pinDots.forEach((dot, idx) => {
+            if (idx < currentPinInput.length) dot.classList.add('filled');
+            else dot.classList.remove('filled');
+        });
+        btnConfirm.disabled = currentPinInput.length !== 4;
+    }
+
+    keypadBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const val = btn.getAttribute('data-val');
+            if (val === 'back') {
+                currentPinInput = currentPinInput.slice(0, -1);
+            } else if (val) {
+                if (currentPinInput.length < 4) currentPinInput += val;
+            }
+            updatePinUI();
+        });
+    });
+
+    document.getElementById('auto-exam-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const qty = hiddenQtyInput.value;
+        const totalAmount = parseFloat(hiddenQtyInput.dataset.total);
+
+        if (!qty) return showToast("Please select a quantity.", "error");
+
+        if (currentBalance < totalAmount) {
+            return showToast(`Insufficient balance. You need ₦${totalAmount.toLocaleString()} to purchase ${qty} PIN(s).`, "error");
+        }
+
+        modalNetworkLogo.src = `../../assets/img/${autoExamLogo}`;
+        modalPlan.textContent = `${autoExamType.toUpperCase()}`;
+        modalQty.textContent = `${qty} PIN${qty > 1 ? 's' : ''}`;
+        modalAmount.textContent = `₦${totalAmount.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+
+        currentPinInput = '';
+        updatePinUI();
+        pinModal.classList.add('active');
+    });
+
+    btnCancel.addEventListener('click', () => {
+        pinModal.classList.remove('active');
+        currentPinInput = '';
+        updatePinUI();
+    });
+
+    btnConfirm.addEventListener('click', async () => {
+        if (!userPin) return showToast('Please set your 4-digit PIN in your security settings first.', 'error');
+        if (currentPinInput !== userPin) return showToast('Incorrect PIN. Try again.', 'error');
+
+        const qty = hiddenQtyInput.value;
+        
+        btnConfirm.disabled = true;
+        btnCancel.disabled = true;
+        btnConfirm.innerHTML = 'Processing...';
+
+        try {
+            const { data: resData, error } = await window.db.functions.invoke('vend-exam-swift', {
+                body: { exam_type: autoExamType, quantity: qty }
+            });
+
+            if (error) throw new Error(error.message);
+            if (resData && resData.success === false) throw new Error(resData.message);
+
+            pinModal.classList.remove('active');
+            const safePins = resData.pins.replace(/"/g, '&quot;').replace(/\n/g, '\\n');
+
+            // TRIGGER NEW FULLSCREEN PIN REVEAL UI
+            pinRevealBox.innerHTML = resData.pins;
+            liveDownloadBtn.onclick = () => downloadReceipt(autoExamType, safePins);
+            successOverlay.classList.add('active');
+
+            await loadProfileAndBalance();
+
+        } catch (err) {
+            showToast(err.message, "error");
+            btnConfirm.disabled = false;
+            btnCancel.disabled = false;
+            btnConfirm.innerHTML = 'Pay Now';
+            pinModal.classList.remove('active');
+        }
     });
 
     window.downloadReceipt = async function(examType, pinsText) {
@@ -222,7 +324,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         ctx.fillText('Visit brytpay.name.ng to purchase more securely', baseWidth / 2, baseHeight - 20);
 
         if (window.Capacitor !== undefined) {
-            // NATIVE MOBILE DOWNLOAD
             const base64data = canvas.toDataURL('image/png', 1.0).split(',')[1];
             const fileName = `BRYT_${examType.toUpperCase()}_PIN.png`;
             try {
@@ -234,71 +335,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showToast("Save failed", "error");
             }
         } else {
-            // CHROME WEB DOWNLOAD
             const link = document.createElement('a');
             link.download = `BRYT_${examType.toUpperCase()}_PIN.png`;
             link.href = canvas.toDataURL('image/png', 1.0);
             link.click();
         }
     };
-
-    document.getElementById('auto-exam-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const qty = hiddenQtyInput.value;
-        const totalAmount = parseFloat(hiddenQtyInput.dataset.total);
-
-        if (!qty) return showToast("Please select a quantity.", "error");
-
-        const { data: currentWallet } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
-        if (currentWallet && parseFloat(currentWallet.balance) < totalAmount) {
-            return showToast(`Insufficient balance. You need ₦${totalAmount.toLocaleString()} to purchase ${qty} PIN(s).`, "error");
-        }
-
-        modalNetworkLogo.src = `../../assets/img/${autoExamLogo}`;
-        modalPlan.textContent = `${autoExamType.toUpperCase()}`;
-        modalQty.textContent = `${qty} PIN${qty > 1 ? 's' : ''}`;
-        modalAmount.textContent = `₦${totalAmount.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
-
-        confirmModal.style.display = 'flex';
-    });
-
-    btnCancel.addEventListener('click', () => confirmModal.style.display = 'none');
-
-    btnConfirm.addEventListener('click', async () => {
-        const qty = hiddenQtyInput.value;
-        
-        btnConfirm.disabled = true;
-        btnCancel.disabled = true;
-        btnConfirm.innerHTML = 'Processing...';
-
-        try {
-            const { data: resData, error } = await window.db.functions.invoke('vend-exam-swift', {
-                body: { exam_type: autoExamType, quantity: qty }
-            });
-
-            if (error) throw new Error(error.message);
-            if (resData && resData.success === false) throw new Error(resData.message);
-
-            confirmModal.style.display = 'none';
-            const safePins = resData.pins.replace(/"/g, '&quot;').replace(/\n/g, '\\n');
-
-            // 🚀 TRIGGER NEW FULLSCREEN PIN REVEAL UI
-            pinRevealBox.innerHTML = resData.pins;
-            
-            // Re-wire the download button with the fresh pin data
-            liveDownloadBtn.onclick = () => downloadReceipt(autoExamType, safePins);
-            
-            successOverlay.classList.add('active');
-
-        } catch (err) {
-            showToast(err.message, "error");
-            btnConfirm.disabled = false;
-            btnCancel.disabled = false;
-            btnConfirm.innerHTML = 'Confirm & Pay';
-            confirmModal.style.display = 'none';
-        }
-    });
 
     // MANUAL LOGIC
     let manualExam = 'WAEC';
