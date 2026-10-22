@@ -5,96 +5,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Admin: JAMB Orders — BRYT Pay</title>
 
+    <script>
+        if (localStorage.getItem('bryt_theme') === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+        }
+    </script>
+
     <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#1D5ED0">
+    <meta name="theme-color" content="#ffffff">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     <link rel="stylesheet" href="../../assets/css/main.css?v=2.0">
     <style>
+        :root {
+            --bryt-primary: #1D5ED0;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-main: #0B1220;
+            --text-muted: #64748b;
+            --border-light: #e2e8f0;
+            --input-bg: #f8fafc;
+        }
+
+        html.dark-theme {
+            --bryt-primary: #3b82f6;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-light: #334155;
+            --input-bg: #0f172a;
+        }
+
         * { box-sizing: border-box; }
-        body { background: #f8fafc; margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            margin: 0; 
+            font-family: system-ui, -apple-system, sans-serif; 
+            padding-bottom: 80px !important;
+            transition: background-color 0.3s, color 0.3s;
+        }
         
-        /* Overall Page Font Scaling */
-        .admin-container { max-width: 900px; margin: 0 auto; padding: 16px 12px 60px; }
-        
-        .admin-header-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-        .page-title { font-size: 1.05rem; color: #0f172a; margin: 0 0 2px 0; font-weight: 800; }
-        .page-desc { font-size: 0.65rem; color: #64748b; margin: 0; }
+        .app-topbar { 
+            display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; 
+            background: var(--card-bg); position: sticky; top: 0; z-index: 100; 
+            border-bottom: 1px solid var(--border-light); 
+        }
+        .app-topbar-left { display: flex; align-items: center; gap: 8px; }
+        .smart-back { color: var(--text-main); display: flex; align-items: center; text-decoration: none; padding: 2px; }
+        .page-title { font-size: 0.9rem; font-weight: 800; color: var(--text-main); margin: 0; }
 
-        .search-bar-wrap { display: flex; gap: 8px; align-items: center; width: 100%; max-width: 280px; }
-        .search-input { width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.65rem; outline: none; background: #ffffff; }
-        .search-input:focus { border-color: #1D5ED0; }
+        .admin-container { max-width: 900px; margin: 0 auto; padding: 12px; }
+        .admin-header-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+        .page-desc { font-size: 0.6rem; color: var(--text-muted); margin: 0; }
 
-        .admin-table { width: 100%; border-collapse: collapse; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; }
-        .admin-table th { background: #f8fafc; padding: 8px 10px; text-align: left; font-size: 0.55rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; }
-        .admin-table td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; font-size: 0.65rem; color: #1e293b; vertical-align: middle; }
-        .admin-table tr:hover { background: #f8fafc; cursor: pointer; }
+        .search-bar-wrap { display: flex; gap: 6px; align-items: center; width: 100%; max-width: 200px; }
+        .search-input { width: 100%; padding: 6px 8px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 0.65rem; outline: none; background: var(--input-bg); color: var(--text-main); }
+        .search-input:focus { border-color: var(--bryt-primary); background: var(--card-bg); }
+
+        /* FIX: Removing min-width entirely fixes the sliding issue on mobile */
+        .table-responsive { width: 100%; overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-light); background: var(--card-bg); }
+        .admin-table { width: 100%; border-collapse: collapse; }
+        .admin-table th { background: var(--input-bg); padding: 8px 10px; text-align: left; font-size: 0.55rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-light); }
+        .admin-table td { padding: 8px 10px; border-bottom: 1px solid var(--border-light); font-size: 0.6rem; color: var(--text-main); vertical-align: middle; }
+        .admin-table tr:hover { background: var(--input-bg); cursor: pointer; }
         .admin-table tr:last-child td { border-bottom: none; }
 
-        .service-col { display: flex; align-items: center; gap: 8px; font-weight: 700; }
-        .jamb-logo { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; background: #f1f5f9; padding: 2px; }
+        .service-col { display: flex; align-items: center; gap: 6px; font-weight: 800; }
+        .jamb-logo { width: 16px; height: 16px; border-radius: 4px; object-fit: cover; background: var(--input-bg); border: 1px solid var(--border-light); }
+        .order-ref { font-family: monospace; font-weight: 800; color: var(--bryt-primary); background: rgba(29, 94, 208, 0.1); padding: 3px 6px; border-radius: 4px; font-size: 0.6rem; }
 
-        .order-ref { font-family: monospace; font-weight: 700; color: #1D5ED0; background: #eff6ff; padding: 3px 6px; border-radius: 4px; letter-spacing: 0.5px; font-size: 0.6rem; }
+        .status-badge { font-size: 0.55rem; font-weight: 800; padding: 3px 6px; border-radius: 6px; text-transform: uppercase; white-space: nowrap; }
+        .badge-paid { background: var(--input-bg); color: var(--text-muted); border: 1px solid var(--border-light); }
+        .badge-processing { background: rgba(234, 179, 8, 0.15); color: #a16207; border: 1px solid rgba(234, 179, 8, 0.3); }
+        .badge-completed { background: rgba(22, 163, 74, 0.15); color: #16a34a; border: 1px solid rgba(22, 163, 74, 0.3); }
+        .badge-failed { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
 
-        .status-badge { font-size: 0.55rem; font-weight: 800; padding: 3px 6px; border-radius: 8px; text-transform: uppercase; white-space: nowrap; }
-        .badge-paid { background: #f1f5f9; color: #475569; }
-        .badge-processing { background: #fef9c3; color: #a16207; }
-        .badge-completed { background: #dcfce7; color: #15803d; }
-        .badge-failed { background: #fee2e2; color: #b91c1c; }
-
-        /* PERFECTLY CENTERED & SCALED MODAL */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(7, 26, 58, 0.7); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 12px; }
+        /* ULTRA COMPACT MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(11, 18, 32, 0.8); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 12px; }
+        .modal-content { background: var(--card-bg); width: 100%; max-width: 280px; max-height: 85vh; overflow-y: auto; border-radius: 12px; padding: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); border: 1px solid var(--border-light); margin: auto; }
         
-        .modal-content { background: #ffffff; width: 100%; max-width: 290px; max-height: 85vh; overflow-y: auto; border-radius: 12px; padding: 16px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); margin: auto; }
-        
-        .modal-title { margin: 0 0 2px 0; font-size: 0.95rem; font-weight: 800; color: #0f172a; }
-        
-        .modal-top-row { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
-        .modal-desc { font-family: monospace; color: #1D5ED0; font-weight: 700; font-size: 0.65rem; margin: 0; }
+        .modal-title { margin: 0 0 2px 0; font-size: 0.85rem; font-weight: 800; color: var(--text-main); }
+        .modal-top-row { display: flex; align-items: center; gap: 4px; margin-bottom: 12px; }
+        .modal-desc { font-family: monospace; color: var(--bryt-primary); font-weight: 800; font-size: 0.65rem; margin: 0; background: rgba(29, 94, 208, 0.1); padding: 2px 6px; border-radius: 4px; }
 
-        .modal-breakdown { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 10px; margin-bottom: 14px; }
-        .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 0.65rem; border-bottom: 1px dashed #e2e8f0; }
+        .modal-breakdown { background: var(--input-bg); border: 1px solid var(--border-light); border-radius: 8px; padding: 8px 10px; margin-bottom: 12px; }
+        .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 0.65rem; border-bottom: 1px dashed var(--border-light); }
         .modal-row:last-child { border-bottom: none; }
-        .modal-row span { color: #64748b; font-weight: 600; font-size: 0.6rem; }
+        .modal-row span { color: var(--text-muted); font-weight: 700; font-size: 0.55rem; }
         
-        /* Transparent Copy Buttons */
         .detail-wrap { display: inline-flex; align-items: center; gap: 4px; text-align: right; }
-        .detail-wrap strong { color: #0f172a; font-weight: 800; }
-        .btn-copy { background: transparent; border: none; color: #94a3b8; padding: 2px; cursor: pointer; display: inline-flex; align-items: center; transition: color 0.2s; outline: none; }
-        .btn-copy:hover { color: #1D5ED0; }
+        .detail-wrap strong { color: var(--text-main); font-weight: 800; font-size: 0.65rem; }
+        .btn-copy { background: transparent; border: none; color: var(--text-muted); padding: 2px; cursor: pointer; display: inline-flex; align-items: center; outline: none; border-radius: 4px; }
+        .btn-copy:hover { color: var(--bryt-primary); background: rgba(29, 94, 208, 0.1); }
         .btn-copy svg { width: 12px; height: 12px; }
 
         .form-group { margin-bottom: 10px; }
-        .form-label { display: block; font-weight: 800; font-size: 0.55rem; color: #475569; margin-bottom: 4px; text-transform: uppercase; }
-        .form-select, .form-input { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.65rem; background: #ffffff; outline: none; }
-        .form-select:focus, .form-input:focus { border-color: #1D5ED0; }
+        .form-label { display: block; font-weight: 800; font-size: 0.55rem; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; }
+        .form-select, .form-input { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-light); font-size: 0.65rem; background: var(--input-bg); color: var(--text-main); outline: none; }
+        .form-select:focus, .form-input:focus { border-color: var(--bryt-primary); background: var(--card-bg); }
 
-        .upload-box { display: none; background: #f0f9ff; border: 1px dashed #1D5ED0; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
-        .upload-box small { color: #64748b; font-size: 0.55rem; margin-top: 3px; display: block; }
+        .upload-box { display: none; background: rgba(29, 94, 208, 0.05); border: 1px dashed rgba(29, 94, 208, 0.3); padding: 8px; border-radius: 6px; margin-bottom: 12px; text-align: center; }
+        .upload-box small { color: var(--text-muted); font-size: 0.55rem; margin-top: 4px; display: block; font-weight: 600;}
 
-        .modal-actions { display: flex; gap: 6px; margin-top: 14px; }
-        .btn-modal { padding: 8px; border-radius: 6px; font-weight: 800; font-size: 0.65rem; border: none; cursor: pointer; flex: 1; transition: 0.2s; }
-        .btn-cancel { background: #f1f5f9; color: #475569; }
-        .btn-cancel:hover { background: #e2e8f0; }
-        .btn-save { background: #0f172a; color: #ffffff; flex: 1.5; }
-        .btn-save:hover { background: #1D5ED0; }
+        .modal-actions { display: flex; gap: 6px; margin-top: 16px; }
+        .btn-modal { padding: 8px; border-radius: 6px; font-weight: 800; font-size: 0.65rem; border: none; cursor: pointer; flex: 1; }
+        .btn-cancel { background: var(--input-bg); color: var(--text-muted); border: 1px solid var(--border-light); }
+        .btn-cancel:hover { background: var(--border-light); color: var(--text-main); }
+        .btn-save { background: var(--bryt-primary); color: #ffffff; flex: 1.5; }
 
+        .mobile-nav { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: var(--card-bg) !important; z-index: 9999 !important; border-top: 1px solid var(--border-light) !important; display: flex !important; justify-content: space-around !important; padding: 10px 0 8px 0 !important; }
+        .mobile-nav .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none; }
+        .mobile-nav .nav-item span { font-size: 0.6rem; font-weight: 800; }
+        .mobile-nav .nav-item svg { width: 20px; height: 20px; }
+        .mobile-nav .nav-item.active { color: var(--bryt-primary); }
+        
         @media (max-width: 480px) {
-            .admin-header-row { flex-direction: column; align-items: flex-start; }
+            .admin-header-row { flex-direction: column; align-items: flex-start; gap: 8px; }
             .search-bar-wrap { max-width: 100%; }
         }
+        @media (min-width: 768px) { .mobile-nav { display: none !important; } body { padding-bottom: 0 !important; } }
     </style>
 </head>
 <body>
 
+    <header class="app-topbar">
+        <div class="app-topbar-left">
+            <a href="../index.html" class="smart-back">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </a>
+            <h1 class="page-title">JAMB Desk</h1>
+        </div>
+    </header>
+
     <main class="admin-container">
         <div class="admin-header-row">
             <div>
-                <a href="/admin" style="display: inline-flex; align-items: center; gap: 4px; color: #64748b; text-decoration: none; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                    Back to Admin
-                </a>
-                <h1 class="page-title">JAMB Desk</h1>
                 <p class="page-desc">Process orders and dispatch documents.</p>
             </div>
             <div class="search-bar-wrap">
@@ -102,21 +151,23 @@
             </div>
         </div>
 
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Service</th>
-                    <th>Order Ref</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="admin-orders-body">
-                <tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 20px; font-size: 0.65rem;">Loading orders...</td></tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Order Ref</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-orders-body">
+                    <tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 20px; font-size: 0.65rem; font-weight: 600;">Loading orders...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </main>
 
-    <!-- Compact Modal -->
+    <!-- Modal Base (Strict display block override controlled by JS) -->
     <div id="admin-modal" class="modal-overlay">
         <div class="modal-content">
             <h3 class="modal-title">Process Order</h3>
@@ -142,7 +193,6 @@
                     <span>Reg No:</span>
                     <div class="detail-wrap">
                         <strong id="modal-reg" style="font-family: monospace;">---</strong>
-                        <!-- JAMB REG NUMBER HAS LETTERS, SO WE DO NOT EXTRACT JUST DIGITS -->
                         <button type="button" class="btn-copy" onclick="copyDetail('modal-reg', this)" title="Copy Reg No">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                         </button>
@@ -151,7 +201,7 @@
                 <div class="modal-row">
                     <span>WhatsApp:</span>
                     <div class="detail-wrap">
-                        <strong id="modal-whatsapp">---</strong>
+                        <strong id="modal-whatsapp" style="font-family: monospace;">---</strong>
                         <button type="button" class="btn-copy" onclick="copyDetail('modal-whatsapp', this, true)" title="Copy Number">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                         </button>
@@ -180,32 +230,31 @@
             </div>
 
             <div class="upload-box" id="upload-section">
-                <label class="form-label" style="color: #1D5ED0;">Upload Document</label>
-                <input type="file" id="document-upload" class="form-input" accept=".pdf, .jpg, .jpeg, .png">
-                <small>Securely stored and emailed to user.</small>
+                <label class="form-label" style="color: var(--bryt-primary);">Upload Document</label>
+                <input type="file" id="document-upload" class="form-input" style="background: var(--card-bg);" accept=".pdf, .jpg, .jpeg, .png">
+                <small>Securely stored and emailed.</small>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Admin Notes</label>
-                <textarea id="update-notes" class="form-input" placeholder="e.g. Dispatched to agent..." rows="2" style="resize: vertical;"></textarea>
+                <textarea id="update-notes" class="form-input" placeholder="e.g. Dispatched to agent..." rows="2" style="resize: vertical; min-height: 40px;"></textarea>
             </div>
 
             <div class="modal-actions">
-                <button type="button" id="modal-cancel" class="btn-modal btn-cancel">Cancel</button>
+                <button type="button" id="modal-cancel" class="btn-modal btn-cancel" onclick="document.getElementById('admin-modal').style.display='none'">Cancel</button>
                 <button type="button" id="modal-save" class="btn-modal btn-save">Save & Dispatch</button>
             </div>
         </div>
     </div>
 
-    <!-- Mobile Nav -->
-    <nav class="mobile-nav no-print" style="position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; z-index: 9999; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; padding: 10px 0;">
-        <a href="/dashboard/" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span style="font-size: 0.65rem; font-weight: 700;">Home</span></a>
-        <a href="/dashboard/services/" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span style="font-size: 0.65rem; font-weight: 700;">Services</span></a>
-        <a href="/dashboard/fund/" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span style="font-size: 0.65rem; font-weight: 700;">Wallet</span></a>
-        <a href="/dashboard/orders/" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span style="font-size: 0.65rem; font-weight: 700;">My Orders</span></a>
-        <a href="/dashboard/account/" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size: 0.65rem; font-weight: 700;">Account</span></a>
+    <!-- Native Bottom Nav -->
+    <nav class="mobile-nav no-print">
+        <a href="/dashboard/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+        <a href="/dashboard/services/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span>Services</span></a>
+        <a href="/dashboard/fund/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
+        <a href="/dashboard/orders/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>Orders</span></a>
+        <a href="/dashboard/account/index.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
     </nav>
-    <style>@media (min-width: 768px) { .mobile-nav { display: none !important; } body { padding-bottom: 0 !important; } }</style>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../assets/js/supabase-client.js?v=2.0"></script>

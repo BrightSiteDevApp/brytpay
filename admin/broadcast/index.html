@@ -5,61 +5,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Email Broadcast Studio — BRYT Admin</title>
 
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#1D5ED0">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="../../assets/css/main.css">
+    <script>
+        if (localStorage.getItem('bryt_theme') === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+        }
+    </script>
 
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../assets/css/main.css">
     <style>
-        body { display: none; background: #f8fafc; margin: 0; font-family: system-ui, -apple-system, sans-serif; color: #0f172a; }
-        .admin-container { max-width: 900px; margin: 0 auto; padding: 24px 16px 80px; }
-        .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
-        .back-link:hover { color: #1D5ED0; }
+        :root {
+            --bryt-primary: #1D5ED0;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-main: #0B1220;
+            --text-muted: #64748b;
+            --border-light: #e2e8f0;
+            --input-bg: #f8fafc;
+        }
+
+        html.dark-theme {
+            --bryt-primary: #3b82f6;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-light: #334155;
+            --input-bg: #0f172a;
+        }
+
+        body { 
+            display: none; 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            margin: 0; 
+            font-family: system-ui, -apple-system, sans-serif; 
+            padding-bottom: 80px !important;
+            transition: background-color 0.3s, color 0.3s;
+        }
         
-        .studio-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; align-items: start; }
+        .app-topbar { 
+            display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; 
+            background: var(--card-bg); position: sticky; top: 0; z-index: 100; 
+            border-bottom: 1px solid var(--border-light); 
+        }
+        .app-topbar-left { display: flex; align-items: center; gap: 12px; }
+        .smart-back { color: var(--text-main); display: flex; align-items: center; text-decoration: none; padding: 4px; margin-left: -4px; }
+        .page-title { font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin: 0; }
+        .integration-badge { background: rgba(22, 163, 74, 0.1); color: #16a34a; font-weight: 800; font-size: 0.6rem; padding: 4px 8px; border-radius: 8px; border: 1px solid rgba(22, 163, 74, 0.2); }
+
+        .admin-container { max-width: 900px; margin: 0 auto; padding: 16px; }
+        
+        .studio-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 16px; align-items: start; }
         @media (max-width: 860px) { .studio-grid { grid-template-columns: 1fr; } }
 
-        .composer-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
-        .form-group { margin-bottom: 18px; }
-        .form-label { display: flex; justify-content: space-between; font-weight: 800; font-size: 0.75rem; color: #475569; margin-bottom: 8px; text-transform: uppercase; }
-        .form-input { width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 0.9rem; outline: none; background: #f8fafc; font-family: inherit; transition: 0.2s; box-sizing: border-box; }
-        .form-input:focus { border-color: #1D5ED0; background: #ffffff; box-shadow: 0 0 0 3px rgba(29, 94, 208, 0.1); }
+        .composer-card { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 12px; padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: flex; justify-content: space-between; font-weight: 800; font-size: 0.6rem; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+        .form-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 0.75rem; outline: none; background: var(--input-bg); color: var(--text-main); font-family: inherit; transition: 0.2s; box-sizing: border-box; }
+        .form-input:focus { border-color: var(--bryt-primary); background: var(--card-bg); }
         
-        .mode-tabs { display: flex; background: #f1f5f9; padding: 4px; border-radius: 10px; margin-bottom: 20px; gap: 4px; }
-        .mode-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer; color: #64748b; background: transparent; transition: 0.2s; }
-        .mode-btn.active { background: #ffffff; color: #1D5ED0; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+        .mode-tabs { display: flex; background: var(--input-bg); padding: 4px; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 20px; gap: 4px; }
+        .mode-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-weight: 700; font-size: 0.7rem; cursor: pointer; color: var(--text-muted); background: transparent; transition: 0.2s; }
+        .mode-btn.active { background: var(--card-bg); color: var(--bryt-primary); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
 
-        .upload-dropzone { border: 2px dashed #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc; cursor: pointer; position: relative; transition: 0.2s; }
-        .upload-dropzone:hover { border-color: #1D5ED0; background: #eff6ff; }
+        .upload-dropzone { border: 1px dashed var(--border-light); border-radius: 8px; padding: 16px; text-align: center; background: var(--input-bg); color: var(--text-muted); cursor: pointer; position: relative; font-size: 0.65rem; }
+        .upload-dropzone:hover { border-color: var(--bryt-primary); background: rgba(29, 94, 208, 0.05); color: var(--bryt-primary); }
         .upload-dropzone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-        .upload-preview { max-width: 100%; max-height: 180px; border-radius: 8px; margin-top: 12px; display: none; object-fit: contain; margin-left: auto; margin-right: auto; }
+        .upload-preview { max-width: 100%; max-height: 120px; border-radius: 6px; margin-top: 8px; display: none; object-fit: contain; margin-left: auto; margin-right: auto; }
 
-        .preview-pane { position: sticky; top: 20px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
-        .preview-screen { border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; min-height: 480px; max-height: 600px; overflow-y: auto; padding: 12px; }
+        .preview-pane { position: sticky; top: 70px; background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 12px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .preview-screen { border: 1px solid var(--border-light); border-radius: 8px; background: var(--input-bg); min-height: 300px; max-height: 500px; overflow-y: auto; padding: 8px; }
 
-        .btn-dispatch { background: #0f172a; color: #ffffff; width: 100%; padding: 16px; border-radius: 12px; font-weight: 800; font-size: 1rem; border: none; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-dispatch:hover { background: #1D5ED0; }
-        .counter-badge { background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; }
-        .counter-badge.valid { background: #dcfce7; color: #15803d; }
+        .btn-dispatch { background: var(--bryt-primary); color: #ffffff; width: 100%; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-dispatch:hover { background: #174ea6; }
+        .counter-badge { background: var(--border-light); color: var(--text-main); padding: 2px 6px; border-radius: 8px; font-size: 0.6rem; font-weight: 800; }
+        .counter-badge.valid { background: rgba(22, 163, 74, 0.15); color: #16a34a; }
+
+        .mobile-nav { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: var(--card-bg) !important; z-index: 9999 !important; border-top: 1px solid var(--border-light) !important; display: flex !important; justify-content: space-around !important; padding: 10px 0 8px 0 !important; }
+        .mobile-nav .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none; }
+        .mobile-nav .nav-item span { font-size: 0.6rem; font-weight: 800; }
+        .mobile-nav .nav-item svg { width: 20px; height: 20px; }
+        .mobile-nav .nav-item.active { color: var(--bryt-primary); }
+        @media (min-width: 768px) { .mobile-nav { display: none !important; } body { padding-bottom: 0 !important; } }
     </style>
 </head>
 <body>
 
-    <main class="admin-container">
-        <div class="header-row">
-            <a href="../index.html" class="back-link">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                Back to Admin Hub
+    <header class="app-topbar">
+        <div class="app-topbar-left">
+            <a href="../index.html" class="smart-back">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </a>
-            <span style="background: #f0fdf4; color: #16a34a; font-weight: 800; font-size: 0.7rem; padding: 4px 10px; border-radius: 12px; border: 1px solid #bbf7d0;">Brevo + Cloudinary</span>
+            <h1 class="page-title">Broadcast Studio</h1>
         </div>
+        <span class="integration-badge">Brevo + Cloudinary</span>
+    </header>
 
+    <main class="admin-container">
         <div class="studio-grid">
-            <!-- LEFT COLUMN: CONTROLS -->
             <div class="composer-card">
                 <div class="mode-tabs">
-                    <button type="button" class="mode-btn active" id="tab-newsletter" onclick="setMode('newsletter')">Standard Newsletter</button>
+                    <button type="button" class="mode-btn active" id="tab-newsletter" onclick="setMode('newsletter')">Newsletter</button>
                     <button type="button" class="mode-btn" id="tab-flyer" onclick="setMode('flyer')">Flyer Only</button>
                 </div>
 
@@ -68,32 +118,31 @@
                         <span>Recipients</span>
                         <span id="email-counter" class="counter-badge">0 / 300</span>
                     </div>
-                    <textarea id="recipient-list" class="form-input" style="min-height: 80px;" placeholder="user1@gmail.com, user2@yahoo.com..."></textarea>
+                    <textarea id="recipient-list" class="form-input" style="min-height: 60px;" placeholder="user1@gmail.com, user2@yahoo.com..."></textarea>
                 </div>
 
                 <div class="form-group">
                     <div class="form-label">Subject Line</div>
-                    <input type="text" id="email-subject" class="form-input" placeholder="e.g. Special Weekend Announcement from BRYT Pay">
+                    <input type="text" id="email-subject" class="form-input" placeholder="e.g. Update from BRYT Pay">
                 </div>
 
-                <!-- MODE A: NEWSLETTER FIELDS -->
                 <div id="newsletter-fields">
                     <div class="form-group">
                         <div class="form-label">Header Logo (Optional)</div>
-                        <div class="upload-dropzone" style="padding: 12px;">
-                            <span id="upload-status-logo" style="font-size: 0.75rem; color: #64748b;">Click to upload a custom logo (Defaults to BRYT Pay)</span>
+                        <div class="upload-dropzone">
+                            <span id="upload-status-logo">Click to upload logo (Defaults to BRYT Pay)</span>
                             <input type="file" id="logo-file-picker" accept="image/*" onchange="handleCloudinaryUpload(event, 'logo')">
-                            <img id="logo-preview-img" class="upload-preview" alt="Logo Preview" style="max-height: 40px;">
+                            <img id="logo-preview-img" class="upload-preview" alt="Logo Preview" style="max-height: 30px;">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <div class="form-label">Intro Text</div>
-                        <textarea id="nl-intro" class="form-input" style="min-height: 90px;" placeholder="Hey there! Here is the latest update..."></textarea>
+                        <textarea id="nl-intro" class="form-input" style="min-height: 60px;" placeholder="Message intro..."></textarea>
                     </div>
 
                     <div class="form-group">
-                        <div class="form-label">Middle Landscape Image (Optional)</div>
+                        <div class="form-label">Middle Image (Optional)</div>
                         <div class="upload-dropzone">
                             <span id="upload-status-middle">Click to Upload via Cloudinary</span>
                             <input type="file" id="middle-file-picker" accept="image/*" onchange="handleCloudinaryUpload(event, 'middle')">
@@ -103,25 +152,24 @@
 
                     <div class="form-group">
                         <div class="form-label">Body Text</div>
-                        <textarea id="nl-body" class="form-input" style="min-height: 100px;" placeholder="Further details, terms, or notes..."></textarea>
+                        <textarea id="nl-body" class="form-input" style="min-height: 80px;" placeholder="Further details..."></textarea>
                     </div>
 
-                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                         <div>
                             <div class="form-label">Button Label</div>
                             <input type="text" id="cta-label" class="form-input" placeholder="e.g. Claim Discount">
                         </div>
                         <div>
-                            <div class="form-label">Button Link (URL)</div>
-                            <input type="text" id="cta-url" class="form-input" placeholder="https://brytpay.name.ng/dashboard/">
+                            <div class="form-label">Button URL</div>
+                            <input type="text" id="cta-url" class="form-input" placeholder="https://...">
                         </div>
                     </div>
                 </div>
 
-                <!-- MODE B: FLYER ONLY FIELDS -->
                 <div id="flyer-fields" style="display: none;">
                     <div class="form-group">
-                        <div class="form-label">Upload Promotional Flyer</div>
+                        <div class="form-label">Upload Flyer</div>
                         <div class="upload-dropzone">
                             <span id="upload-status-flyer">Click to Upload Flyer to Cloudinary</span>
                             <input type="file" id="flyer-file-picker" accept="image/*" onchange="handleCloudinaryUpload(event, 'flyer')">
@@ -130,77 +178,33 @@
                     </div>
                     <div class="form-group">
                         <div class="form-label">Flyer Click Action Link</div>
-                        <input type="text" id="flyer-click-url" class="form-input" placeholder="https://brytpay.name.ng/dashboard/" value="https://brytpay.name.ng/">
+                        <input type="text" id="flyer-click-url" class="form-input" placeholder="https://..." value="https://brytpay.name.ng/">
                     </div>
                 </div>
 
                 <button id="btn-dispatch" class="btn-dispatch">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     Send Broadcast
                 </button>
             </div>
 
-            <!-- RIGHT COLUMN: LIVE PHONE PREVIEW -->
             <div class="preview-pane">
-                <div class="form-label" style="margin-bottom: 12px;">Live Mobile Preview</div>
+                <div class="form-label" style="margin-bottom: 8px;">Mobile Preview</div>
                 <div class="preview-screen" id="live-preview-box"></div>
             </div>
         </div>
     </main>
 
-     <nav class="mobile-nav no-print">
-    <!-- 1. Home -->
-    <a href="/dashboard/" class="nav-item">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        </svg>
-        <span>Home</span>
-    </a>
-
-    <!-- 2. Services -->
-    <a href="/dashboard/services/" class="nav-item">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-        </svg>
-        <span>Services</span>
-    </a>
-
-    <!-- 3. Wallet -->
-    <a href="/dashboard/fund/" class="nav-item">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="5" width="20" height="14" rx="2"/>
-            <line x1="2" y1="10" x2="22" y2="10"/>
-        </svg>
-        <span>Wallet</span>
-    </a>
-
-    <!-- 4. My Orders -->
-    <a href="/dashboard/orders/" class="nav-item">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <path d="M16 10a4 4 0 0 1-8 0"></path>
-        </svg>
-        <span>My Orders</span>
-    </a>
-
-    <!-- 5. Account -->
-    <a href="/dashboard/account/" class="nav-item">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        <span>Account</span>
-    </a>
-</nav>
-
+    <nav class="mobile-nav no-print">
+        <a href="/dashboard/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+        <a href="/dashboard/services/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span>Services</span></a>
+        <a href="/dashboard/fund/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
+        <a href="/dashboard/orders/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>Orders</span></a>
+        <a href="/dashboard/account/index.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
+    </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../assets/js/supabase-client.js"></script>
-
     <script>
         const CLOUDINARY_CLOUD_NAME = "y2tsggmu"; 
         const CLOUDINARY_UPLOAD_PRESET = "email-img"; 
@@ -215,25 +219,11 @@
             try {
                 const { data: { session } } = await window.db.auth.getSession();
                 if (!session) { window.location.href = '/auth/login.html'; return; }
-
-                const { data: adminRecord } = await window.db
-                    .from('admins')
-                    .select('email')
-                    .eq('email', session.user.email)
-                    .maybeSingle();
-
-                if (!adminRecord) {
-                    alert('Unauthorized access. Admin privileges required.');
-                    window.location.href = '/dashboard/';
-                    return;
-                }
-
+                const { data: adminRecord } = await window.db.from('admins').select('email').eq('email', session.user.email).maybeSingle();
+                if (!adminRecord) { window.location.href = '/dashboard/'; return; }
                 document.body.style.display = 'block';
                 updateLivePreview();
-            } catch (err) {
-                console.error('Security check error:', err);
-                window.location.href = '/dashboard/';
-            }
+            } catch (err) { window.location.href = '/dashboard/'; }
         });
 
         const recipientInput = document.getElementById('recipient-list');
@@ -253,7 +243,6 @@
 
             const statusText = document.getElementById(`upload-status-${target}`);
             const previewImg = document.getElementById(`${target}-preview-img`);
-            
             statusText.textContent = "Uploading...";
 
             const formData = new FormData();
@@ -261,21 +250,13 @@
             formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
 
             try {
-                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-                    method: "POST",
-                    body: formData
-                });
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
                 const data = await res.json();
-
                 if (!res.ok) throw new Error(data.error?.message || "Upload failed");
 
-                if (target === 'middle') {
-                    middleImageUrl = data.secure_url;
-                } else if (target === 'flyer') {
-                    flyerImageUrl = data.secure_url;
-                } else if (target === 'logo') {
-                    headerLogoUrl = data.secure_url;
-                }
+                if (target === 'middle') middleImageUrl = data.secure_url;
+                else if (target === 'flyer') flyerImageUrl = data.secure_url;
+                else if (target === 'logo') headerLogoUrl = data.secure_url;
 
                 previewImg.src = data.secure_url;
                 previewImg.style.display = 'block';
@@ -283,7 +264,7 @@
                 updateLivePreview();
             } catch (err) {
                 alert(`Upload failed: ${err.message}`);
-                statusText.textContent = "Error uploading. Try again.";
+                statusText.textContent = "Error uploading.";
             }
         }
 
@@ -296,106 +277,75 @@
             updateLivePreview();
         }
 
+        // 🚀 THE FIX: BOTH FORMATS NOW INCLUDE THE SOCIAL & WEBSITE FOOTER AT THE BOTTOM
         function generateEmailHtml() {
+            
+            const emailFooter = `
+                <tr>
+                    <td align="center" style="padding-top: 16px; border-top: 1px dashed #e2e8f0; font-family: sans-serif; font-size: 12px;">
+                        <a href="https://brytpay.name.ng" style="color: #1D5ED0; text-decoration: none; margin: 0 8px; font-weight: 600;">Website</a> &bull;
+                        <a href="https://www.instagram.com/bryttechnologies" style="color: #1D5ED0; text-decoration: none; margin: 0 8px; font-weight: 600;">Instagram</a> &bull;
+                        <a href="https://wa.me/2349153375488" style="color: #1D5ED0; text-decoration: none; margin: 0 8px; font-weight: 600;">WhatsApp</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" style="padding-top: 16px; font-family: sans-serif; font-size: 11px; color: #94a3b8; line-height: 1.4;">
+                        BRYT Technologies | Kaduna, Nigeria<br>
+                        <a href="#" style="color: #94a3b8; text-decoration: underline;">Unsubscribe</a>
+                    </td>
+                </tr>
+            `;
+
             if (currentMode === 'flyer') {
                 const clickUrl = document.getElementById('flyer-click-url').value || 'https://brytpay.name.ng';
-                const flyerSrc = flyerImageUrl || 'https://via.placeholder.com/600x800.png?text=Upload+Your+Flyer+Here';
+                const flyerSrc = flyerImageUrl || 'https://via.placeholder.com/600x800.png?text=Flyer+Preview';
 
                 return `
-                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; padding: 20px 0;">
-                    <tr>
-                        <td align="center">
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
-                                <tr>
-                                    <td align="center" style="padding: 0;">
-                                        <a href="${clickUrl}" target="_blank" style="display: block; text-decoration: none;">
-                                            <img src="${flyerSrc}" alt="Announcement" style="display: block; width: 100%; max-width: 600px; height: auto; border: none;">
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td align="center" style="padding: 24px; font-family: sans-serif; font-size: 11px; color: #94a3b8; line-height: 1.5;">
-                                        BRYT Technologies | Kaduna, Nigeria<br>
-                                        <a href="#" style="color: #1D5ED0; text-decoration: none;">Unsubscribe</a>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; padding: 10px 0;">
+                    <tr><td align="center">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0;">
+                            <tr><td align="center" style="padding: 0;">
+                                <a href="${clickUrl}" target="_blank" style="display: block; text-decoration: none;">
+                                    <img src="${flyerSrc}" alt="Announcement" style="display: block; width: 100%; max-width: 600px; height: auto; border: none;">
+                                </a>
+                            </td></tr>
+                            ${emailFooter}
+                        </table>
+                    </td></tr>
                 </table>`;
             }
 
-            const intro = document.getElementById('nl-intro').value.replace(/\n/g, '<br>') || 'Introductory message here...';
+            const intro = document.getElementById('nl-intro').value.replace(/\n/g, '<br>') || 'Intro message...';
             const body = document.getElementById('nl-body').value.replace(/\n/g, '<br>');
             const ctaLabel = document.getElementById('cta-label').value;
             const ctaUrl = document.getElementById('cta-url').value;
 
             let imageBlock = '';
             if (middleImageUrl) {
-                imageBlock = `
-                <tr>
-                    <td align="center" style="padding: 0 0 20px 0;">
-                        <img src="${middleImageUrl}" alt="Feature" style="width: 100%; max-width: 520px; height: auto; border-radius: 8px; display: block; margin: 0 auto;">
-                    </td>
-                </tr>`;
+                imageBlock = `<tr><td align="center" style="padding: 0 0 16px 0;"><img src="${middleImageUrl}" style="width: 100%; max-width: 500px; height: auto; border-radius: 6px; display: block; margin: 0 auto;"></td></tr>`;
             }
 
             let ctaBlock = '';
             if (ctaLabel && ctaUrl) {
-                ctaBlock = `
-                <tr>
-                    <td align="center" style="padding: 10px 0 24px 0;">
-                        <a href="${ctaUrl}" target="_blank" style="background: linear-gradient(135deg, #1D5ED0, #159FE3); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: bold; font-family: sans-serif; font-size: 14px; display: inline-block;">
-                            ${ctaLabel}
-                        </a>
-                    </td>
-                </tr>`;
+                ctaBlock = `<tr><td align="center" style="padding: 8px 0 16px 0;"><a href="${ctaUrl}" target="_blank" style="background: linear-gradient(135deg, #1D5ED0, #159FE3); color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; font-family: sans-serif; font-size: 13px; display: inline-block;">${ctaLabel}</a></td></tr>`;
             }
 
             return `
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; padding: 20px 0;">
-                <tr>
-                    <td align="center">
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; padding: 32px 24px;">
-                            <tr>
-                                <td align="center" style="padding-bottom: 24px;">
-                                    <img src="${headerLogoUrl}" alt="Brand Logo" style="height: 36px; object-fit: contain;">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="font-family: sans-serif; font-size: 15px; color: #1e293b; line-height: 1.6; padding-bottom: 20px;">
-                                    ${intro}
-                                </td>
-                            </tr>
-                            ${imageBlock}
-                            <tr>
-                                <td style="font-family: sans-serif; font-size: 14px; color: #475569; line-height: 1.6; padding-bottom: 20px;">
-                                    ${body}
-                                </td>
-                            </tr>
-                            ${ctaBlock}
-                            <tr>
-                                <td align="center" style="padding-top: 16px; border-top: 1px dashed #e2e8f0; font-family: sans-serif; font-size: 12px;">
-                                    <a href="https://brytpay.name.ng" style="color: #1D5ED0; text-decoration: none; margin: 0 8px; font-weight: 600;">Website</a> &bull;
-                                    <a href="https://www.instagram.com/bryttechnologies" style="color: #1D5ED0; text-decoration: none; margin: 0 8px; font-weight: 600;">Instagram</a> &bull;
-                                    <a href="https://wa.me/2349153375488" style="color: #1D5ED0; text-decoration: none; margin: 0 8px; font-weight: 600;">WhatsApp</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td align="center" style="padding-top: 16px; font-family: sans-serif; font-size: 11px; color: #94a3b8; line-height: 1.4;">
-                                    BRYT Technologies | Kaduna, Nigeria<br>
-                                    <a href="#" style="color: #94a3b8; text-decoration: underline;">Unsubscribe</a>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; padding: 10px 0;">
+                <tr><td align="center">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; padding: 20px 16px;">
+                        <tr><td align="center" style="padding-bottom: 16px;"><img src="${headerLogoUrl}" style="height: 24px; object-fit: contain;"></td></tr>
+                        <tr><td style="font-family: sans-serif; font-size: 13px; color: #1e293b; line-height: 1.5; padding-bottom: 16px;">${intro}</td></tr>
+                        ${imageBlock}
+                        <tr><td style="font-family: sans-serif; font-size: 12px; color: #475569; line-height: 1.5; padding-bottom: 16px;">${body}</td></tr>
+                        ${ctaBlock}
+                        ${emailFooter}
+                    </table>
+                </td></tr>
             </table>`;
         }
 
-        function updateLivePreview() {
-            document.getElementById('live-preview-box').innerHTML = generateEmailHtml();
-        }
+        function updateLivePreview() { document.getElementById('live-preview-box').innerHTML = generateEmailHtml(); }
 
         ['nl-intro', 'nl-body', 'cta-label', 'cta-url', 'flyer-click-url'].forEach(id => {
             const el = document.getElementById(id);
@@ -403,39 +353,32 @@
         });
 
         document.getElementById('btn-dispatch').addEventListener('click', async () => {
-            if (validRecipients.length === 0) return alert("Please enter at least one valid recipient.");
-            if (validRecipients.length > 300) return alert("Free limit is 300 recipients per day.");
+            if (validRecipients.length === 0) return alert("Please enter at least one recipient.");
+            if (validRecipients.length > 300) return alert("Limit is 300 recipients.");
             
             const subject = document.getElementById('email-subject').value;
-            if (!subject) return alert("Subject line is required.");
+            if (!subject) return alert("Subject line required.");
 
             const fullHtml = generateEmailHtml();
             const btn = document.getElementById('btn-dispatch');
             const originalText = btn.innerHTML;
             
-            btn.innerHTML = "Sending Broadcast...";
+            btn.innerHTML = "Sending...";
             btn.disabled = true;
 
             try {
                 const { data, error } = await window.db.functions.invoke('send-broadcast', {
-                    body: {
-                        recipients: validRecipients,
-                        subject: subject,
-                        rawCompiledHtml: fullHtml,
-                        sendEmail: true, // 🚀 FIXED: Now triggers the Brevo dispatch
-                        sendPush: true   // 🚀 FIXED: Now triggers push notifications
-                    }
+                    body: { recipients: validRecipients, subject: subject, rawCompiledHtml: fullHtml, sendEmail: true, sendPush: true }
                 });
-
                 if (error) throw new Error(error.message);
-                if (data && !data.success) throw new Error(data.error || "Failed to dispatch broadcast");
+                if (data && !data.success) throw new Error(data.error || "Failed to dispatch");
 
                 alert(`Success! ${data.message}`);
                 recipientInput.value = '';
                 document.getElementById('email-subject').value = '';
                 counterBadge.textContent = '0 / 300';
             } catch (err) {
-                alert(`Dispatch Error: ${err.message}`);
+                alert(`Error: ${err.message}`);
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;

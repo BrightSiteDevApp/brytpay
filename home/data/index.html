@@ -53,9 +53,15 @@
         .mobile-menu.active { display: flex; }
         .mobile-menu a { text-decoration: none; color: var(--bryt-navy); font-weight: 600; font-size: 1rem; }
         
-        .hero { position: relative; padding: 60px 20px 80px; overflow: hidden; background: radial-gradient(circle at top right, rgba(29, 94, 208, 0.05), transparent 50%); text-align: center; }
+        /* Hero Section Split Layout */
+        .hero { position: relative; padding: 60px 20px 80px; overflow: hidden; background: radial-gradient(circle at top right, rgba(29, 94, 208, 0.05), transparent 50%); }
+        .hero-container { display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center; max-width: 1100px; margin: 0 auto; text-align: center; }
         .hero-content h1 { font-size: 2.4rem; font-weight: 800; color: var(--bryt-navy); line-height: 1.15; margin-bottom: 16px; letter-spacing: -1px; }
         .hero-content p { font-size: 1rem; color: var(--text-muted); line-height: 1.6; margin: 0 auto 24px; max-width: 600px; }
+        
+        .hero-visual { position: relative; display: flex; justify-content: center; }
+        .desktop-phone-img { width: 100%; max-width: 280px; height: auto; position: relative; z-index: 2; border-radius: 36px; transform: rotate(-2deg); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 25px 50px rgba(7, 26, 58, 0.15); }
+        .desktop-phone-img:hover { transform: rotate(0deg) translateY(-10px) scale(1.02); box-shadow: 0 30px 60px rgba(7, 26, 58, 0.2); }
 
         .pricing-grid { display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 1100px; margin: 0 auto; }
         .price-card { background: #FFFFFF; padding: 24px; border-radius: 12px; border: 1px solid #E2E8F0; transition: 0.2s; display: flex; flex-direction: column; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
@@ -74,20 +80,30 @@
         .final-cta h2 { font-size: 2rem; font-weight: 800; color: var(--bryt-navy); margin-bottom: 16px; letter-spacing: -0.5px; }
         .final-cta p { font-size: 1rem; color: var(--text-muted); margin-bottom: 32px; }
         
-        .bryt-footer { background: var(--bryt-navy); color: #fff; padding: 60px 24px 24px; }
-        .footer-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; margin-bottom: 40px; padding-bottom: 24px; }
-        .footer-col h4 { font-size: 1rem; margin-bottom: 16px; color: #fff; font-weight: 700; }
-        .footer-col p, .footer-col a { color: #cbd5e1; font-size: 0.85rem; line-height: 1.6; text-decoration: none; display: block; margin-bottom: 12px; }
-        .footer-brand-logo { height: 28px; filter: brightness(0) invert(1); margin-bottom: 16px; width: auto; }
-        .footer-bottom { text-align: center; color: #94a3b8; font-size: 0.8rem; }
+        /* Updated Footer */
+        .bryt-footer { background: var(--bryt-navy); color: #fff; padding: 64px 0 0; }
+        .footer-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; padding-bottom: 48px; padding-left: 24px; padding-right: 24px; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 16px; color: #fff; font-weight: 700; }
+        .footer-col p { color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; }
+        .footer-col a { display: block; color: #cbd5e1; font-size: 0.95rem; margin-bottom: 12px; text-decoration: none; transition: color 0.2s; }
+        .footer-col a:hover { color: var(--bryt-accent); }
+        .footer-brand-logo { height: 32px; filter: brightness(0) invert(1); margin-bottom: 16px; }
+
+        .footer-legal-wrap { background-color: #080D18; position: relative; overflow: hidden; padding: 40px 24px; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+        .footer-regulatory-watermark { position: absolute; bottom: -5%; right: 0%; font-size: clamp(6rem, 18vw, 16rem); font-weight: 900; color: rgba(255, 255, 255, 0.025); line-height: 1; z-index: 1; user-select: none; pointer-events: none; letter-spacing: -2px; }
+        .footer-legal-inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 2; display: flex; flex-direction: column; gap: 20px; }
+        .footer-legal-inner .footer-bottom { margin: 0; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: #94a3b8; text-align: left; }
+        .regulatory-text { color: #64748b; font-size: 0.85rem; line-height: 1.6; max-width: 750px; margin: 0; }
 
         @media (min-width: 600px) { .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 900px) {
             .nav-links { display: flex; }
             .mobile-toggle { display: none; }
+            .hero-container { grid-template-columns: 1fr 1fr; text-align: left; }
+            .hero-content p { margin: 0 0 24px 0; }
             .hero-content h1 { font-size: 3.2rem; }
             .pricing-grid { grid-template-columns: repeat(4, 1fr); }
-            .footer-bottom { display: flex; justify-content: space-between; max-width: 1100px; margin: 0 auto; }
+            .footer-legal-inner .footer-bottom { flex-direction: row; justify-content: flex-start; gap: 32px; }
         }
     </style>
 </head>
@@ -118,11 +134,14 @@
     </div>
 
     <section class="hero">
-        <div class="container">
+        <div class="hero-container">
             <div class="hero-content">
                 <h1>Ultra-Fast, <span class="text-gradient">Cheap Data.</span></h1>
                 <p>Buy highly affordable SME, Corporate Gifting, and Direct Data plans across all major Nigerian networks. Auto-connected directly to telecom gateways for 1-second delivery.</p>
                 <a href="/auth/signup.html" class="btn-nav-primary" style="font-size: 1rem; padding: 14px 28px;">Top Up Data</a>
+            </div>
+            <div class="hero-visual">
+                <img src="../../assets/img/data.png" alt="BRYT Pay Data Interface" class="desktop-phone-img">
             </div>
         </div>
     </section>
@@ -198,29 +217,44 @@
 
     <footer class="bryt-footer">
         <div class="footer-grid">
-            <div class="footer-col" style="text-align: left;">
-                <img src="../../assets/img/brytpay-logo.png" alt="BRYT Pay Logo" class="footer-brand-logo">
+            <div class="footer-col">
+                <img src="../../assets/img/brytpay-logo.png" alt="BRYT Pay Logo" class="footer-brand-logo" width="120" height="32">
                 <p>BRYT Pay is Nigeria's fast, reliable digital services platform engineered to simplify online payments.</p>
             </div>
-            <div class="footer-col" style="text-align: left;">
+            <div class="footer-col">
                 <h4>Quick Links</h4>
                 <a href="/">Home</a>
                 <a href="/#services">Services</a>
                 <a href="/doc/faq/">FAQ</a>
+                <a href="/doc/about/">About Us</a>
             </div>
-            <div class="footer-col" style="text-align: left;">
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <a href="/doc/terms/">Terms & Conditions</a>
+                <a href="/doc/privacy/">Privacy Policy</a>
+                <a href="/doc/refund/">Refund Policy</a>
+            </div>
+            <div class="footer-col">
                 <h4>Customer Support</h4>
                 <a href="tel:09153375488">0915 337 5488</a>
-                <a href="mailto:bryttechnologies@gmail.com">bryttechnologies@gmail.com</a>
+                <a href="mailto:brytpay@gmail.com">brytpay@gmail.com</a>
+                <p>Kaduna, Nigeria</p>
             </div>
         </div>
-        <div class="footer-bottom">
-            <span>A product of BRYT Technologies</span>
-            <span>&copy; 2026 BRYT Technologies. All rights reserved.</span>
+        <div class="footer-legal-wrap">
+            <div class="footer-regulatory-watermark">BRYT</div>
+            <div class="footer-legal-inner">
+                <div class="footer-bottom">
+                    <span>&copy; 2026 BRYT Pay. All rights reserved.</span>
+                    <span>A product of <a href="https://bryttechnologies.name.ng" target="_blank" style="color: var(--bryt-accent);">BRYT Technologies</a></span>
+                </div>
+                <p class="regulatory-text">
+                    BRYT Pay operates in partnership with licensed Payment Service Providers and Microfinance Banks. All user funds are securely handled, insured, and managed by these regulated financial institutions.
+                </p>
+            </div>
         </div>
     </footer>
 
-    <!-- JavaScript to make Mobile Menu work -->
     <script>
         const mobileToggle = document.getElementById('mobile-toggle');
         const mobileMenu = document.getElementById('mobile-menu');

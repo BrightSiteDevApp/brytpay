@@ -103,7 +103,9 @@
         .footer-grid { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; margin-bottom: 48px; }
         .footer-col h4 { font-size: 1.1rem; margin-bottom: 16px; color: #fff; }
         .footer-col a, .footer-col p { display: block; color: #cbd5e1; font-size: 0.9rem; margin-bottom: 12px; }
+        .footer-brand-logo { height: 32px; filter: brightness(0) invert(1); margin-bottom: 16px; }
         .footer-bottom { text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); color: #94a3b8; font-size: 0.85rem; }
+        .regulatory-text { font-size: 0.75rem; color: #64748b; margin-top: 12px; max-width: 700px; margin-left: auto; margin-right: auto; line-height: 1.5; }
 
         @media (max-width: 768px) {
             .nav-links { display: none; } 
@@ -157,7 +159,7 @@
             </ul>
 
             <h2>5. Funding the Wallet</h2>
-            <p>Users can fund their wallets using the available payment methods provided on the platform. Payment processing is handled by third-party payment providers (such as Flutterwave). Payment confirmation depends on successful verification by these providers. Users should not assume a failed or abandoned payment has been credited. If funds are debited from your bank but your wallet is not credited, please contact our support team with your payment reference.</p>
+            <p>Users can fund their wallets by navigating to the <strong>Wallet</strong> section on their dashboard, generating a unique virtual account number, and transferring funds to that account from any bank app. Payment processing and account generation are handled securely by our licensed banking partners. Users should not assume a delayed transfer has been lost. If funds are debited from your bank but your wallet is not credited, please contact our support team with your payment reference.</p>
 
             <h2>6. Service Purchases</h2>
             <p>When purchasing a service (e.g., Airtime, Data, TV, WAEC, JAMB services), you will review the price and details before confirmation. Upon confirmation, your wallet is debited, and the service is processed. Service availability and delivery times may depend on the respective third-party service provider.</p>
@@ -215,7 +217,7 @@
             <p>If you have any questions about these Terms, please contact us:</p>
             <ul>
                 <li><strong>Phone / WhatsApp:</strong> <a href="tel:09153375488">09153375488</a></li>
-                <li><strong>Email:</strong> <a href="mailto:bryttechnologies@gmail.com">bryttechnologies@gmail.com</a></li>
+                <li><strong>Email:</strong> <a href="mailto:brytpay@gmail.com">brytpay@gmail.com</a></li>
                 <li><strong>Location:</strong> Kaduna, Nigeria</li>
             </ul>
         </div>
@@ -224,7 +226,7 @@
     <footer class="bryt-footer">
         <div class="footer-grid">
             <div class="footer-col">
-                <h4>BRYT Pay</h4>
+                <img src="../../assets/img/brytpay-logo.png" alt="BRYT Pay Logo" class="footer-brand-logo" width="120" height="32" onerror="this.src=''; this.alt='BRYT Pay';">
                 <p>Making everyday digital services fast, simple, and reliable for Nigerians.</p>
             </div>
             <div class="footer-col">
@@ -244,13 +246,13 @@
             <div class="footer-col">
                 <h4>Contact</h4>
                 <a href="tel:09153375488">09153375488</a>
-                <a href="mailto:bryttechnologies@gmail.com">bryttechnologies@gmail.com</a>
+                <a href="mailto:brytpay@gmail.com">brytpay@gmail.com</a>
                 <p>Kaduna, Nigeria</p>
             </div>
         </div>
         <div class="footer-bottom">
-            A product of <a href="https://bryttechnologies.name.ng" target="_blank" style="color: var(--bryt-accent);">BRYT Technologies</a><br>
-            &copy; 2026 BRYT Technologies. All rights reserved.
+            &copy; 2026 BRYT Pay. A product of <a href="https://bryttechnologies.name.ng" target="_blank" style="color: var(--bryt-accent);">BRYT Technologies</a>.
+            <p class="regulatory-text">BRYT Pay is powered by CBN-licensed Payment Service Providers and NDIC-insured Microfinance Banks. All wallet funds are securely held and protected by these regulated institutions.</p>
         </div>
     </footer>
 </body>

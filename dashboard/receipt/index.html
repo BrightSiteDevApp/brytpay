@@ -47,7 +47,6 @@
         .smart-back:hover { color: var(--bryt-primary); }
         .smart-back svg { width: 16px; height: 16px; }
 
-        /* The actual receipt stays light/dark compatible */
         .receipt-card { 
             background: var(--card-bg); 
             border-radius: 12px; 
@@ -71,16 +70,18 @@
             z-index: 2;
         }
 
-        /* Scaled Watermark */
-        .receipt-card::after {
-            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 140px; height: 140px;
-            background-image: url('../../assets/img/brytpay-logo.png');
-            background-size: contain; background-repeat: no-repeat; background-position: center;
-            opacity: 0.02; z-index: 0; pointer-events: none;
+        /* HTML-based Watermarks (html2canvas safe) */
+        .watermarks {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 0; pointer-events: none; overflow: hidden;
         }
         
-        html.dark-theme .receipt-card::after { opacity: 0.05; }
+        .wm-logo { position: absolute; filter: grayscale(100%); }
+        .wm-tl { top: 20px; left: 15px; width: 60px; }
+        .wm-tr { top: 20px; right: 15px; width: 60px; }
+        .wm-bl { bottom: 20px; left: 15px; width: 60px; }
+        .wm-br { bottom: 20px; right: 15px; width: 60px; }
+        .wm-c { top: 50%; left: 50%; transform: translate(-50%, -50%); width: 130px; }
         
         .receipt-content-wrapper { position: relative; z-index: 1; }
         .receipt-header { text-align: center; margin-bottom: 16px; }
@@ -90,7 +91,7 @@
             height: 38px; 
             border-radius: 6px; 
             object-fit: contain; 
-            background: #ffffff; /* Always white so logos look right */
+            background: #ffffff;
             border: 1px solid #e2e8f0;
             padding: 4px;
             margin: 0 auto 10px; 
@@ -148,6 +149,15 @@
         </a>
 
         <div class="receipt-card" id="receipt-content">
+            <!-- Inline styles applied directly to ensure html2canvas reads the low opacity flawlessly -->
+            <div class="watermarks">
+                <img src="../../assets/img/brytpay-logo.png" class="wm-logo wm-tl" style="opacity: 0.04;" alt="">
+                <img src="../../assets/img/brytpay-logo.png" class="wm-logo wm-tr" style="opacity: 0.04;" alt="">
+                <img src="../../assets/img/brytpay-logo.png" class="wm-logo wm-bl" style="opacity: 0.04;" alt="">
+                <img src="../../assets/img/brytpay-logo.png" class="wm-logo wm-br" style="opacity: 0.04;" alt="">
+                <img src="../../assets/img/brytpay-logo.png" class="wm-logo wm-c" style="opacity: 0.04;" alt="">
+            </div>
+
             <div class="receipt-content-wrapper">
                 <div class="receipt-header">
                     <img src="../../assets/img/brytpay-logo.png" id="receipt-provider-logo" alt="Provider" class="receipt-provider-logo" onerror="this.style.display='none'">
