@@ -75,4 +75,37 @@
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
+
+  <url>
+    <loc>https://brytpay.name.ng/home/airtime/ </loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://brytpay.name.ng/home/data/</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://brytpay.name.ng/home/education/</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://brytpay.name.ng/home/tv/</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://brytpay.name.ng/home/jamb/</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://brytpay.name.ng/home/nin/</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
 </urlset>
