@@ -32,7 +32,7 @@
             --border-light: #334155;
         }
 
-        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 80px !important; font-family: system-ui, -apple-system, sans-serif; margin: 0; transition: background-color 0.3s, color 0.3s; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 20px !important; font-family: system-ui, -apple-system, sans-serif; margin: 0; transition: background-color 0.3s, color 0.3s; }
         
         .app-topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: var(--card-bg); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-light); transition: background 0.3s, border 0.3s; }
         .app-topbar-left { display: flex; align-items: center; gap: 16px; }
@@ -81,12 +81,6 @@
         .sheet-input { width: 100%; background: var(--bg-color); border: 1.5px solid var(--border-light); color: var(--text-main); padding: 14px; border-radius: 12px; margin-bottom: 16px; outline: none; font-size: 0.85rem; font-weight: 600; resize: vertical; min-height: 80px; transition: 0.2s; box-sizing: border-box; }
         .sheet-input:focus { border-color: var(--bryt-primary); background: var(--card-bg); }
         .btn-submit-query { background: var(--bryt-primary); color: #fff; width: 100%; padding: 14px; font-size: 0.9rem; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; transition: 0.2s; }
-        
-        .mobile-nav { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: var(--card-bg) !important; z-index: 9999 !important; border-top: 1px solid var(--border-light) !important; display: flex !important; justify-content: space-around !important; padding: 12px 0 10px 0 !important; transition: background 0.3s, border 0.3s; }
-        .mobile-nav .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none; transition: color 0.2s; }
-        .mobile-nav .nav-item span { font-size: 0.65rem; font-weight: 800; }
-        .mobile-nav .nav-item svg { width: 22px; height: 22px; }
-        .mobile-nav .nav-item.active { color: var(--bryt-primary); }
     </style>
 </head>
 <body>
@@ -165,14 +159,6 @@
             <button id="btn-submit-query" class="btn-submit-query">Submit Query</button>
         </div>
     </div>
-
-    <nav class="mobile-nav no-print">
-        <a href="/dashboard/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
-        <a href="/dashboard/services/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span>Services</span></a>
-        <a href="/dashboard/fund/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
-        <a href="/dashboard/orders/index.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>Orders</span></a>
-        <a href="/dashboard/account/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
-    </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../assets/js/supabase-client.js"></script>

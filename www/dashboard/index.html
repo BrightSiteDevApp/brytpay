@@ -10,7 +10,6 @@
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../../assets/css/main.css">
     
-    <!-- Anti-Flash Dark Mode Script -->
     <script>
         if (localStorage.getItem('bryt_theme') === 'dark') {
             document.documentElement.classList.add('dark-theme');
@@ -27,7 +26,6 @@
             --border-light: #f1f5f9;
         }
 
-        /* Dark Theme Variables */
         html.dark-theme {
             --bryt-navy: #ffffff;
             --bg-color: #0f172a;
@@ -43,15 +41,52 @@
             font-family: system-ui, -apple-system, sans-serif;
             overscroll-behavior-y: contain; 
             transition: background-color 0.3s, color 0.3s;
+            margin: 0;
         }
 
-        /* Pull to Refresh */
+        /* --- APP SPLASH OVERLAY --- */
+        .app-splash {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff; 
+            z-index: 99999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        .splash-logo-container {
+            display: flex; align-items: center; justify-content: center;
+            animation: splashPulse 2s infinite ease-in-out;
+        }
+        .splash-logo { 
+            width: 170px; 
+            height: auto; 
+            display: block;
+            transition: filter 0.3s;
+        }
+        .splash-spinner {
+            position: absolute; bottom: 60px; width: 30px; height: 30px;
+            border: 3px solid rgba(29, 94, 208, 0.15); 
+            border-top-color: #1D5ED0; 
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        html.dark-theme .app-splash { background: #0f172a; }
+        html.dark-theme .splash-spinner { border: 3px solid rgba(255, 255, 255, 0.1); border-top-color: #1D5ED0; }
+        html.dark-theme .splash-logo { filter: drop-shadow(0px 2px 15px rgba(255, 255, 255, 0.15)); }
+        .app-splash.hidden { opacity: 0; visibility: hidden; }
+
+        @keyframes splashPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        /* -------------------------- */
+
         #ptr-indicator { position: fixed; top: 0; left: 0; right: 0; height: 60px; display: flex; align-items: center; justify-content: center; transform: translateY(-100%); transition: transform 0.2s; color: var(--bryt-primary); z-index: 9999; font-weight: 700; font-size: 0.85rem; gap: 8px; }
         #ptr-indicator.refreshing { transform: translateY(0); }
         .spinner { width: 20px; height: 20px; border: 3px solid #e2e8f0; border-top-color: var(--bryt-primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Topbar */
         .app-topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--card-bg); position: sticky; top: 0; z-index: 100; transition: background 0.3s; border-bottom: 1px solid var(--border-light); }
         .profile-container { display: flex; align-items: center; gap: 12px; }
         .profile-avatar { width: 42px; height: 42px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--bryt-primary); font-weight: 800; font-size: 1.2rem; text-decoration: none; cursor: pointer; }
@@ -65,7 +100,6 @@
 
         .main-content { padding: 16px 20px; }
 
-        /* Wallet Card */
         .wallet-card { background: linear-gradient(135deg, var(--bryt-primary) 0%, #113c88 100%); border-radius: 20px; padding: 24px 20px; color: #ffffff; box-shadow: 0 12px 24px rgba(29, 94, 208, 0.2); position: relative; overflow: hidden; margin-bottom: 24px; }
         .wallet-card::before { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; }
         .wallet-label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; position: relative; z-index: 1; }
@@ -75,18 +109,46 @@
         .wallet-currency { font-size: 1.2rem; font-weight: 700; opacity: 0.9; margin-right: 4px; }
         .wallet-amount { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; line-height: 1; }
 
-        /* Action Buttons */
-        .action-row { display: flex; gap: 12px; margin-bottom: 24px; }
+        .action-row { display: flex; gap: 12px; margin-bottom: 20px; }
         .slim-action-btn { flex: 1; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 0.85rem; text-decoration: none; transition: 0.2s; cursor: pointer;}
         .slim-action-btn svg { width: 18px; height: 18px; }
-        
         .btn-send { background: #1e293b; color: #ffffff; border: 1px solid #334155; }
         .btn-add { background: #ffffff; color: #0B1220; border: 1px solid #cbd5e1; }
-        
         html.dark-theme .btn-send { background: #1e293b; color: #f8fafc; border-color: #334155; }
         html.dark-theme .btn-add { background: var(--bryt-primary); color: #ffffff; border: none; }
 
-        /* 8-Grid Utilities */
+        /* 🚀 SLIM HORIZONTAL VIRTUAL ACCOUNTS */
+        .va-scroll-wrapper {
+            display: flex; overflow-x: auto; gap: 10px; padding-bottom: 12px; margin-bottom: 20px;
+            scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+        }
+        .va-scroll-wrapper::-webkit-scrollbar { display: none; }
+        .va-card {
+            flex: 0 0 90%; max-width: 320px; scroll-snap-align: center;
+            background: #f8fafc; border: 1px solid #e2e8f0; 
+            border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between;
+        }
+        html.dark-theme .va-card { background: #1e293b; border-color: #334155; }
+        .va-info-left { display: flex; align-items: center; gap: 12px; }
+        .va-icon-wrap {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: #e0e7ff; color: #4f46e5;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        html.dark-theme .va-icon-wrap { background: rgba(79, 70, 229, 0.2); }
+        .va-bank-title { font-size: 0.65rem; font-weight: 800; color: var(--text-main); margin-bottom: 2px; text-transform: uppercase;}
+        .va-acc-number { font-size: 1rem; font-weight: 800; color: var(--text-main); letter-spacing: 0.5px; line-height: 1.1; margin-bottom: 2px;}
+        .va-acc-name { font-size: 0.65rem; color: #64748b; font-weight: 700; line-height: 1.2; }
+        .va-fee-text { font-size: 0.6rem; color: var(--bryt-primary); font-weight: 800; }
+        
+        .btn-va-copy {
+            background: var(--bryt-primary); color: #fff; border: none;
+            padding: 8px 14px; border-radius: 12px; font-size: 0.7rem; font-weight: 800;
+            cursor: pointer; display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+            transition: 0.2s;
+        }
+        .btn-va-copy:active { transform: scale(0.95); }
+
         .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
         .section-title { font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin: 0; }
         .section-link { font-size: 0.8rem; font-weight: 700; color: var(--bryt-primary); text-decoration: none; }
@@ -97,25 +159,9 @@
         .utility-icon svg { width: 22px; height: 22px; }
         .utility-label { font-size: 0.65rem; font-weight: 700; color: var(--text-main); text-align: center; }
 
-       /* New Image Promo Banner (Responsive Fix) */
-        .promo-banner { 
-            width: 100%; 
-            height: auto; /* Removes the hardcoded height */
-            border-radius: 16px; 
-            overflow: hidden; 
-            margin-bottom: 24px; 
-            position: relative; 
-            border: 1px solid var(--border-light); 
-            background: #e2e8f0; 
-        }
-        .promo-banner img { 
-            width: 100%; 
-            height: auto; /* Scales proportionally */
-            display: block; /* Removes bottom spacing */
-            object-fit: contain; 
-        }
+        .promo-banner { width: 100%; height: auto; border-radius: 16px; overflow: hidden; margin-bottom: 24px; position: relative; border: 1px solid var(--border-light); background: #e2e8f0; }
+        .promo-banner img { width: 100%; height: auto; display: block; object-fit: contain; }
 
-        /* Native Bottom Nav */
         .mobile-nav { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: var(--card-bg) !important; z-index: 9999 !important; border-top: 1px solid var(--border-light) !important; display: flex !important; justify-content: space-around !important; padding: 12px 0 10px 0 !important; transition: background 0.3s, border 0.3s; }
         .mobile-nav .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none; transition: color 0.2s; }
         .mobile-nav .nav-item span { font-size: 0.65rem; font-weight: 800; }
@@ -125,28 +171,109 @@
         .tx-card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-light); padding: 12px; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: background 0.3s, border 0.3s; }
         .skeleton { color: transparent !important; background: #e2e8f0; border-radius: 8px; animation: pulse 1.5s infinite; }
         html.dark-theme .skeleton { background: #334155; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* Coming Soon Toast */
         .toast-msg-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--bryt-primary); color: #ffffff; padding: 12px 20px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; z-index: 10000; display: none; align-items: center; gap: 8px; box-shadow: 0 10px 30px rgba(29, 94, 208, 0.3); border: 1px solid rgba(255,255,255,0.2); }
+        
+        .bryt-toast { position: fixed; top: 20px; left: 0; right: 0; margin: 0 auto; width: max-content; max-width: 90%; transform: translateY(-150px); background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-light); padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 9999; transition: transform 0.4s; border-left: 4px solid var(--bryt-primary); }
+        .bryt-toast.show { transform: translateY(0); }
+        .toast-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+        .toast-success .toast-icon { background: #16a34a; }
+        .toast-text { font-size: 0.8rem; font-weight: 600; }
 
         /* 🚀 MANDATORY PIN SETUP OVERLAY */
         .pin-modal-overlay { position: fixed; inset: 0; background: rgba(11, 18, 32, 0.95); backdrop-filter: blur(8px); z-index: 999999; display: none; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity 0.3s; }
         .pin-modal-overlay.active { display: flex; opacity: 1; pointer-events: all; }
-        
         .pin-bottom-sheet { background: var(--card-bg); width: 100%; max-width: 480px; border-radius: 32px 32px 0 0; padding: 24px 24px 40px; text-align: center; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .pin-modal-overlay.active .pin-bottom-sheet { transform: translateY(0); }
-        
         .pin-display { display: flex; justify-content: center; gap: 16px; margin: 24px 0 32px; }
         .pin-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #cbd5e1; transition: 0.2s; }
         .pin-dot.filled { background: var(--bryt-primary); border-color: var(--bryt-primary); transform: scale(1.1); }
-        
         .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 24px; max-width: 280px; margin: 0 auto 32px; }
         .keypad-btn { background: transparent; border: none; font-size: 1.6rem; font-weight: 700; color: var(--text-main); height: 60px; width: 60px; margin: 0 auto; cursor: pointer; border-radius: 50%; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
         .keypad-btn:active { background: rgba(29, 94, 208, 0.1); }
     </style>
 </head>
 <body>
+
+    <!-- Seamless App Splash Screen -->
+    <div id="app-splash" class="app-splash">
+        <div class="splash-logo-container">
+            <img src="../../assets/img/brytpay-logo.png" alt="BRYT Pay" class="splash-logo">
+        </div>
+        <div class="splash-spinner"></div>
+    </div>
+
+    <!-- 🚀 APP UNLOCK SCREEN (PIN REQUIRED) -->
+    <div id="app-unlock-screen" class="app-splash" style="z-index: 99998; background: var(--bg-color); display: none;">
+        <div id="unlock-main-view" style="text-align: center; width: 100%; max-width: 340px; padding: 20px;">
+            <div id="unlock-avatar" style="width: 60px; height: 60px; background: var(--bryt-primary); color: #fff; font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin: 0 auto 16px;">U</div>
+            <h2 style="margin: 0 0 4px; font-size: 1.4rem; color: var(--text-main); font-weight: 800;">Welcome Back</h2>
+            <p id="unlock-email" style="margin: 0 0 24px; color: #64748b; font-size: 0.85rem; font-weight: 600;">--</p>
+            
+            <p style="margin: 0 0 16px; font-weight: 700; color: var(--text-main); font-size: 0.9rem;">Enter your PIN</p>
+            
+            <div class="pin-display" style="margin-bottom: 8px;">
+                <div class="pin-dot u-dot"></div><div class="pin-dot u-dot"></div><div class="pin-dot u-dot"></div><div class="pin-dot u-dot"></div>
+            </div>
+            
+            <div id="unlock-error" style="color: #dc2626; font-size: 0.75rem; font-weight: 800; height: 16px; margin-bottom: 24px; transition: 0.2s;"></div>
+
+            <div class="pin-keypad" style="margin-bottom: 16px;">
+                <button class="keypad-btn u-key" data-val="1">1</button>
+                <button class="keypad-btn u-key" data-val="2">2</button>
+                <button class="keypad-btn u-key" data-val="3">3</button>
+                <button class="keypad-btn u-key" data-val="4">4</button>
+                <button class="keypad-btn u-key" data-val="5">5</button>
+                <button class="keypad-btn u-key" data-val="6">6</button>
+                <button class="keypad-btn u-key" data-val="7">7</button>
+                <button class="keypad-btn u-key" data-val="8">8</button>
+                <button class="keypad-btn u-key" data-val="9">9</button>
+                <div></div>
+                <button class="keypad-btn u-key" data-val="0">0</button>
+                <button class="keypad-btn u-key" data-val="back">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
+                </button>
+            </div>
+
+            <!-- Stylized Action Pill Buttons -->
+            <div style="display: flex; justify-content: center; gap: 12px; width: 100%; margin-top: 8px;">
+                <button id="btn-trigger-forgot-pin" style="flex: 1; padding: 12px; background: var(--card-bg); border: 1px solid var(--border-light); color: var(--text-main); font-size: 0.75rem; font-weight: 800; border-radius: 12px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    Forgot PIN?
+                </button>
+                <button id="btn-unlock-logout" style="flex: 1; padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #dc2626; font-size: 0.75rem; font-weight: 800; border-radius: 12px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Sign Out
+                </button>
+            </div>
+        </div>
+
+        <!-- Inline PIN Recovery View -->
+        <div id="unlock-recovery-view" style="display: none; text-align: center; width: 100%; max-width: 320px; padding: 20px;">
+            <div style="background: rgba(29, 94, 208, 0.1); color: var(--bryt-primary); width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h2 style="margin: 0 0 6px; font-size: 1.2rem; color: var(--text-main); font-weight: 800;">Reset PIN</h2>
+            <p id="unlock-recovery-desc" style="margin: 0 0 24px; color: #64748b; font-size: 0.85rem; line-height: 1.4;">Click below to send a secure 6-digit recovery code to your registered email.</p>
+            
+            <div id="unlock-recovery-step1">
+                <button id="btn-unlock-send-otp" style="background: var(--bryt-primary); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 12px; font-weight: 800; cursor: pointer;">Send Recovery Code</button>
+            </div>
+
+            <div id="unlock-recovery-step2" style="display: none;">
+                <input type="text" id="unlock-recovery-otp" placeholder="6-Digit OTP" maxlength="6" inputmode="numeric" style="width: 100%; padding: 14px; border: 1.5px solid var(--border-light); border-radius: 12px; font-size: 1rem; font-weight: 800; letter-spacing: 4px; text-align: center; margin-bottom: 12px; background: var(--card-bg); color: var(--text-main); outline: none;">
+                <input type="password" id="unlock-recovery-newpin" placeholder="New 4-Digit PIN" maxlength="4" inputmode="numeric" style="width: 100%; padding: 14px; border: 1.5px solid var(--border-light); border-radius: 12px; font-size: 1rem; font-weight: 800; text-align: center; margin-bottom: 16px; background: var(--card-bg); color: var(--text-main); outline: none;">
+                <button id="btn-unlock-verify-otp" style="background: var(--bryt-primary); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 12px; font-weight: 800; cursor: pointer;">Verify & Reset PIN</button>
+            </div>
+
+            <button id="btn-cancel-recovery" style="background: none; border: none; color: #64748b; font-size: 0.8rem; font-weight: 800; cursor: pointer; margin-top: 16px;">&larr; Back to PIN Entry</button>
+        </div>
+    </div>
+
+    <div id="bryt-toast" class="bryt-toast">
+        <div id="toast-icon-wrap" class="toast-icon"></div>
+        <div id="toast-text" class="toast-text">Message</div>
+    </div>
 
     <!-- Coming Soon Toast -->
     <div id="coming-soon-toast" class="toast-msg-box">
@@ -217,17 +344,23 @@
 
         <!-- Slim Pill Action Buttons -->
        <section class="action-row">
-    <!-- UPDATED: Links to your new send page and removes the old ID -->
-    <a href="/dashboard/send/index.html" class="slim-action-btn btn-send">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-        Send Money
-    </a>
-    
-    <a href="/dashboard/fund/index.html" class="slim-action-btn btn-add">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        Add Money
-    </a>
-</section>
+            <a href="/dashboard/send/index.html" class="slim-action-btn btn-send">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                Send Money
+            </a>
+            
+            <a href="/dashboard/fund/index.html" class="slim-action-btn btn-add">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add Money
+            </a>
+        </section>
+
+        <!-- 🚀 NEW VIRTUAL ACCOUNTS SCROLL CONTAINER -->
+        <div id="virtual-accounts-container" class="va-scroll-wrapper">
+            <!-- Loading state structure -->
+            <div class="va-card skeleton" style="border: none;">Loading...</div>
+        </div>
+        
         <!-- Expanded 8-Grid Utility Section -->
         <div class="section-header">
             <h2 class="section-title">Utility</h2>
@@ -296,7 +429,6 @@
     <!-- NATIVE PULL TO REFRESH & DARK MODE SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Dark Mode Toggle Logic
             const themeToggle = document.getElementById('theme-toggle');
             if (themeToggle) {
                 themeToggle.addEventListener('click', () => {
@@ -306,7 +438,6 @@
                 });
             }
 
-            // Pull to Refresh Logic
             const container = document.body;
             const ptrIndicator = document.getElementById('ptr-indicator');
             let startY = 0; let currentY = 0; let isPulling = false;

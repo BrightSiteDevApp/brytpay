@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Create Account — BRYT Pay</title>
 
     <script>
@@ -46,13 +46,50 @@
 
         body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; margin: 0; background: radial-gradient(circle at top right, rgba(29, 94, 208, 0.1), transparent 400px), var(--bg-color); transition: background-color 0.3s, color 0.3s; font-family: system-ui, -apple-system, sans-serif; }
         
+        /* --- APP SPLASH OVERLAY --- */
+        .app-splash {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff; 
+            z-index: 99999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        .splash-logo-container {
+            display: flex; align-items: center; justify-content: center;
+            animation: splashPulse 2s infinite ease-in-out;
+        }
+        .splash-logo { 
+            width: 170px; 
+            height: auto; 
+            display: block;
+            transition: filter 0.3s;
+        }
+        .splash-spinner {
+            position: absolute; bottom: 60px; width: 30px; height: 30px;
+            border: 3px solid rgba(29, 94, 208, 0.15); 
+            border-top-color: #1D5ED0; 
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        html.dark-theme .app-splash { background: #0f172a; }
+        html.dark-theme .splash-spinner { border: 3px solid rgba(255, 255, 255, 0.1); border-top-color: #1D5ED0; }
+        html.dark-theme .splash-logo { filter: drop-shadow(0px 2px 15px rgba(255, 255, 255, 0.15)); }
+
+        .app-splash.hidden { opacity: 0; visibility: hidden; }
+
+        @keyframes splashPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        /* -------------------------- */
+
         .auth-card { width: 100%; max-width: 440px; padding: 40px 32px; background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05); transition: 0.3s; }
         
-        /* Removed the white box and border radius */
         .auth-brand { display: flex; justify-content: center; margin-bottom: 24px; }
         .brand-logo-img { max-width: 180px; height: auto; object-fit: contain; display: block; transition: 0.3s; }
-        
-        /* Subtle glow in dark mode so the black text remains readable */
         html.dark-theme .brand-logo-img { filter: drop-shadow(0px 2px 15px rgba(255, 255, 255, 0.15)); }
         
         .auth-header { text-align: center; margin-bottom: 32px; }
@@ -74,7 +111,6 @@
         .auth-footer a { color: var(--bryt-primary); font-weight: 800; text-decoration: none; transition: 0.2s; }
         .auth-footer a:hover { text-decoration: underline; }
         
-        /* Password Visibility & Hints */
         .password-wrapper { position: relative; }
         .toggle-password { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
         .toggle-password:hover { color: var(--bryt-primary); }
@@ -82,9 +118,27 @@
         .password-hint.valid { color: #10b981; }
         .password-hint.invalid { color: #ef4444; }
 
+        /* Form Fade-In Animation */
+        .auth-card {
+            animation: formFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes formFadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
     </style>
 </head>
 <body class="landing-page">
+
+    <!-- Seamless App Splash Screen -->
+    <div id="app-splash" class="app-splash">
+        <div class="splash-logo-container">
+            <img src="../assets/img/brytpay-logo.png" alt="BRYT Pay" class="splash-logo">
+        </div>
+        <div class="splash-spinner"></div>
+    </div>
+
     <div class="auth-card">
         <div class="auth-brand">
             <img src="../assets/img/brytpay-logo.png" alt="BRYT Pay" class="brand-logo-img">

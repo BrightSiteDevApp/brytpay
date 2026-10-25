@@ -1,5 +1,12 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // ==========================================
+    // 🧹 MASTER SECURITY RESET
+    // ==========================================
+    // Wipe dashboard memory so every fresh login strictly requires the PIN
+    sessionStorage.removeItem('bryt_unlocked');
+    sessionStorage.removeItem('bryt_dash_splash_shown');
+
+    // ==========================================
     // 🚀 TEST & REVIEWER OVERRIDE CONFIG
     // ==========================================
     const TEST_REVIEWER_EMAILS = [
@@ -23,10 +30,41 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    const { data: { session } } = await window.db.auth.getSession();
-    if (session) {
-        handleSmartRedirect();
-        return;
+    // ==========================================
+    // ⏱️ AUTH SPLASH LOGIC & SESSION CHECK
+    // ==========================================
+    const splash = document.getElementById('app-splash');
+    const authSplashShown = sessionStorage.getItem('bryt_auth_splash_shown');
+
+    if (splash) {
+        if (authSplashShown === 'true') {
+            splash.remove();
+            const { data: { session } } = await window.db.auth.getSession();
+            if (session) {
+                handleSmartRedirect();
+                return;
+            }
+        } else {
+            const minSplashTime = new Promise(resolve => setTimeout(resolve, 1500));
+            const sessionPromise = window.db.auth.getSession();
+
+            const [_, { data: { session } }] = await Promise.all([minSplashTime, sessionPromise]);
+
+            if (session) {
+                handleSmartRedirect();
+                return;
+            }
+
+            splash.classList.add('hidden');
+            sessionStorage.setItem('bryt_auth_splash_shown', 'true');
+            setTimeout(() => splash.remove(), 500); 
+        }
+    } else {
+        const { data: { session } } = await window.db.auth.getSession();
+        if (session) {
+            handleSmartRedirect();
+            return;
+        }
     }
 
     const errorEl = document.getElementById('auth-error');
@@ -73,7 +111,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const pwdHint = document.getElementById('pwd-hint');
         const pwdMatchHint = document.getElementById('pwd-match-hint');
 
-        // Check Strength
         pwdInput.addEventListener('input', () => {
             if (pwdRegex.test(pwdInput.value)) {
                 pwdHint.textContent = "✓ Password is strong";
@@ -85,7 +122,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             checkMatch(); 
         });
 
-        // Check Match
         const checkMatch = () => {
             if (!confirmPwdInput.value) {
                 pwdMatchHint.textContent = "";
@@ -178,7 +214,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             btn.disabled = true;
-            btn.textContent = 'Verifying...';
+            btn.textContent = 'Logging in...'; // 🚀 Updated to look natural
 
             const { data, error } = await window.db.auth.verifyOtp({ email: verifyEmail, token, type: 'signup' });
 
@@ -205,21 +241,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     .select();
 
                 if (!profileError && (!updatedRows || updatedRows.length === 0)) {
-                    const upsertRes = await window.db
-                        .from('profiles')
-                        .upsert({ 
-                            id: user.id, 
-                            full_name: secureFullName, 
-                            phone_number: securePhone,
-                            email: user.email 
-                        })
-                        .select();
-                    updatedRows = upsertRes.data;
-                    profileError = upsertRes.error;
+                    await window.db.from('profiles').upsert({ 
+                        id: user.id, 
+                        full_name: secureFullName, 
+                        phone_number: securePhone,
+                        email: user.email 
+                    });
                 }
 
                 await window.db.from('wallets').upsert({ user_id: user.id, balance: 0.00 });
                 window.db.functions.invoke('send-welcome-email', { body: {} }).catch(err => console.error(err));
+                
+                // 🚀 INSTANT 9PSB PROVISIONING (Awaited silently in the background)
+                try {
+                    await window.db.functions.invoke('reserve-virtual-account', {
+                        body: { action: 'reserve_basic', phoneNumber: securePhone }
+                    });
+                } catch (reserveErr) {
+                    console.error("Basic account gen failed:", reserveErr);
+                }
                 
                 localStorage.removeItem('bryt_pending_email');
                 localStorage.removeItem('bryt_pending_name');
@@ -290,9 +330,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             loginEmailForOtp = email;
 
-            // 🚀 PLAY STORE TEST ACCOUNT BYPASS
             if (TEST_REVIEWER_EMAILS.includes(email.toLowerCase())) {
-                // Changed to localStorage for Capacitor mobile persistence
                 localStorage.setItem('bryt_test_email', email);
                 localStorage.setItem('bryt_test_pass', password);
                 
@@ -304,7 +342,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            // Normal User Flow
             await window.db.auth.signOut();
             const { error: otpError } = await window.db.auth.signInWithOtp({ email });
 
@@ -325,13 +362,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const btn = document.getElementById('verify-login-btn');
             const token = document.getElementById('login-otp-code').value.trim();
             
-            // Checking localStorage instead of sessionStorage
             const currentEmail = (loginEmailForOtp || localStorage.getItem('bryt_test_email') || '').toLowerCase();
 
             btn.disabled = true;
             btn.textContent = 'Authenticating...';
 
-            // 🚀 PLAY STORE TEST ACCOUNT OTP BYPASS
             if (TEST_REVIEWER_EMAILS.includes(currentEmail) && token === TEST_OTP) {
                 const { data: sessData } = await window.db.auth.getSession();
                 if (!sessData?.session) {
@@ -348,14 +383,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 }
                 
-                // Cleanup persistent storage
                 localStorage.removeItem('bryt_test_email');
                 localStorage.removeItem('bryt_test_pass');
+                
                 handleSmartRedirect();
                 return;
             }
 
-            // Normal User OTP Verification
             const { error } = await window.db.auth.verifyOtp({ email: currentEmail || loginEmailForOtp, token, type: 'email' });
 
             if (error) {
