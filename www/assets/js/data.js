@@ -9,7 +9,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentBalance = 0;
     let currentPin = '';
 
-    // 🚀 SMART ROUTING: Explicitly define back targets based on where they came from
+    // 🚀 BENEFICIARIES STATE
+    let allBeneficiaries = [];
+    let pendingDeleteId = null;
+    let pendingDeleteBtn = null;
+
+    // 🚀 SMART ROUTING
     const backBtn = document.getElementById('smart-back-btn');
     if (backBtn) {
         const referrer = document.referrer || '';
@@ -114,7 +119,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     const pinDots = document.querySelectorAll('.pin-dot');
     const keypadBtns = document.querySelectorAll('.keypad-btn');
     
+    // Beneficiary & Success Elements
     const successOverlay = document.getElementById('success-overlay');
+    const saveBeneficiaryBox = document.getElementById('save-beneficiary-box');
+    const btnSaveBeneficiary = document.getElementById('btn-save-beneficiary');
+    const btnSkipSave = document.getElementById('btn-skip-save');
+    const beneficiaryNameInput = document.getElementById('beneficiary-name');
+
+    const benModalOverlay = document.getElementById('beneficiaries-modal');
+    const btnOpenBeneficiaries = document.getElementById('btn-open-beneficiaries');
+    const btnCloseBeneficiaries = document.getElementById('close-beneficiaries');
+    const benListContainer = document.getElementById('beneficiaries-list');
+    const searchBeneficiaryInput = document.getElementById('search-beneficiary');
+    
+    // Custom Delete Modal Elements
+    const deleteModal = document.getElementById('delete-modal');
+    const btnCancelDelete = document.getElementById('cancel-delete');
+    const btnConfirmDelete = document.getElementById('confirm-delete');
+    const deleteBenName = document.getElementById('delete-ben-name');
 
     const networkPrefixes = {
         '0803': 'mtn', '0806': 'mtn', '0703': 'mtn', '0706': 'mtn', '0813': 'mtn', '0816': 'mtn', '0810': 'mtn', '0814': 'mtn', '0903': 'mtn', '0906': 'mtn', '0913': 'mtn', '0916': 'mtn', '0704': 'mtn', '0702': 'mtn',
@@ -122,6 +144,134 @@ document.addEventListener('DOMContentLoaded', async () => {
         '0805': 'glo', '0807': 'glo', '0705': 'glo', '0815': 'glo', '0811': 'glo', '0905': 'glo', '0915': 'glo',
         '0809': '9mobile', '0818': '9mobile', '0817': '9mobile', '0909': '9mobile', '0908': '9mobile'
     };
+
+    // 🚀 FETCH BENEFICIARIES ON LOAD
+    async function loadBeneficiaries() {
+        try {
+            const { data, error } = await window.db.from('beneficiaries').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+            if (!error && data) {
+                allBeneficiaries = data;
+            }
+        } catch(e) {
+            console.error("Failed to load beneficiaries.");
+        }
+    }
+    
+    function renderBeneficiaries(searchQuery = '') {
+        benListContainer.innerHTML = '';
+        
+        const filtered = allBeneficiaries.filter(b => {
+            const term = searchQuery.toLowerCase();
+            return (b.name && b.name.toLowerCase().includes(term)) || (b.phone && b.phone.includes(term));
+        });
+
+        if (filtered.length === 0) {
+            benListContainer.innerHTML = `<div style="text-align: center; color: #64748b; font-size: 0.8rem; font-weight: 600; padding: 20px;">No contacts found.</div>`;
+            return;
+        }
+
+        filtered.forEach(ben => {
+            let logoFile = 'mtn-logo.png';
+            if (ben.network === 'airtel') logoFile = 'airtel-logo.png';
+            if (ben.network === 'glo') logoFile = 'glo-logo.png';
+            if (ben.network === '9mobile') logoFile = '9mob-logo.png';
+
+            const initial = ben.name ? ben.name.charAt(0).toUpperCase() : '#';
+
+            const item = document.createElement('div');
+            item.className = 'beneficiary-item';
+            
+            item.innerHTML = `
+                <div class="ben-avatar">${initial}</div>
+                <div class="ben-info">
+                    <div class="ben-name">${ben.name}</div>
+                    <div class="ben-phone">${ben.phone}</div>
+                </div>
+                <img src="../../assets/img/${logoFile}" class="ben-network-logo" alt="${ben.network}">
+                <button class="btn-del-ben" title="Delete Contact" style="background: rgba(239, 68, 68, 0.1); border: none; color: #ef4444; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+            `;
+            
+            // Handle Clicking a Beneficiary
+            item.addEventListener('click', (e) => {
+                
+                // Trashed icon clicked
+                if (e.target.closest('.btn-del-ben')) {
+                    e.stopPropagation();
+                    pendingDeleteId = ben.id;
+                    pendingDeleteBtn = e.target.closest('.btn-del-ben');
+                    deleteBenName.textContent = ben.name;
+                    deleteModal.classList.add('active');
+                    return;
+                }
+                
+                // Normal row click -> populate input
+                phoneInput.value = ben.phone;
+                benModalOverlay.classList.remove('active');
+                
+                // Force input event so network auto-detects
+                const event = new Event('input', { bubbles: true });
+                phoneInput.dispatchEvent(event);
+            });
+            
+            benListContainer.appendChild(item);
+        });
+    }
+
+    // Modal Triggers
+    if (btnOpenBeneficiaries) {
+        btnOpenBeneficiaries.addEventListener('click', () => {
+            renderBeneficiaries(); // Reset list
+            benModalOverlay.classList.add('active');
+        });
+    }
+    if (btnCloseBeneficiaries) {
+        btnCloseBeneficiaries.addEventListener('click', () => {
+            benModalOverlay.classList.remove('active');
+        });
+    }
+    if (searchBeneficiaryInput) {
+        searchBeneficiaryInput.addEventListener('input', (e) => {
+            renderBeneficiaries(e.target.value);
+        });
+    }
+    
+    // 🚀 CUSTOM DELETE MODAL ACTIONS
+    if (btnCancelDelete) {
+        btnCancelDelete.addEventListener('click', () => {
+            deleteModal.classList.remove('active');
+            pendingDeleteId = null;
+            pendingDeleteBtn = null;
+        });
+    }
+    
+    if (btnConfirmDelete) {
+        btnConfirmDelete.addEventListener('click', async () => {
+            if (!pendingDeleteId) return;
+            
+            btnConfirmDelete.disabled = true;
+            btnConfirmDelete.textContent = 'Deleting...';
+            if (pendingDeleteBtn) pendingDeleteBtn.style.opacity = '0.5';
+
+            const { error } = await window.db.from('beneficiaries').delete().eq('id', pendingDeleteId);
+            
+            if (!error) {
+                allBeneficiaries = allBeneficiaries.filter(b => b.id !== pendingDeleteId);
+                renderBeneficiaries(searchBeneficiaryInput.value);
+                showToast('Contact removed.', 'success');
+            } else {
+                showToast('Failed to remove contact.', 'error');
+                if (pendingDeleteBtn) pendingDeleteBtn.style.opacity = '1';
+            }
+
+            deleteModal.classList.remove('active');
+            btnConfirmDelete.disabled = false;
+            btnConfirmDelete.textContent = 'Delete';
+            pendingDeleteId = null;
+            pendingDeleteBtn = null;
+        });
+    }
 
     phoneInput.addEventListener('input', (e) => {
         const val = e.target.value.trim();
@@ -148,7 +298,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('user-balance').textContent = `₦${currentBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
         }
     }
-    await fetchBalance();
+    await Promise.all([fetchBalance(), loadBeneficiaries()]);
 
     selectTrigger.addEventListener('click', () => selectWrapper.classList.toggle('open'));
     document.addEventListener('click', (e) => {
@@ -302,14 +452,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (error) throw new Error(error.message);
             if (resData && resData.success === false) throw new Error(resData.message);
 
-            // 🚀 SUCCESS! Trigger Fullscreen Checkmark Animation
             pinModal.classList.remove('active');
             successOverlay.classList.add('active');
             
-            // Exactly 1.5s later, reload the page to clear the form without leaving
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
+            // 🚀 BENEFICIARY CHECK HOOK
+            const alreadySaved = allBeneficiaries.some(b => b.phone === phone);
+            
+            if (alreadySaved) {
+                setTimeout(() => { window.location.reload(); }, 1500);
+            } else {
+                setTimeout(() => {
+                    saveBeneficiaryBox.style.display = 'block';
+                }, 1000);
+            }
 
         } catch (err) {
             showToast(err.message, "error");
@@ -318,5 +473,42 @@ document.addEventListener('DOMContentLoaded', async () => {
             modalConfirm.textContent = 'Pay Now';
             pinModal.classList.remove('active');
         }
+    });
+
+    // 🚀 SAVE BENEFICIARY BUTTON LOGIC
+    btnSaveBeneficiary.addEventListener('click', async () => {
+        const benName = beneficiaryNameInput.value.trim();
+        const phone = phoneInput.value.trim();
+        
+        if (!benName) {
+            showToast('Please enter a name.', 'error');
+            return;
+        }
+
+        btnSaveBeneficiary.disabled = true;
+        btnSaveBeneficiary.textContent = 'Saving...';
+
+        try {
+            const { error } = await window.db.from('beneficiaries').insert({
+                user_id: user.id,
+                name: benName,
+                phone: phone,
+                network: selectedNetwork
+            });
+
+            if (error) throw error;
+            
+            showToast('Contact saved!', 'success');
+            setTimeout(() => { window.location.reload(); }, 1000);
+            
+        } catch (err) {
+            showToast('Failed to save contact.', 'error');
+            btnSaveBeneficiary.disabled = false;
+            btnSaveBeneficiary.textContent = 'Save Contact';
+        }
+    });
+
+    btnSkipSave.addEventListener('click', () => {
+        window.location.reload();
     });
 });

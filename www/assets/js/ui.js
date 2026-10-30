@@ -1,57 +1,5 @@
-// ==========================================
-// 🛑 1. THE INSTANT GUARD (Runs before page loads)
-// ==========================================
-(function globalSecurityGuard() {
-    const isUnlocked = sessionStorage.getItem('bryt_unlocked') === 'true';
-    const currentPath = window.location.pathname.toLowerCase();
-    const isIndexPage = currentPath.endsWith('/dashboard/') || currentPath.endsWith('/dashboard/index.html');
-    
-    // If locked and trying to access any page other than the index, bounce instantly.
-    if (!isUnlocked && !isIndexPage) {
-        window.location.replace('/dashboard/index.html');
-    }
-})();
-
-// ==========================================
-// 🛑 2. THE CACHE & BACKGROUND BUSTERS
-// ==========================================
-// Catches BFCache (Back-Forward Cache) loading
-window.addEventListener('pageshow', (event) => {
-    if (event.persisted) {
-        const isUnlocked = sessionStorage.getItem('bryt_unlocked') === 'true';
-        const currentPath = window.location.pathname.toLowerCase();
-        const isIndexPage = currentPath.endsWith('/dashboard/') || currentPath.endsWith('/dashboard/index.html');
-        
-        if (!isUnlocked && !isIndexPage) {
-            window.location.replace('/dashboard/index.html');
-        }
-    }
-});
-
-// Catches users minimizing the app and opening it again
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-        const isUnlocked = sessionStorage.getItem('bryt_unlocked') === 'true';
-        const currentPath = window.location.pathname.toLowerCase();
-        const isIndexPage = currentPath.endsWith('/dashboard/') || currentPath.endsWith('/dashboard/index.html');
-        
-        if (!isUnlocked && !isIndexPage) {
-            window.location.replace('/dashboard/index.html');
-        }
-    }
-});
-
-// ==========================================
-// MAIN DOM LOGIC
-// ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
     
-    const splash = document.getElementById('app-splash');
-    const unlockScreen = document.getElementById('app-unlock-screen');
-    const splashShown = sessionStorage.getItem('bryt_dash_splash_shown');
-    const isUnlocked = sessionStorage.getItem('bryt_unlocked') === 'true';
-
-    // Support Dropdown Logic
     const supportTrigger = document.getElementById('support-trigger');
     const supportMenu = document.getElementById('support-menu');
     if (supportTrigger && supportMenu) {
@@ -60,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const isMenuOpen = supportMenu.style.display === 'block';
             supportMenu.style.display = isMenuOpen ? 'none' : 'block';
         });
+
         document.addEventListener('click', (e) => {
             if (!supportTrigger.contains(e.target) && !supportMenu.contains(e.target)) {
                 supportMenu.style.display = 'none';
@@ -70,17 +19,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session }, error: sessionError } = await window.db.auth.getSession();
     
     if (!session) {
-        window.location.replace('/auth/login.html'); 
+        window.location.href = '/auth/login.html'; 
         return;
     }
     
     const user = session.user;
     let currentBalance = 0;
-    let userAccountId = '';
     let isBalanceHidden = localStorage.getItem('brytpay_balance_hidden') === 'true';
-    let userPin = null;
 
-    // Global Clipboard Toast Function
     window.showToast = function(message, type = 'success') {
         const toast = document.getElementById('bryt-toast');
         const toastText = document.getElementById('toast-text');
@@ -124,36 +70,41 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // ==========================================
-    // ⏱️ STRICT DASHBOARD SPLASH & UNLOCK ROUTING
-    // ==========================================
-    async function initializeAppState() {
-        const { data } = await window.db.from('profiles').select('full_name, account_id, transaction_pin, psb9_account_number, palmpay_account_number, payvessel_palmpay_account_number, moniepoint_account_number, virtual_account_name').eq('id', user.id).single();
+    async function checkUnreadNotifications() {
+        const notifDot = document.getElementById('notif-dot');
+        if (!notifDot) return;
+        try {
+            const { data, error } = await window.db.from('user_notifications').select('id, user_id').or(`user_id.eq.${user.id},user_id.is.null`).eq('is_read', false);
+            if (error || !data) return;
+            const localRead = JSON.parse(localStorage.getItem('bryt_read_notifs') || '[]');
+            const hasUnread = data.some(notif => {
+                if (notif.user_id === null) return !localRead.includes(notif.id);
+                return true; 
+            });
+            if (hasUnread) notifDot.classList.add('active');
+            else notifDot.classList.remove('active');
+        } catch (err) {}
+    }
+
+    const hour = new Date().getHours();
+    const greetingTime = document.getElementById('greeting-time');
+    if (greetingTime) {
+        if (hour < 12) greetingTime.textContent = 'Good morning,';
+        else if (hour < 18) greetingTime.textContent = 'Good afternoon,';
+        else greetingTime.textContent = 'Good evening,';
+    }
+
+    async function loadProfile() {
+        const { data } = await window.db.from('profiles').select('full_name, psb9_account_number, palmpay_account_number, payvessel_palmpay_account_number, moniepoint_account_number, virtual_account_name').eq('id', user.id).single();
+        const greetingEl = document.getElementById('user-greeting');
+        
         if (data) {
-            userPin = data.transaction_pin;
-            
-            // 1. Populate Greeting & IDs
-            const greetingEl = document.getElementById('user-greeting');
-            const displayIdEl = document.getElementById('display-account-id');
-            const unlockAvatar = document.getElementById('unlock-avatar');
-            const unlockNameEl = document.getElementById('unlock-email'); 
-            
             if (greetingEl) {
                 greetingEl.textContent = data.full_name ? data.full_name.split(' ')[0] : "User";
                 greetingEl.classList.remove('skeleton');
             }
-            if (unlockAvatar) {
-                unlockAvatar.textContent = data.full_name ? data.full_name.charAt(0).toUpperCase() : "U";
-            }
-            if (unlockNameEl) {
-                unlockNameEl.textContent = data.full_name || "User"; 
-            }
-            if (displayIdEl && data.account_id) {
-                userAccountId = data.account_id;
-                displayIdEl.textContent = userAccountId;
-            }
 
-            // 2. Populate Virtual Accounts
+            // 🚀 SMART VIRTUAL ACCOUNTS
             const vaContainer = document.getElementById('virtual-accounts-container');
             if (vaContainer) {
                 let cardsHtml = '';
@@ -180,12 +131,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (data.psb9_account_number) {
                     cardsHtml += buildCard('9Payment Service Bank (9PSB)', data.psb9_account_number, 'PAYVESSEL/BRYT Pay', 'Fixed fee: ₦50');
                 }
+                
+                // Legacy Topify PalmPay
                 if (data.palmpay_account_number) {
                     cardsHtml += buildCard('PalmPay', data.palmpay_account_number, legacyTopifyName, 'Fixed fee: 1.5%');
                 }
+                
+                // New Payvessel PalmPay
                 if (data.payvessel_palmpay_account_number) {
                     cardsHtml += buildCard('PalmPay', data.payvessel_palmpay_account_number, 'BRYT Pay (Nexpay)', 'Fixed fee: 1.5%');
                 }
+                
+                // Legacy Topify Moniepoint
                 if (data.moniepoint_account_number) {
                     cardsHtml += buildCard('Moniepoint', data.moniepoint_account_number, legacyTopifyName, 'Fixed fee: 1.5%');
                 }
@@ -196,249 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     vaContainer.style.display = 'none';
                 }
             }
-
-            // 3. Evaluate PIN Lock Status
-            const currentPath = window.location.pathname.toLowerCase();
-            const isIndexPage = currentPath.endsWith('/dashboard/') || currentPath.endsWith('/dashboard/index.html');
-
-            if (!userPin) {
-                sessionStorage.setItem('bryt_unlocked', 'true');
-                if (!isIndexPage) {
-                    window.location.replace('/dashboard/index.html');
-                    return;
-                }
-                initPinSetup();
-                dismissSplash();
-            } else if (!isUnlocked) {
-                if (!isIndexPage) {
-                    window.location.replace('/dashboard/index.html');
-                    return;
-                } else {
-                    if (unlockScreen) unlockScreen.style.display = 'flex';
-                    initUnlockKeypad();
-                    dismissSplash();
-
-                    // ==========================================
-                    // 🛑 3. THE DEEP BACK-BUTTON TRAP
-                    // ==========================================
-                    // We push 10 states so a rapid swipe still hits a trap layer
-                    for (let i = 0; i < 10; i++) {
-                        history.pushState(null, '', location.href);
-                    }
-                    
-                    window.onpopstate = function () {
-                        if (sessionStorage.getItem('bryt_unlocked') !== 'true') {
-                            history.pushState(null, '', location.href);
-                        }
-                    };
-                }
-            } else {
-                dismissSplash();
-            }
-        } else {
-            dismissSplash();
         }
-    }
-
-    function dismissSplash() {
-        if (splash) {
-            if (splashShown === 'true') {
-                splash.remove();
-            } else {
-                const minSplashTime = new Promise(resolve => setTimeout(resolve, 1500));
-                minSplashTime.then(() => {
-                    splash.classList.add('hidden');
-                    sessionStorage.setItem('bryt_dash_splash_shown', 'true');
-                    setTimeout(() => splash.remove(), 500); 
-                });
-            }
-        }
-    }
-
-    // Trigger initialization immediately
-    initializeAppState();
-
-    // ==========================================
-    // 🔒 UNLOCK KEYPAD LOGIC
-    // ==========================================
-    function initUnlockKeypad() {
-        const uDots = document.querySelectorAll('.u-dot');
-        const uBtns = document.querySelectorAll('.u-key');
-        const uErr = document.getElementById('unlock-error');
-        let enteredPin = '';
-
-        function updateUDots() {
-            uDots.forEach((dot, idx) => {
-                if (idx < enteredPin.length) dot.classList.add('filled');
-                else dot.classList.remove('filled');
-            });
-            
-            if (enteredPin.length === 4) {
-                verifyUnlock();
-            }
-        }
-
-        function verifyUnlock() {
-            if (enteredPin === userPin) {
-                uErr.textContent = '';
-                sessionStorage.setItem('bryt_unlocked', 'true');
-                unlockScreen.style.opacity = '0';
-                
-                window.onpopstate = null; // Release the back-button trap
-                
-                setTimeout(() => { unlockScreen.remove(); }, 300);
-            } else {
-                uErr.textContent = 'Incorrect PIN';
-                enteredPin = '';
-                const display = document.querySelector('.pin-display');
-                display.style.transform = 'translateX(10px)';
-                setTimeout(() => display.style.transform = 'translateX(-10px)', 50);
-                setTimeout(() => display.style.transform = 'translateX(10px)', 100);
-                setTimeout(() => display.style.transform = 'translateX(0)', 150);
-                updateUDots();
-            }
-        }
-
-        uBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                uErr.textContent = ''; 
-                const val = btn.getAttribute('data-val');
-                if (val === 'back') {
-                    enteredPin = enteredPin.slice(0, -1);
-                } else {
-                    if (enteredPin.length < 4) enteredPin += val;
-                }
-                updateUDots();
-            });
-        });
-
-        const unlockLogoutBtn = document.getElementById('btn-unlock-logout');
-        if (unlockLogoutBtn) {
-            unlockLogoutBtn.addEventListener('click', async () => {
-                unlockLogoutBtn.textContent = 'Signing out...';
-                sessionStorage.clear();
-                await window.db.auth.signOut();
-                window.location.replace('/auth/login.html');
-            });
-        }
-    }
-
-    // ==========================================
-    // 🔑 INLINE UNLOCK RECOVERY (FORGOT PIN)
-    // ==========================================
-    const btnTriggerForgot = document.getElementById('btn-trigger-forgot-pin');
-    const mainView = document.getElementById('unlock-main-view');
-    const recView = document.getElementById('unlock-recovery-view');
-    
-    if (btnTriggerForgot && mainView && recView) {
-        btnTriggerForgot.addEventListener('click', () => {
-            mainView.style.display = 'none';
-            recView.style.display = 'block';
-        });
-
-        document.getElementById('btn-cancel-recovery').addEventListener('click', () => {
-            recView.style.display = 'none';
-            mainView.style.display = 'block';
-            document.getElementById('unlock-recovery-step1').style.display = 'block';
-            document.getElementById('unlock-recovery-step2').style.display = 'none';
-            document.getElementById('unlock-recovery-desc').textContent = 'Click below to send a secure 6-digit recovery code to your registered email.';
-        });
-
-        const btnUnlockSend = document.getElementById('btn-unlock-send-otp');
-        btnUnlockSend.addEventListener('click', async () => {
-            btnUnlockSend.disabled = true; btnUnlockSend.textContent = 'Sending...';
-            try {
-                const { data, error } = await window.db.functions.invoke('reset-pin', { body: { action: 'send' } });
-                if (error) throw error;
-                if (data && data.error) throw new Error(data.error);
-                
-                document.getElementById('unlock-recovery-step1').style.display = 'none';
-                document.getElementById('unlock-recovery-step2').style.display = 'block';
-                document.getElementById('unlock-recovery-desc').innerHTML = '<span style="color: #10b981; font-weight: bold;">Code sent!</span> Enter the 6-digit code and your new PIN.';
-            } catch (err) {
-                alert(err.message || 'Error sending code.');
-            }
-            btnUnlockSend.disabled = false; btnUnlockSend.textContent = 'Send Recovery Code';
-        });
-
-        const btnUnlockVerify = document.getElementById('btn-unlock-verify-otp');
-        btnUnlockVerify.addEventListener('click', async () => {
-            const otp = document.getElementById('unlock-recovery-otp').value;
-            const newPin = document.getElementById('unlock-recovery-newpin').value;
-            
-            if (otp.length !== 6) return alert("Please enter the 6-digit code from your email.");
-            if (newPin.length !== 4) return alert("Your new PIN must be exactly 4 digits.");
-            
-            btnUnlockVerify.disabled = true; btnUnlockVerify.textContent = 'Verifying...';
-            
-            try {
-                const { data, error } = await window.db.functions.invoke('reset-pin', { body: { action: 'verify', otp, newPin } });
-                if (error) throw error;
-                if (data && data.error) throw new Error(data.error);
-                
-                userPin = newPin; 
-                sessionStorage.setItem('bryt_unlocked', 'true'); 
-                unlockScreen.style.opacity = '0';
-                window.onpopstate = null; // Release trap
-                setTimeout(() => { unlockScreen.remove(); }, 300);
-            } catch (err) {
-                alert(err.message || 'Error verifying code.');
-                btnUnlockVerify.disabled = false; btnUnlockVerify.textContent = 'Verify & Reset PIN';
-            }
-        });
-    }
-
-    // ==========================================
-    // ⚙️ INITIALIZE PIN SETUP (FIRST TIME)
-    // ==========================================
-    function initPinSetup() {
-        const overlay = document.getElementById('pin-setup-overlay');
-        const dots = document.querySelectorAll('.pin-dot:not(.u-dot)');
-        const keypadBtns = document.querySelectorAll('.keypad-btn:not(.u-key)');
-        const saveBtn = document.getElementById('btn-save-pin');
-        let currentPin = '';
-
-        if (!overlay) return;
-        overlay.classList.add('active');
-
-        function updateDots() {
-            dots.forEach((dot, idx) => {
-                if (idx < currentPin.length) dot.classList.add('filled');
-                else dot.classList.remove('filled');
-            });
-            saveBtn.disabled = currentPin.length !== 4;
-        }
-
-        keypadBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const val = btn.getAttribute('data-val');
-                if (val === 'back') {
-                    currentPin = currentPin.slice(0, -1);
-                } else {
-                    if (currentPin.length < 4) currentPin += val;
-                }
-                updateDots();
-            });
-        });
-
-        saveBtn.addEventListener('click', async () => {
-            if (currentPin.length !== 4) return;
-            saveBtn.disabled = true;
-            saveBtn.innerHTML = 'Saving...';
-            
-            const { error } = await window.db.from('profiles').update({ transaction_pin: currentPin }).eq('id', user.id);
-            
-            if (error) {
-                alert('Connection error. Please try again.');
-                saveBtn.disabled = false;
-                saveBtn.innerHTML = 'Save PIN';
-            } else {
-                saveBtn.style.background = '#10b981';
-                saveBtn.innerHTML = 'PIN Saved! ✓';
-                userPin = currentPin; 
-                setTimeout(() => { overlay.classList.remove('active'); }, 1000);
-            }
-        });
     }
 
     async function loadWallet() {
@@ -451,9 +166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    function formatCurrency(amount) {
-        return amount.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
+    function formatCurrency(amount) { return amount.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
     const toggleBtn = document.getElementById('toggle-balance');
     const balanceAmount = document.getElementById('balance-amount');
@@ -617,47 +330,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    async function managePushConsent() {
-        const consentUI = document.getElementById('push-consent-ui');
-        const btnAllow = document.getElementById('btn-allow-push');
-        const btnDeny = document.getElementById('btn-deny-push');
-        if (!consentUI) return;
-        if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-        const dismissedUntil = localStorage.getItem('bryt_push_dismissed_until');
-        if (dismissedUntil && Date.now() < parseInt(dismissedUntil)) return;
-        if (Notification.permission === 'granted' || Notification.permission === 'denied') return;
-        setTimeout(() => { consentUI.classList.add('active'); }, 1500);
-        btnDeny.addEventListener('click', () => {
-            consentUI.classList.remove('active');
-            localStorage.setItem('bryt_push_dismissed_until', (Date.now() + 172800000).toString()); 
-        });
-        btnAllow.addEventListener('click', async () => {
-            btnAllow.textContent = "Connecting...";
-            btnAllow.disabled = true;
-            try {
-                const permission = await Notification.requestPermission();
-                if (permission !== 'granted') { consentUI.classList.remove('active'); return; }
-                const registration = await navigator.serviceWorker.ready;
-                const VAPID_PUBLIC_KEY = "BLfbGDEa2tl28dIanGQ5KffDXg9rEuSdyI49VurFSGZyef8h1Gg3B-uf6-B6BuBZfYz1bCt0VPiybjqodHC5gKk";
-                const urlBase64ToUint8Array = (base64String) => {
-                    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-                    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-                    const rawData = window.atob(base64);
-                    const outputArray = new Uint8Array(rawData.length);
-                    for (let i = 0; i < rawData.length; ++i) { outputArray[i] = rawData.charCodeAt(i); }
-                    return outputArray;
-                };
-                const subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
-                await window.db.from('push_subscriptions').insert({ user_id: user.id, subscription: subscription });
-                btnAllow.textContent = "Connected! ✓";
-                btnAllow.style.background = "#10b981";
-                setTimeout(() => { consentUI.classList.remove('active'); }, 1000);
-            } catch (err) {}
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            logoutBtn.textContent = 'Logging out...';
+            await window.db.auth.signOut();
+            window.location.href = '/auth/login.html'; 
         });
     }
 
     checkUnreadNotifications();
+    loadProfile();
     loadWallet();
     loadTransactions();
-    managePushConsent();
 });

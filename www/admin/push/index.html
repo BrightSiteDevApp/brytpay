@@ -2,42 +2,102 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Push Notifications — BRYT Admin</title>
+
+    <script>
+        if (localStorage.getItem('bryt_theme') === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+        }
+    </script>
+
     <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
     <link rel="stylesheet" href="../../assets/css/main.css">
     <style>
-        body { display: none; background: #f8fafc; font-family: system-ui, sans-serif; color: #0f172a; margin: 0; }
-        .admin-container { max-width: 600px; margin: 40px auto; padding: 24px; }
-        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 24px; }
-        .back-link:hover { color: #1D5ED0; }
-        .composer-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
-        h1 { font-size: 1.5rem; font-weight: 800; margin-top: 0; margin-bottom: 24px; }
+        :root {
+            --bryt-primary: #1D5ED0;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-main: #0B1220;
+            --text-muted: #64748b;
+            --border-light: #e2e8f0;
+            --input-bg: #f8fafc;
+        }
+
+        html.dark-theme {
+            --bryt-primary: #3b82f6;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-light: #334155;
+            --input-bg: #0f172a;
+        }
+
+        * { box-sizing: border-box; }
+        body { 
+            display: none; 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            margin: 0; 
+            font-family: system-ui, -apple-system, sans-serif; 
+            padding-bottom: 80px !important;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .app-topbar { 
+            display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; 
+            background: var(--card-bg); position: sticky; top: 0; z-index: 100; 
+            border-bottom: 1px solid var(--border-light); 
+        }
+        .app-topbar-left { display: flex; align-items: center; gap: 8px; }
+        .smart-back { color: var(--text-main); display: flex; align-items: center; text-decoration: none; padding: 2px; }
+        .page-title { font-size: 0.9rem; font-weight: 800; color: var(--text-main); margin: 0; }
+
+        .admin-container { max-width: 500px; margin: 0 auto; padding: 20px 16px; }
+
+        .composer-card { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .card-header { font-size: 1.05rem; font-weight: 800; margin-bottom: 16px; color: var(--text-main); }
         
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-weight: 800; font-size: 0.75rem; color: #475569; margin-bottom: 8px; text-transform: uppercase; }
-        .form-input { width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; outline: none; background: #f8fafc; font-family: inherit; box-sizing: border-box; transition: 0.2s; }
-        .form-input:focus { border-color: #1D5ED0; background: #ffffff; box-shadow: 0 0 0 3px rgba(29, 94, 208, 0.1); }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-weight: 800; font-size: 0.65rem; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+        .form-input { width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 0.75rem; outline: none; background: var(--input-bg); color: var(--text-main); font-family: inherit; box-sizing: border-box; transition: 0.2s; }
+        .form-input:focus { border-color: var(--bryt-primary); background: var(--card-bg); }
         
-        .btn-dispatch { background: #0f172a; color: #ffffff; width: 100%; padding: 16px; border-radius: 12px; font-weight: 800; font-size: 1rem; border: none; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; }
-        .btn-dispatch:hover { background: #1D5ED0; }
-        .btn-dispatch:disabled { background: #94a3b8; cursor: not-allowed; }
+        .btn-dispatch { background: var(--text-main); color: var(--bg-color); width: 100%; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; border: none; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; }
+        .btn-dispatch:hover { background: var(--bryt-primary); color: #fff;}
+        .btn-dispatch:disabled { background: var(--border-light); color: var(--text-muted); cursor: not-allowed; }
         
-        .status-banner { display: none; padding: 16px; border-radius: 12px; font-size: 0.9rem; font-weight: 700; margin-bottom: 24px; text-align: center; }
-        .status-success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-        .status-error { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .status-banner { display: none; padding: 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; margin-bottom: 16px; text-align: center; }
+        .status-success { background: rgba(22, 163, 74, 0.15); color: #16a34a; border: 1px solid rgba(22, 163, 74, 0.3); }
+        .status-error { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        .mobile-nav { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: var(--card-bg) !important; z-index: 9999 !important; border-top: 1px solid var(--border-light) !important; display: flex !important; justify-content: space-around !important; padding: 10px 0 8px 0 !important; }
+        .mobile-nav .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none; }
+        .mobile-nav .nav-item span { font-size: 0.6rem; font-weight: 800; }
+        .mobile-nav .nav-item svg { width: 20px; height: 20px; }
+        .mobile-nav .nav-item.active { color: var(--bryt-primary); }
+        @media (min-width: 768px) { .mobile-nav { display: none !important; } body { padding-bottom: 0 !important; } }
     </style>
 </head>
 <body>
-    <main class="admin-container">
-        <!-- 🚀 BACK BUTTON -->
-        <a href="/admin/" class="back-link">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            Back to Admin Hub
-        </a>
+    <header class="app-topbar">
+        <div class="app-topbar-left">
+            <a href="../index.html" class="smart-back">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </a>
+            <h1 class="page-title">Push Notifications</h1>
+        </div>
+    </header>
 
+    <main class="admin-container">
         <div class="composer-card">
-            <h1>Blast Notification</h1>
+            <div class="card-header">Blast Alert</div>
             
             <div id="status-msg" class="status-banner"></div>
 
@@ -48,7 +108,7 @@
             
             <div class="form-group">
                 <label class="form-label">Message Body</label>
-                <textarea id="push-body" class="form-input" style="min-height: 100px; resize: vertical;" placeholder="e.g. BRYT Pay will be down for 15 mins tonight..." required></textarea>
+                <textarea id="push-body" class="form-input" style="min-height: 80px; resize: vertical;" placeholder="Short, punchy message..." required></textarea>
             </div>
             
             <div class="form-group">
@@ -57,65 +117,23 @@
             </div>
 
             <button id="btn-send" class="btn-dispatch">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 Send to All Devices
             </button>
         </div>
     </main>
-     <nav class="mobile-nav no-print">
-    <!-- 1. Home -->
-    <a href="/dashboard/" class="nav-item">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        </svg>
-        <span>Home</span>
-    </a>
 
-    <!-- 2. Services -->
-    <a href="/dashboard/services/" class="nav-item">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-        </svg>
-        <span>Services</span>
-    </a>
-
-    <!-- 3. Wallet -->
-    <a href="/dashboard/fund/" class="nav-item">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="5" width="20" height="14" rx="2"/>
-            <line x1="2" y1="10" x2="22" y2="10"/>
-        </svg>
-        <span>Wallet</span>
-    </a>
-
-    <!-- 4. My Orders -->
-    <a href="/dashboard/orders/" class="nav-item">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <path d="M16 10a4 4 0 0 1-8 0"></path>
-        </svg>
-        <span>My Orders</span>
-    </a>
-
-    <!-- 5. Account -->
-    <a href="/dashboard/account/" class="nav-item">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        <span>Account</span>
-    </a>
-</nav>
-
+    <nav class="mobile-nav no-print">
+        <a href="/dashboard/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+        <a href="/dashboard/services/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span>Services</span></a>
+        <a href="/dashboard/fund/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Wallet</span></a>
+        <a href="/dashboard/orders/index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>Orders</span></a>
+        <a href="/dashboard/account/index.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Account</span></a>
+    </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../assets/js/supabase-client.js"></script>
     <script>
-        // Strict Admin Guard
         document.addEventListener('DOMContentLoaded', async () => {
             const { data: { session } } = await window.db.auth.getSession();
             if (!session) return window.location.href = '/auth/login.html';
@@ -124,7 +142,6 @@
             document.body.style.display = 'block';
         });
 
-        // 🚀 DISPATCH LOGIC (Connected to send-push)
         document.getElementById('btn-send').addEventListener('click', async () => {
             const title = document.getElementById('push-title').value.trim();
             const body = document.getElementById('push-body').value.trim();
@@ -144,7 +161,6 @@
             statusBox.style.display = 'none';
 
             try {
-                // Ensure this targets your new 'send-push' edge function
                 const { data, error } = await window.db.functions.invoke('send-push', {
                     body: { title, body, url: clickUrl }
                 });
@@ -152,7 +168,6 @@
                 if (error) throw new Error(error.message);
                 if (data && data.error) throw new Error(data.error);
 
-                // Display success payload from the Edge Function
                 statusBox.className = 'status-banner status-success';
                 statusBox.innerHTML = `Success! Sent to ${data.sent} devices.<br>(${data.failed} failed/uninstalled)`;
                 statusBox.style.display = 'block';
@@ -165,7 +180,7 @@
                 statusBox.style.display = 'block';
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Send to All Devices`;
+                btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Send to All Devices`;
             }
         });
     </script>

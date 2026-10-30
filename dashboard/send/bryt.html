@@ -13,38 +13,59 @@
         body { background-color: var(--bg-color); color: var(--text-main); font-family: system-ui, -apple-system, sans-serif; margin: 0; padding-bottom: 80px !important; }
         
         .app-topbar { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: var(--card-bg); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-light); }
-        .smart-back { color: var(--text-main); display: flex; text-decoration: none; }
+        .smart-back { color: var(--text-main); display: flex; text-decoration: none; padding: 4px; margin-left: -4px; }
         .page-title { font-size: 1.15rem; font-weight: 800; margin: 0; }
         
         .main-content { padding: 20px; }
         
-        /* Balance Pill */
-        .balance-pill { background: var(--card-bg); border: 1px solid var(--border-light); padding: 16px 20px; border-radius: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+        .balance-pill { background: var(--card-bg); border: 1px solid var(--border-light); padding: 16px 20px; border-radius: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: 0.3s; }
         .balance-label { font-size: 0.65rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
         .balance-amount { font-size: 1.4rem; font-weight: 800; line-height: 1; }
         
-        .form-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-light); }
+        .form-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-light); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02); transition: 0.3s; }
+        .form-group { margin-bottom: 20px; }
         .form-group label { font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px; display: block; }
         
-        /* Segmented Selector */
         .selector-bg { display: flex; background: var(--bg-color); border-radius: 12px; padding: 4px; margin-bottom: 16px; border: 1px solid var(--border-light); }
         .selector-btn { flex: 1; padding: 10px; text-align: center; font-size: 0.75rem; font-weight: 800; color: #64748b; background: transparent; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; }
         .selector-btn.active { background: var(--card-bg); color: var(--bryt-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 
-        .input-wrapper { position: relative; display: flex; align-items: center; margin-bottom: 20px; }
-        .input-wrapper input { width: 100%; padding: 14px; border: 1.5px solid var(--border-light); border-radius: 12px; font-size: 0.95rem; font-weight: 700; color: var(--text-main); outline: none; background: var(--bg-color); }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-wrapper input { width: 100%; padding: 14px; border: 1.5px solid var(--border-light); border-radius: 12px; font-size: 0.95rem; font-weight: 700; color: var(--text-main); outline: none; background: var(--bg-color); box-sizing: border-box; }
         .input-wrapper input:focus { border-color: var(--bryt-primary); background: var(--card-bg); }
         
-        .name-badge { display: none; margin-top: -12px; margin-bottom: 20px; background: var(--bg-color); border: 1px solid var(--border-light); font-size: 0.75rem; font-weight: 800; padding: 8px 12px; border-radius: 8px; width: fit-content; max-width: 100%; word-break: break-word; }
+        /* PHONEBOOK ICON */
+        .btn-phonebook { position: absolute; right: 12px; background: none; border: none; color: var(--bryt-primary); cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; }
+        .btn-phonebook:active { background: rgba(29, 94, 208, 0.1); }
+
+        .name-badge { display: none; margin-top: 8px; background: var(--bg-color); border: 1px solid var(--border-light); font-size: 0.75rem; font-weight: 800; padding: 8px 12px; border-radius: 8px; width: fit-content; max-width: 100%; word-break: break-word; }
         .name-badge.success { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
         .name-badge.error { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.2); }
 
-        .currency-prefix { position: absolute; left: 16px; font-weight: 800; font-size: 1.05rem; }
+        .currency-prefix { position: absolute; left: 16px; font-weight: 800; font-size: 1.05rem; color: var(--text-main); }
         .input-currency { padding-left: 36px !important; }
         
         .btn-primary { width: 100%; padding: 14px; background: var(--bryt-primary); color: #fff; font-size: 0.9rem; border-radius: 12px; font-weight: 800; border: none; cursor: pointer; display: flex; justify-content: center; gap: 8px; }
         
-        /* 🚀 COMPACT PIN KEYPAD OVERLAY */
+        /* BENEFICIARY STYLING */
+        .beneficiary-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--bg-color); border: 1px solid var(--border-light); border-radius: 12px; cursor: pointer; transition: 0.2s; margin-bottom: 8px; }
+        .beneficiary-item:active { background: var(--border-light); }
+        .ben-avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(29, 94, 208, 0.1); color: var(--bryt-primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex-shrink: 0; text-transform: uppercase; border: 1px solid rgba(29, 94, 208, 0.2); }
+        .ben-info { flex: 1; min-width: 0; text-align: left; }
+        .ben-name { font-size: 0.85rem; font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+        .ben-phone { font-size: 0.75rem; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .btn-del-ben { transition: transform 0.2s, opacity 0.2s; }
+        .btn-del-ben:active { transform: scale(0.85); }
+
+        /* Custom Delete Modal */
+        .custom-modal-overlay { position: fixed; inset: 0; background: rgba(11, 18, 32, 0.8); backdrop-filter: blur(4px); z-index: 99999; display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
+        .custom-modal-overlay.active { display: flex; opacity: 1; }
+        .custom-modal { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 20px; padding: 24px; width: 90%; max-width: 320px; text-align: center; transform: translateY(20px); transition: 0.3s; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .custom-modal-overlay.active .custom-modal { transform: translateY(0); }
+        .modal-icon-danger { width: 48px; height: 48px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+        .modal-icon-danger svg { width: 22px; height: 22px; }
+
+        /* COMPACT PIN KEYPAD OVERLAY */
         .pin-modal-overlay { position: fixed; inset: 0; background: rgba(11, 18, 32, 0.95); z-index: 20000; display: none; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity 0.25s ease; }
         .pin-modal-overlay.active { display: flex; opacity: 1; }
         .pin-bottom-sheet { background: var(--card-bg); width: 100%; max-width: 480px; border-radius: 24px 24px 0 0; padding: 16px 20px 20px; text-align: center; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.15); box-sizing: border-box; }
@@ -67,31 +88,81 @@
         
         .forgot-pin-wrap { margin: 4px 0 12px; text-align: center; }
         .forgot-pin-link { font-size: 0.75rem; font-weight: 700; color: var(--bryt-primary); text-decoration: none; }
-        .forgot-pin-link:active { opacity: 0.7; }
-
         .pin-actions { display: flex; gap: 10px; }
 
-        /* Success & Toast Overlays */
-        .success-overlay { position: fixed; inset: 0; background: var(--card-bg); z-index: 30000; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        /* Success Overlay */
+        .success-overlay { position: fixed; inset: 0; background: var(--card-bg); z-index: 30000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         .success-overlay.active { display: flex; opacity: 1; }
-        .success-circle { width: 80px; height: 80px; border-radius: 50%; background: #10b981; color: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; box-shadow: 0 0 0 10px rgba(16, 185, 129, 0.15); }
-        .success-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
-        
-        .bryt-toast { position: fixed; top: 80px; left: 16px; right: 16px; margin: 0 auto; background: var(--card-bg); border: 1px solid var(--border-light); padding: 14px 16px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); display: flex; align-items: flex-start; gap: 12px; z-index: 999999; transform: translateY(-150px); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-left: 4px solid var(--bryt-primary); word-break: break-word; }
+        .success-circle { width: 80px; height: 80px; border-radius: 50%; background: #10b981; color: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; box-shadow: 0 0 0 10px rgba(16, 185, 129, 0.15); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .success-circle svg { width: 40px; height: 40px; }
+        .success-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; color: var(--text-main); }
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* Toast */
+        .bryt-toast { position: fixed; top: 20px; left: 0; right: 0; margin: 0 auto; width: max-content; max-width: 90%; transform: translateY(-150px); background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-light); padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 999999; transition: transform 0.4s; border-left: 4px solid var(--bryt-primary); }
         .bryt-toast.show { transform: translateY(0); }
+        .toast-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+        .toast-success .toast-icon { background: #16a34a; }
+        .toast-error .toast-icon { background: #dc2626; }
+        .toast-text { font-size: 0.8rem; font-weight: 600; }
     </style>
 </head>
 <body>
 
     <div id="bryt-toast" class="bryt-toast">
-        <div id="toast-text" style="font-size: 0.8rem; font-weight: 700; line-height: 1.4; color: var(--text-main);"></div>
+        <div id="toast-icon-wrap" class="toast-icon"></div>
+        <div id="toast-text" class="toast-text">Message</div>
     </div>
 
+    <!-- 🚀 FULLSCREEN SUCCESS OVERLAY & SAVE BENEFICIARY PROMPT -->
     <div id="success-overlay" class="success-overlay">
         <div class="success-circle">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
         </div>
-        <div class="success-title">Transfer Sent!</div>
+        <h2 class="success-title">Transfer Successful!</h2>
+        <p id="success-details" style="font-size: 0.85rem; color: #64748b; margin-bottom: 24px; text-align: center;"></p>
+        
+        <button type="button" id="success-done-btn" class="btn-primary" style="width: 200px; margin-top: 0; display: none;">Done</button>
+
+        <div id="save-beneficiary-box" style="display: none; background: var(--bg-color); border: 1px solid var(--border-light); border-radius: 16px; padding: 20px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+            <h4 style="margin: 0 0 6px; font-size: 1.05rem; font-weight: 800; color: var(--text-main);">Save User?</h4>
+            <p style="margin: 0 0 16px; font-size: 0.75rem; color: #64748b; font-weight: 600;">Save this user for quicker transfers.</p>
+            <input type="text" id="beneficiary-name" placeholder="e.g. My Brother" style="width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border-light); margin-bottom: 12px; box-sizing: border-box; outline: none; background: var(--card-bg); color: var(--text-main); font-family: inherit; font-size: 0.9rem; font-weight: 600;">
+            <button type="button" id="btn-save-beneficiary" class="btn-primary" style="width: 100%; padding: 14px; background: var(--bryt-primary); color: #fff; border: none; border-radius: 12px; font-weight: 800; font-size: 0.9rem; cursor: pointer; margin-bottom: 8px; transition: 0.2s;">Save</button>
+            <button type="button" id="btn-skip-save" style="width: 100%; padding: 12px; background: transparent; color: #64748b; border: none; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.2s;">Not Now</button>
+        </div>
+    </div>
+
+    <!-- 🚀 BENEFICIARIES BOTTOM SHEET -->
+    <div id="beneficiaries-modal" class="pin-modal-overlay">
+        <div class="pin-bottom-sheet" style="padding-bottom: 24px; min-height: 50vh; display: flex; flex-direction: column;">
+            <div class="sheet-handle"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-main);">Saved Users</h3>
+                <button type="button" id="close-beneficiaries" style="background: none; border: none; color: #64748b; font-size: 1rem; cursor: pointer; padding: 4px; font-weight: bold;">✕</button>
+            </div>
+            
+            <input type="text" id="search-beneficiary" placeholder="Search name or ID..." style="width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border-light); background: var(--bg-color); color: var(--text-main); margin-bottom: 16px; outline: none; font-family: inherit; font-weight: 600; box-sizing: border-box;">
+            
+            <div id="beneficiaries-list" style="flex: 1; overflow-y: auto; text-align: left; display: flex; flex-direction: column; max-height: 40vh; scrollbar-width: none;">
+                <div style="text-align: center; color: #64748b; font-size: 0.8rem; font-weight: 600; padding: 20px;">Loading users...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🚀 CUSTOM DELETE CONFIRMATION MODAL -->
+    <div class="custom-modal-overlay" id="delete-modal">
+        <div class="custom-modal">
+            <div class="modal-icon-danger">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px;">Delete User?</h3>
+            <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 20px; line-height: 1.4;">Are you sure you want to remove <strong id="delete-ben-name" style="color: var(--text-main);"></strong> from your saved users?</p>
+            <div style="display: flex; gap: 8px;">
+                <button type="button" id="cancel-delete" style="flex: 1; padding: 10px; border-radius: 10px; background: var(--bg-color); color: #64748b; border: 1px solid var(--border-light); font-weight: 700; font-size: 0.85rem; cursor: pointer;">Cancel</button>
+                <button type="button" id="confirm-delete" style="flex: 1; padding: 10px; border-radius: 10px; background: #ef4444; color: #ffffff; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer;">Delete</button>
+            </div>
+        </div>
     </div>
 
     <header class="app-topbar">
@@ -121,7 +192,12 @@
                 <div class="form-group">
                     <label id="input-label">2. Recipient ID</label>
                     <div class="input-wrapper">
-                        <input type="text" id="recipient-id" placeholder="e.g. IQY5" autocomplete="off" required>
+                        <input type="text" id="recipient-id" style="padding-right: 48px;" placeholder="e.g. IQY5" autocomplete="off" required>
+                        
+                        <!-- 🚀 PHONEBOOK ICON -->
+                        <button type="button" id="btn-open-beneficiaries" class="btn-phonebook">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </button>
                     </div>
                     <div id="name-badge" class="name-badge">Checking...</div>
                 </div>
@@ -154,12 +230,10 @@
                 <div class="modal-row" style="padding-top: 8px; margin-top: 6px; border-top: 1px dashed var(--border-light);"><span style="color: #64748b;">Amount:</span><strong id="modal-amount" style="color: #10b981; font-size: 0.95rem; font-weight: 800;">₦0.00</strong></div>
             </div>
 
-            <!-- PIN Dots Display -->
             <div class="pin-display">
                 <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
             </div>
 
-            <!-- Custom Numeric Keypad -->
             <div class="pin-keypad">
                 <button type="button" class="keypad-btn" data-val="1">1</button>
                 <button type="button" class="keypad-btn" data-val="2">2</button>
@@ -177,7 +251,6 @@
                 </button>
             </div>
 
-            <!-- Forgot PIN Link -->
             <div class="forgot-pin-wrap">
                 <a href="/dashboard/security/index.html" class="forgot-pin-link">Forgot PIN?</a>
             </div>
@@ -191,6 +264,421 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../assets/js/supabase-client.js"></script>
-    <script src="../../assets/js/send-bryt.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await window.db.auth.getSession();
+            if (!session) { window.location.href = '/auth/login.html'; return; }
+
+            const user = session.user;
+            
+            const userBalanceEl = document.getElementById('user-balance');
+            const recipientInput = document.getElementById('recipient-id');
+            const inputLabel = document.getElementById('input-label');
+            const nameBadge = document.getElementById('name-badge');
+            const amountInput = document.getElementById('amount');
+            const form = document.getElementById('send-form');
+            
+            const pinModal = document.getElementById('pin-modal-overlay');
+            const modalRecipient = document.getElementById('modal-recipient');
+            const modalAmount = document.getElementById('modal-amount');
+            const confirmBtn = document.getElementById('modal-confirm');
+            const cancelBtn = document.getElementById('modal-cancel');
+            
+            const successOverlay = document.getElementById('success-overlay');
+            const successDetails = document.getElementById('success-details');
+            const successDoneBtn = document.getElementById('success-done-btn');
+            
+            const saveBeneficiaryBox = document.getElementById('save-beneficiary-box');
+            const btnSaveBeneficiary = document.getElementById('btn-save-beneficiary');
+            const btnSkipSave = document.getElementById('btn-skip-save');
+            const beneficiaryNameInput = document.getElementById('beneficiary-name');
+
+            const benModalOverlay = document.getElementById('beneficiaries-modal');
+            const btnOpenBeneficiaries = document.getElementById('btn-open-beneficiaries');
+            const btnCloseBeneficiaries = document.getElementById('close-beneficiaries');
+            const benListContainer = document.getElementById('beneficiaries-list');
+            const searchBeneficiaryInput = document.getElementById('search-beneficiary');
+            
+            const deleteModal = document.getElementById('delete-modal');
+            const btnCancelDelete = document.getElementById('cancel-delete');
+            const btnConfirmDelete = document.getElementById('confirm-delete');
+            const deleteBenName = document.getElementById('delete-ben-name');
+            
+            const pinDots = document.querySelectorAll('.pin-dot');
+            const keypadBtns = document.querySelectorAll('.keypad-btn');
+
+            let currentRecipient = null;
+            let typingTimer;
+            let searchMode = 'id';
+            let currentPin = '';
+            let currentBalance = 0;
+            let allBeneficiaries = [];
+            let pendingDeleteId = null;
+            let pendingDeleteBtn = null;
+
+            function showToast(message, type = 'success') {
+                const toast = document.getElementById('bryt-toast');
+                const toastText = document.getElementById('toast-text');
+                const iconWrap = document.getElementById('toast-icon-wrap');
+                
+                toast.className = `bryt-toast toast-${type}`;
+                
+                const svgNS = "http://www.w3.org/2000/svg";
+                const svg = document.createElementNS(svgNS, "svg");
+                svg.setAttribute("width", "14"); svg.setAttribute("height", "14");
+                svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("fill", "none");
+                svg.setAttribute("stroke", "currentColor"); svg.setAttribute("stroke-width", "3");
+
+                if (type === 'success') {
+                    const poly = document.createElementNS(svgNS, "polyline");
+                    poly.setAttribute("points", "20 6 9 17 4 12");
+                    svg.appendChild(poly);
+                } else {
+                    const l1 = document.createElementNS(svgNS, "line");
+                    l1.setAttribute("x1", "18"); l1.setAttribute("y1", "6"); l1.setAttribute("x2", "6"); l1.setAttribute("y2", "18");
+                    const l2 = document.createElementNS(svgNS, "line");
+                    l2.setAttribute("x1", "6"); l2.setAttribute("y1", "6"); l2.setAttribute("x2", "18"); l2.setAttribute("y2", "18");
+                    svg.appendChild(l1); svg.appendChild(l2);
+                }
+                
+                if (iconWrap) {
+                    iconWrap.innerHTML = '';
+                    iconWrap.appendChild(svg);
+                }
+                
+                if (toastText) toastText.textContent = message; 
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 4000);
+            }
+
+            async function loadBalance() {
+                try {
+                    const { data: walletData } = await window.db.from('wallets').select('balance').eq('user_id', user.id).single();
+                    if (walletData && userBalanceEl) {
+                        currentBalance = parseFloat(walletData.balance);
+                        userBalanceEl.textContent = `₦${currentBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+                    }
+                } catch (e) {}
+            }
+            
+            async function loadBeneficiaries() {
+                try {
+                    const { data } = await window.db.from('beneficiaries').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+                    if (data) {
+                        allBeneficiaries = data.filter(b => b.network === 'brytpay');
+                    }
+                } catch (e) {}
+            }
+
+            function renderBeneficiaries(searchQuery = '') {
+                if (!benListContainer) return;
+                benListContainer.innerHTML = '';
+                
+                const filtered = allBeneficiaries.filter(b => {
+                    const term = searchQuery.toLowerCase();
+                    return (b.name && b.name.toLowerCase().includes(term)) || (b.phone && b.phone.includes(term));
+                });
+
+                if (filtered.length === 0) {
+                    benListContainer.innerHTML = `<div style="text-align: center; color: #64748b; font-size: 0.8rem; font-weight: 600; padding: 20px;">No saved users found.</div>`;
+                    return;
+                }
+
+                filtered.forEach(ben => {
+                    const initial = ben.name ? ben.name.charAt(0).toUpperCase() : '#';
+                    
+                    const item = document.createElement('div');
+                    item.className = 'beneficiary-item';
+                    item.innerHTML = `
+                        <div class="ben-avatar">${initial}</div>
+                        <div class="ben-info">
+                            <div class="ben-name">${ben.name}</div>
+                            <div class="ben-phone">${ben.phone} • BRYT Pay</div>
+                        </div>
+                        <button type="button" class="btn-del-ben" style="background: rgba(239, 68, 68, 0.1); border: none; color: #ef4444; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    `;
+                    
+                    item.addEventListener('click', (e) => {
+                        if (e.target.closest('.btn-del-ben')) {
+                            e.stopPropagation();
+                            pendingDeleteId = ben.id;
+                            pendingDeleteBtn = e.target.closest('.btn-del-ben');
+                            if (deleteBenName) deleteBenName.textContent = ben.name;
+                            if (deleteModal) deleteModal.classList.add('active');
+                            return;
+                        }
+                        
+                        if (recipientInput) {
+                            recipientInput.value = ben.phone;
+                            if (benModalOverlay) benModalOverlay.classList.remove('active');
+                            const event = new Event('input', { bubbles: true });
+                            recipientInput.dispatchEvent(event);
+                        }
+                    });
+                    
+                    benListContainer.appendChild(item);
+                });
+            }
+
+            await Promise.all([loadBalance(), loadBeneficiaries()]);
+
+            if (btnOpenBeneficiaries) {
+                btnOpenBeneficiaries.addEventListener('click', () => {
+                    renderBeneficiaries(); 
+                    if (benModalOverlay) benModalOverlay.classList.add('active');
+                });
+            }
+            if (btnCloseBeneficiaries) {
+                btnCloseBeneficiaries.addEventListener('click', () => {
+                    if (benModalOverlay) benModalOverlay.classList.remove('active');
+                });
+            }
+            if (searchBeneficiaryInput) {
+                searchBeneficiaryInput.addEventListener('input', (e) => renderBeneficiaries(e.target.value));
+            }
+
+            if (btnCancelDelete) {
+                btnCancelDelete.addEventListener('click', () => {
+                    if (deleteModal) deleteModal.classList.remove('active');
+                    pendingDeleteId = null;
+                    pendingDeleteBtn = null;
+                });
+            }
+            
+            if (btnConfirmDelete) {
+                btnConfirmDelete.addEventListener('click', async () => {
+                    if (!pendingDeleteId) return;
+                    btnConfirmDelete.disabled = true;
+                    btnConfirmDelete.textContent = 'Deleting...';
+                    if (pendingDeleteBtn) pendingDeleteBtn.style.opacity = '0.5';
+
+                    try {
+                        const { error } = await window.db.from('beneficiaries').delete().eq('id', pendingDeleteId);
+                        if (!error) {
+                            allBeneficiaries = allBeneficiaries.filter(b => b.id !== pendingDeleteId);
+                            renderBeneficiaries(searchBeneficiaryInput ? searchBeneficiaryInput.value : '');
+                            showToast('User removed.', 'success');
+                        } else {
+                            showToast('Failed to remove user.', 'error');
+                            if (pendingDeleteBtn) pendingDeleteBtn.style.opacity = '1';
+                        }
+                    } catch (err) {
+                        showToast('Network error.', 'error');
+                    } finally {
+                        if (deleteModal) deleteModal.classList.remove('active');
+                        btnConfirmDelete.disabled = false;
+                        btnConfirmDelete.textContent = 'Delete';
+                        pendingDeleteId = null;
+                        pendingDeleteBtn = null;
+                    }
+                });
+            }
+
+            document.querySelectorAll('.selector-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.selector-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    searchMode = e.target.getAttribute('data-mode');
+                    
+                    if (inputLabel && recipientInput) {
+                        if (searchMode === 'id') {
+                            inputLabel.textContent = '2. Recipient ID';
+                            recipientInput.placeholder = 'e.g. IQY5';
+                            recipientInput.type = 'text';
+                        } else {
+                            inputLabel.textContent = '2. Email Address';
+                            recipientInput.placeholder = 'e.g. name@email.com';
+                            recipientInput.type = 'email';
+                        }
+                        recipientInput.value = '';
+                    }
+                    if (nameBadge) nameBadge.style.display = 'none';
+                    currentRecipient = null;
+                });
+            });
+
+            if (recipientInput) {
+                recipientInput.addEventListener('input', (e) => {
+                    clearTimeout(typingTimer);
+                    const val = e.target.value.trim();
+                    if (nameBadge) nameBadge.style.display = 'none';
+                    currentRecipient = null;
+
+                    const shouldSearch = (searchMode === 'id' && val.length >= 4) || 
+                                         (searchMode === 'email' && val.includes('@') && val.length >= 5);
+
+                    if (shouldSearch && nameBadge) {
+                        nameBadge.textContent = 'Checking...';
+                        nameBadge.className = 'name-badge';
+                        nameBadge.style.display = 'inline-block';
+
+                        typingTimer = setTimeout(async () => {
+                            try {
+                                const { data, error } = await window.db.rpc('bryt_lookup_recipient', {
+                                    search_query: val,
+                                    search_type: searchMode
+                                });
+
+                                if (error || !data || !data.found) {
+                                    nameBadge.textContent = 'Not found';
+                                    nameBadge.className = 'name-badge error';
+                                    currentRecipient = null;
+                                    return;
+                                }
+
+                                if (data.id === user.id) {
+                                    nameBadge.textContent = "That's you!";
+                                    nameBadge.className = 'name-badge error';
+                                    currentRecipient = null;
+                                    return;
+                                }
+
+                                currentRecipient = data;
+                                nameBadge.textContent = `✓ ${data.full_name}`;
+                                nameBadge.className = 'name-badge success';
+                            } catch (err) {
+                                nameBadge.textContent = 'Not found';
+                                nameBadge.className = 'name-badge error';
+                                currentRecipient = null;
+                            }
+                        }, 350);
+                    }
+                });
+            }
+            
+            function updatePinUI() {
+                pinDots.forEach((dot, idx) => {
+                    if (idx < currentPin.length) dot.classList.add('filled');
+                    else dot.classList.remove('filled');
+                });
+                if (confirmBtn) confirmBtn.disabled = currentPin.length !== 4;
+            }
+
+            keypadBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const val = btn.getAttribute('data-val');
+                    if (val === 'back') {
+                        currentPin = currentPin.slice(0, -1);
+                    } else if (val) {
+                        if (currentPin.length < 4) currentPin += val;
+                    }
+                    updatePinUI();
+                });
+            });
+
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const amount = parseFloat(amountInput ? amountInput.value : 0);
+
+                    if (!currentRecipient) return showToast('Please enter a valid recipient.', 'error');
+                    if (amount > currentBalance) return showToast('Insufficient wallet balance.', 'error');
+
+                    if (modalRecipient) modalRecipient.textContent = currentRecipient.full_name;
+                    if (modalAmount) modalAmount.textContent = `₦${amount.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+                    
+                    currentPin = '';
+                    updatePinUI();
+                    if (pinModal) pinModal.classList.add('active');
+                });
+            }
+
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    if (pinModal) pinModal.classList.remove('active');
+                    currentPin = '';
+                    updatePinUI();
+                });
+            }
+
+            // 🚀 FAILSAFE EXECUTE TRANSFER
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', async () => {
+                    if (currentPin.length !== 4) return showToast('Please enter your 4-digit PIN.', 'error');
+
+                    confirmBtn.disabled = true;
+                    confirmBtn.textContent = 'Processing...';
+                    const transferAmount = parseFloat(amountInput ? amountInput.value : 0);
+                    const accValue = recipientInput ? recipientInput.value.trim() : '';
+
+                    try {
+                        const { data, error } = await window.db.rpc('bryt_transfer_funds', {
+                            sender_uuid: user.id,
+                            recipient_identifier: accValue,
+                            transfer_amount: transferAmount,
+                            sender_pin: currentPin
+                        });
+
+                        if (error) throw new Error(error.message);
+                        if (data && data.success === false) throw new Error(data.message);
+
+                        if (pinModal) pinModal.classList.remove('active');
+                        
+                        const safeName = currentRecipient ? currentRecipient.full_name : accValue;
+                        if (successDetails) {
+                            successDetails.textContent = `₦${transferAmount.toLocaleString('en-NG', { minimumFractionDigits: 2 })} sent to ${safeName}`;
+                        }
+                        if (successOverlay) successOverlay.classList.add('active');
+                        
+                        const alreadySaved = allBeneficiaries.some(b => b.phone === accValue);
+                        
+                        if (alreadySaved) {
+                            if (successDoneBtn) successDoneBtn.style.display = 'flex';
+                            if (saveBeneficiaryBox) saveBeneficiaryBox.style.display = 'none';
+                        } else {
+                            if (successDoneBtn) successDoneBtn.style.display = 'none';
+                            setTimeout(() => {
+                                if (saveBeneficiaryBox) saveBeneficiaryBox.style.display = 'block';
+                                if (beneficiaryNameInput) beneficiaryNameInput.value = safeName;
+                            }, 800);
+                        }
+                        
+                        loadBalance();
+
+                    } catch (err) {
+                        showToast(err.message || 'Transfer failed.', 'error');
+                        if (pinModal) pinModal.classList.remove('active');
+                    } finally {
+                        confirmBtn.disabled = false;
+                        confirmBtn.textContent = 'Send Money';
+                    }
+                });
+            }
+
+            if (successDoneBtn) successDoneBtn.onclick = () => { window.location.href = '/dashboard/index.html'; };
+            if (btnSkipSave) btnSkipSave.onclick = () => { window.location.href = '/dashboard/index.html'; };
+
+            if (btnSaveBeneficiary) {
+                btnSaveBeneficiary.onclick = async () => {
+                    const benName = beneficiaryNameInput ? beneficiaryNameInput.value.trim() : '';
+                    const accValue = recipientInput ? recipientInput.value.trim() : '';
+                    if (!benName) return showToast('Please enter a name.', 'error');
+
+                    btnSaveBeneficiary.disabled = true;
+                    btnSaveBeneficiary.textContent = 'Saving...';
+
+                    try {
+                        const { error } = await window.db.from('beneficiaries').insert({
+                            user_id: user.id,
+                            name: benName,
+                            phone: accValue,
+                            network: 'brytpay'
+                        });
+
+                        if (error) throw error;
+                        
+                        showToast('User saved!', 'success');
+                        setTimeout(() => { window.location.href = '/dashboard/index.html'; }, 1000);
+                    } catch (err) {
+                        showToast('Failed to save user.', 'error');
+                        btnSaveBeneficiary.disabled = false;
+                        btnSaveBeneficiary.textContent = 'Save';
+                    }
+                };
+            }
+        });
+    </script>
 </body>
 </html>

@@ -81,7 +81,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (raw.includes('jmb_') || raw.includes('jamb') || raw.includes('admission') || raw.includes('result')) return 'jamb-logo.png';
         if (raw.includes('nin_') || raw.includes('nin') || raw.includes('slip')) return 'nimc-logo.png';
         
-        // 🚀 BANK TRANSFER FIX
         if (raw.includes('bank_transfer') || raw.includes('transfer')) return 'brytpay-logo.png';
         
         return 'brytpay-logo.png';
@@ -169,7 +168,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             displayProvider = net || 'BRYT PAY'; 
             displayRecipient = data.recipient;
         
-        // 🚀 BANK TRANSFER FIX
         } else if (rawService === 'bank_transfer') {
             displayService = 'EXTERNAL BANK TRANSFER';
             displayProvider = data.provider || 'BANK NETWORK';
@@ -182,8 +180,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             displayRecipient = data.recipient || 'N/A';
         }
 
-        let rowsHtml = `
-            <div class="receipt-row"><div class="receipt-key">Service Type</div><div class="receipt-value">${displayService}</div></div>
+        // Base Rows
+        let rowsHtml = `<div class="receipt-row"><div class="receipt-key">Service Type</div><div class="receipt-value">${displayService}</div></div>`;
+
+        // BANK TRANSFER FEE BREAKDOWN LOGIC
+        if (rawService === 'bank_transfer') {
+            const totalAmount = parseFloat(data.amount);
+            // If total is 10049 or below, fee was 50. If 10050 or above, fee was 100.
+            const feeAmount = totalAmount < 10050 ? 50 : 100;
+            const sentAmount = totalAmount - feeAmount;
+
+            rowsHtml += `
+                <div class="receipt-row"><div class="receipt-key">Amount Sent</div><div class="receipt-value">₦${sentAmount.toLocaleString('en-NG', { minimumFractionDigits: 2 })}</div></div>
+                <div class="receipt-row"><div class="receipt-key">Transaction Fee</div><div class="receipt-value">₦${feeAmount.toLocaleString('en-NG', { minimumFractionDigits: 2 })}</div></div>
+            `;
+        }
+
+        // Continue generating rows
+        rowsHtml += `
             <div class="receipt-row"><div class="receipt-key">Provider</div><div class="receipt-value">${displayProvider}</div></div>
             <div class="receipt-row"><div class="receipt-key">Recipient</div><div class="receipt-value">${displayRecipient}</div></div>
         `;
@@ -260,7 +274,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         texts.forEach(el => el.style.color = '');
     }
 
-   downloadPdfBtn.addEventListener('click', () => {
+    // PDF Download
+    downloadPdfBtn.addEventListener('click', () => {
         downloadPdfBtn.disabled = true;
         const originalText = downloadPdfBtn.innerHTML;
         downloadPdfBtn.textContent = 'Preparing...';
@@ -279,21 +294,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
-        if (window.Capacitor) {
+        // Check if running inside Capacitor natively
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
             html2pdf().set(opt).from(element).toPdf().output('datauristring').then(async (pdfBase64) => {
                 try {
                     const base64Data = pdfBase64.split(',')[1];
                     const savedFile = await window.Capacitor.Plugins.Filesystem.writeFile({
                         path: `BRYT_Receipt_${txId.substring(0,8)}.pdf`,
                         data: base64Data,
-                        directory: 'CACHE'
+                        directory: window.Capacitor.Plugins.Filesystem.Directory.Cache || 'CACHE'
                     });
                     await window.Capacitor.Plugins.Share.share({
                         title: 'BRYT Pay Receipt',
                         url: savedFile.uri
                     });
                 } catch (err) {
-                    alert('Failed to save PDF.');
+                    console.error("Native PDF Error:", err);
+                    alert('Failed to save or share PDF natively.');
                 } finally {
                     restoreFromRender(element);
                     if (copyBtn) copyBtn.style.display = 'flex';
@@ -302,6 +319,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
         } else {
+            // Web fallback
             html2pdf().set(opt).from(element).save().then(() => {
                 restoreFromRender(element);
                 if (copyBtn) copyBtn.style.display = 'flex';
@@ -311,6 +329,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Image Download
     downloadImgBtn.addEventListener('click', async () => {
         downloadImgBtn.disabled = true;
         const originalText = downloadImgBtn.innerHTML;
@@ -325,24 +344,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const canvas = await html2canvas(element, { scale: 3, useCORS: true });
             
-            if (window.Capacitor) {
+            // Check if running inside Capacitor natively
+            if (window.Capacitor && window.Capacitor.isNativePlatform()) {
                 const base64Data = canvas.toDataURL('image/png').split(',')[1];
                 const savedFile = await window.Capacitor.Plugins.Filesystem.writeFile({
                     path: `BRYT_Receipt_${txId.substring(0,8)}.png`,
                     data: base64Data,
-                    directory: 'CACHE'
+                    directory: window.Capacitor.Plugins.Filesystem.Directory.Cache || 'CACHE'
                 });
                 await window.Capacitor.Plugins.Share.share({
                     title: 'BRYT Pay Receipt',
                     url: savedFile.uri
                 });
             } else {
+                // Web fallback
                 const link = document.createElement('a');
                 link.download = `BRYT_Receipt_${txId.substring(0,8)}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             }
         } catch (err) {
+            console.error("Image Error:", err);
             alert('Failed to generate image. Please try PDF.');
         } finally {
             restoreFromRender(element);

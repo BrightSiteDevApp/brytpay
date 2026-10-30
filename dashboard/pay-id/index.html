@@ -38,7 +38,7 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            padding-bottom: 20px !important; /* Adjusted padding since nav is removed */
+            padding-bottom: 20px !important;
             font-family: system-ui, -apple-system, sans-serif;
             margin: 0;
             transition: background-color 0.3s, color 0.3s;
@@ -119,25 +119,23 @@
 
         .pin-actions { display: flex; gap: 10px; }
 
-        /* Toasts */
-        .toast-msg-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--text-main); color: var(--card-bg); padding: 12px 20px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; z-index: 10000; display: none; align-items: center; gap: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-        .toast-error { background: #fee2e2 !important; color: #dc2626 !important; border: 1px solid #fca5a5; }
+        /* 🚀 UNIFIED BRYT PAY TOAST NOTIFICATION */
+        .bryt-toast { position: fixed; top: 20px; left: 0; right: 0; margin: 0 auto; width: max-content; max-width: 90%; transform: translateY(-150px); background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-light); padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 999999; transition: transform 0.4s; border-left: 4px solid var(--bryt-primary); }
+        .bryt-toast.show { transform: translateY(0); }
+        .toast-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+        .toast-success .toast-icon { background: #16a34a; }
+        .toast-error .toast-icon { background: #dc2626; }
+        .toast-text { font-size: 0.8rem; font-weight: 600; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <!-- Success Toast -->
-    <div id="toast" class="toast-msg-box">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-        <span id="toast-text">Copied!</span>
-    </div>
-
-    <!-- Error Toast -->
-    <div id="error-toast" class="toast-msg-box toast-error">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="3"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-        <span id="error-toast-text">Error</span>
+    <!-- 🚀 UNIFIED TOAST CONTAINER -->
+    <div id="bryt-toast" class="bryt-toast">
+        <div id="toast-icon-wrap" class="toast-icon"></div>
+        <div id="toast-text" class="toast-text">Message</div>
     </div>
 
     <header class="app-topbar">
@@ -305,18 +303,36 @@
             }
         }
 
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            document.getElementById('toast-text').textContent = msg;
-            t.style.display = 'flex';
-            setTimeout(() => { t.style.display = 'none'; }, 2500);
-        }
+        // 🚀 NEW UNIFIED TOAST FUNCTION
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('bryt-toast');
+            const toastText = document.getElementById('toast-text');
+            const iconWrap = document.getElementById('toast-icon-wrap');
+            
+            if (!toast || !toastText || !iconWrap) return;
 
-        function showError(msg) {
-            const t = document.getElementById('error-toast');
-            document.getElementById('error-toast-text').textContent = msg;
-            t.style.display = 'flex';
-            setTimeout(() => { t.style.display = 'none'; }, 3500);
+            toast.className = `bryt-toast toast-${type}`;
+            iconWrap.textContent = '';
+            
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("width", "14"); svg.setAttribute("height", "14");
+            svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("fill", "none");
+            svg.setAttribute("stroke", "currentColor"); svg.setAttribute("stroke-width", "3");
+
+            if (type === 'success') {
+                const poly = document.createElementNS(svgNS, "polyline");
+                poly.setAttribute("points", "20 6 9 17 4 12"); svg.appendChild(poly);
+            } else {
+                const l1 = document.createElementNS(svgNS, "line"); l1.setAttribute("x1", "18"); l1.setAttribute("y1", "6"); l1.setAttribute("x2", "6"); l1.setAttribute("y2", "18");
+                const l2 = document.createElementNS(svgNS, "line"); l2.setAttribute("x1", "6"); l2.setAttribute("y1", "6"); l2.setAttribute("x2", "18"); l2.setAttribute("y2", "18");
+                svg.appendChild(l1); svg.appendChild(l2);
+            }
+            iconWrap.appendChild(svg);
+            toastText.textContent = message; 
+            toast.classList.add('show');
+            
+            setTimeout(() => toast.classList.remove('show'), 4000);
         }
 
         function generateSecure6DigitCode() {
@@ -428,8 +444,8 @@
             document.getElementById('modal-cancel-pin').addEventListener('click', closePinModal);
 
             document.getElementById('modal-submit-pin').addEventListener('click', () => {
-                if (!userPin) return showError('Please set your 4-digit PIN in security settings first.');
-                if (currentPinInput !== userPin) return showError('Incorrect PIN. Try again.');
+                if (!userPin) return showToast('Please set your 4-digit PIN in security settings first.', 'error');
+                if (currentPinInput !== userPin) return showToast('Incorrect PIN. Try again.', 'error');
                 
                 closePinModal();
                 createNewPayId();
@@ -472,12 +488,12 @@
 
                 const expiresMs = new Date(inserted.expires_at).getTime();
                 showActiveCodeUI(inserted.code, expiresMs);
-                showToast('New Pay ID generated!');
+                showToast('New Pay ID generated!', 'success');
                 
                 await checkAndLoadCodes(currentUser.id);
 
             } catch (err) {
-                showError(err.message || 'Could not generate Pay ID.');
+                showToast(err.message || 'Could not generate Pay ID.', 'error');
             } finally {
                 btnGen.disabled = false;
                 btnRegen.disabled = false;
@@ -554,7 +570,7 @@
             if (!currentRawCode) return;
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(currentRawCode).then(() => {
-                    showToast(`Copied ${currentRawCode} to clipboard!`);
+                    showToast(`Copied ${currentRawCode} to clipboard!`, 'success');
                 });
             } else {
                 const temp = document.createElement('textarea');
@@ -563,7 +579,7 @@
                 temp.select();
                 document.execCommand('copy');
                 document.body.removeChild(temp);
-                showToast(`Copied ${currentRawCode} to clipboard!`);
+                showToast(`Copied ${currentRawCode} to clipboard!`, 'success');
             }
         }
     </script>

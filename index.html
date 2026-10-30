@@ -120,7 +120,7 @@
         .bryt-header.scrolled { box-shadow: var(--shadow-sm); }
         .bryt-logo img { height: 32px; object-fit: contain; }
         .nav-links { display: none; gap: 24px; align-items: center; }
-        .nav-links a { color: var(--bryt-navy); font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: color 0.2s; }
+        .nav-links a { color: var(--bryt-navy); font-weight: 600; font-size: 0.9rem; text-decoration: none !important; transition: color 0.2s; }
         .nav-links a:hover { color: var(--bryt-primary); }
         
         /* Fintech Button Upgrades */
@@ -132,6 +132,9 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(29, 94, 208, 0.25);
             border: none;
+            text-decoration: none !important;
+            white-space: nowrap; /* Forces text to stay on one line */
+            text-align: center;
         }
         .btn-nav-primary { padding: 10px 20px; display: inline-block; }
         .btn-nav-primary:hover, .btn-primary:hover { 
@@ -143,12 +146,15 @@
             border: 2px solid var(--border-color);
             border-radius: 8px;
             font-weight: 700;
-            color: var(--bryt-navy);
+            color: var(--bryt-navy) !important;
             transition: all 0.3s ease;
+            text-decoration: none !important;
+            white-space: nowrap; /* Forces text to stay on one line */
+            text-align: center;
         }
         .btn-secondary:hover {
             border-color: var(--bryt-primary);
-            color: var(--bryt-primary);
+            color: var(--bryt-primary) !important;
             background: rgba(29, 94, 208, 0.05);
         }
         
@@ -165,7 +171,7 @@
         .mobile-toggle { display: block; background: none; border: none; font-size: 1.5rem; color: var(--bryt-navy); cursor: pointer; }
         .mobile-menu { position: fixed; top: 65px; left: 0; right: 0; background: var(--surface-white); padding: 24px; border-bottom: 1px solid var(--border-color); box-shadow: var(--shadow-md); display: none; flex-direction: column; gap: 20px; z-index: 999; }
         .mobile-menu.active { display: flex; }
-        .mobile-menu a { text-decoration: none; color: var(--bryt-navy); font-weight: 600; font-size: 1.1rem; }
+        .mobile-menu a { text-decoration: none !important; color: var(--bryt-navy); font-weight: 600; font-size: 1.1rem; }
         
         /* Hero Section Enhanced Gradient Mesh */
         .hero { 
@@ -180,7 +186,16 @@
         .hero-container { display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center; max-width: 1100px; margin: 0 auto; }
         .hero-content h1 { font-size: 2.8rem; font-weight: 800; color: var(--bryt-navy); line-height: 1.15; margin-bottom: 24px; letter-spacing: -1px; }
         .hero-content p { font-size: 1.15rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 32px; max-width: 500px; }
-        .hero-actions { display: flex; flex-direction: column; gap: 16px; }
+        .hero-actions { display: flex; flex-direction: column; gap: 16px; align-items: flex-start; } 
+        
+        .playstore-badge { 
+            display: inline-block; 
+            margin-top: 8px; 
+            transition: transform 0.2s ease; 
+        }
+        .playstore-badge:hover { transform: scale(1.05); }
+        .playstore-badge img { height: 48px; width: auto; object-fit: contain; }
+
         .hero-visual { position: relative; display: flex; justify-content: center; }
         
         /* Desktop Image Phone Mockup Styling */
@@ -257,21 +272,21 @@
         .final-cta p { font-size: 1.15rem; color: var(--text-muted); margin-bottom: 40px; }
         .final-cta-btns { display: flex; flex-direction: column; gap: 16px; justify-content: center; align-items: center; }
         
-        /* Footer & Regulatory Section Upgrade (Fixes full-width layout) */
-        .bryt-footer { background: var(--bryt-navy); color: #fff; padding: 64px 0 0; } /* Removed horizontal padding so the dark background stretches full width */
+        /* Footer & Regulatory Section Upgrade */
+        .bryt-footer { background: var(--bryt-navy); color: #fff; padding: 64px 0 0; } 
         .footer-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; padding-bottom: 48px; padding-left: 24px; padding-right: 24px; }
         .footer-col h4 { font-size: 1.1rem; margin-bottom: 16px; color: #fff; font-weight: 700; }
         .footer-col p { color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; }
-        .footer-col a { display: block; color: #cbd5e1; font-size: 0.95rem; margin-bottom: 12px; text-decoration: none; transition: color 0.2s; }
+        .footer-col a { display: block; color: #cbd5e1; font-size: 0.95rem; margin-bottom: 12px; text-decoration: none !important; transition: color 0.2s; }
         .footer-col a:hover { color: var(--bryt-accent); }
         .footer-brand-logo { height: 32px; filter: brightness(0) invert(1); margin-bottom: 16px; }
         
-        .footer-tech-link { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: white; text-decoration: none; background: rgba(255,255,255,0.05); padding: 8px 16px; border-radius: 20px; transition: var(--transition); }
+        .footer-tech-link { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: white; text-decoration: none !important; background: rgba(255,255,255,0.05); padding: 8px 16px; border-radius: 20px; transition: var(--transition); }
         .footer-tech-link:hover { background: rgba(255,255,255,0.1); color: var(--bryt-accent); }
 
         /* Brand Background Watermark & Regulatory Container */
         .footer-legal-wrap {
-            background-color: #080D18; /* Dark contrast background */
+            background-color: #080D18; 
             position: relative;
             overflow: hidden;
             padding: 40px 24px;
@@ -320,7 +335,8 @@
         @media (min-width: 600px) {
             .trust-grid { grid-template-columns: repeat(4, 1fr); }
             .services-grid { grid-template-columns: repeat(2, 1fr); }
-            .hero-actions, .final-cta-btns { flex-direction: row; }
+            .hero-actions, .final-cta-btns { flex-direction: row; align-items: center; flex-wrap: wrap; } 
+            .playstore-badge { margin-top: 0; }
             .btn-primary, .btn-secondary { width: auto; padding: 16px 32px; }
         }
         @media (min-width: 900px) {
@@ -330,7 +346,6 @@
             .hero { padding: 100px 20px 140px; }
             .hero-content h1 { font-size: 3.8rem; }
             
-            /* Toggle Mockup vs Phone Image based on device size */
             .mockup-card { display: none; } 
             .desktop-phone-img { display: block; }
 
@@ -344,26 +359,6 @@
             .jamb-banner h2 { font-size: 2rem; margin-bottom: 16px; }
             .jamb-banner p { font-size: 1.1rem; margin-bottom: 32px; line-height: 1.6; }
             .jamb-disclaimer { font-size: 0.75rem; margin-top: 24px; }
-        }
-
-        .nav-download-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #eff6ff;
-            color: #1D5ED0 !important;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            border: 1px solid #bfdbfe;
-            transition: 0.2s;
-            text-decoration: none;
-        }
-        .nav-download-btn:hover { background: #1D5ED0; color: #ffffff !important; box-shadow: 0 4px 12px rgba(29, 94, 208, 0.2); }
-
-        @media all and (display-mode: standalone) {
-            .nav-download-btn { display: none !important; }
         }
     </style>
 </head>
@@ -380,10 +375,6 @@
             <a href="#how-it-works" title="How BRYT Pay Works">How It Works</a>
             <a href="/doc/faq/" title="Frequently Asked Questions">FAQ</a>
             <a href="/doc/about/" title="About BRYT Pay">About</a>
-            <a href="/download/" class="nav-download-btn" title="Download BRYT Pay Mobile App">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Get App
-            </a>
             <a href="/auth/login.html" class="auth-login" title="Login to BRYT Pay">Login</a>
             <a href="/auth/signup.html" class="btn-nav-primary auth-signup" title="Create Free BRYT Pay Account">Get Started</a>
         </nav>
@@ -399,10 +390,6 @@
         <a href="/doc/faq/" class="mobile-link" title="BRYT Pay Help & FAQ">FAQ</a>
         <a href="/doc/about/" class="mobile-link" title="About BRYT Pay Platform">About</a>
 
-        <a href="/download/" class="nav-download-btn" style="justify-content: center; padding: 12px; margin-top: 8px;" title="Download the BRYT Pay Android App">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Download App
-        </a>
         <hr style="border: none; border-top: 1px solid var(--border-color); margin: 8px 0;">
         <a href="/auth/login.html" class="auth-login" style="color: var(--text-muted);" title="Log In to BRYT Pay">Log In</a>
         <a href="/auth/signup.html" class="btn-nav-primary auth-signup" style="text-align: center;" title="Create Account on BRYT Pay">Get Started</a>
@@ -417,6 +404,11 @@
                 <div class="hero-actions">
                     <a href="/auth/signup.html" class="btn-primary auth-signup" title="Sign up for BRYT Pay">Create Free Account</a>
                     <a href="/auth/login.html" class="btn-secondary auth-login" title="Login to your BRYT Pay Wallet">Log In to Wallet</a>
+                    
+                    <!-- NEW GOOGLE PLAY STORE BADGE -->
+                    <a href="https://play.google.com/store/apps/details?id=com.brytdigitalservices.brytpay" class="playstore-badge" target="_blank" rel="noopener">
+                        <img src="assets/img/playstore.png" alt="Get it on Google Play">
+                    </a>
                 </div>
             </div>
             
@@ -557,7 +549,7 @@
         <div class="jamb-banner">
             <h2>Need Verified JAMB Services on BRYT Pay?</h2>
             <p>Access official JAMB processing services directly through BRYT Pay. Submit your registration details securely and receive your processed Admission Letters, Original Result Slips, UTME Registration Slips, and Change of Course documents delivered straight to your email and dashboard.</p>
-            <a href="/auth/signup.html" class="btn-primary btn-white auth-signup" style="width: auto; display: inline-flex;" title="Access BRYT Pay JAMB Desk">Access JAMB Desk</a>
+            <a href="/auth/signup.html" class="btn-primary btn-white auth-signup" style="width: auto; display: inline-flex; text-decoration: none !important;" title="Access BRYT Pay JAMB Desk">Access JAMB Desk</a>
             <p class="jamb-disclaimer">BRYT Pay acts as an independent processing platform. Services are fulfilled based on portal availability.</p>
         </div>
     </section>
@@ -668,82 +660,7 @@
             }
         };
     </script>
-
-    <!-- App Install / PWA Popup UI -->
-    <div id="pwa-install-prompt" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #ffffff; padding: 16px 20px; border-radius: 16px; box-shadow: 0 10px 40px rgba(7, 26, 58, 0.2); z-index: 10000; width: 90%; max-width: 360px; border: 1px solid #e2e8f0; align-items: center; justify-content: space-between;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <img src="/assets/img/brytpay-logo.png" style="width: 40px; height: 40px; object-fit: contain; background: #f8fafc; border-radius: 8px; padding: 4px;" alt="BRYT Pay Mobile Application Icon" width="40" height="40">
-            <div>
-                <div style="font-weight: 800; color: #071A3A; font-size: 0.9rem; font-family: 'Sora', system-ui, sans-serif;">Install BRYT Pay</div>
-                <div style="font-size: 0.75rem; color: #64748B; font-family: 'Sora', system-ui, sans-serif;">Fast, easy access on your screen</div>
-            </div>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <button id="pwa-close" aria-label="Close Installation Prompt" style="background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer; padding: 4px; line-height: 1;">&times;</button>
-            <button id="pwa-install-btn" style="background: #1D5ED0; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-family: 'Sora', system-ui, sans-serif; cursor: pointer; font-size: 0.85rem;">Install</button>
-        </div>
-    </div>
-
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(err => {
-                    console.log('PWA Service worker registration failed:', err);
-                });
-            });
-        }
-
-        const isRunningInApp = window.matchMedia('(display-mode: standalone)').matches 
-            || window.navigator.standalone 
-            || document.referrer.includes('android-app://');
-
-        const installPromptUI = document.getElementById('pwa-install-prompt');
-        const installBtn = document.getElementById('pwa-install-btn');
-        const closeBtn = document.getElementById('pwa-close');
-
-        let deferredPrompt = null;
-        const isDismissed = sessionStorage.getItem('brytpay_prompt_dismissed');
-
-        if (!isRunningInApp && !isDismissed && installPromptUI) {
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                showInstallUI();
-            });
-
-            setTimeout(() => {
-                showInstallUI();
-            }, 3000);
-        }
-
-        function showInstallUI() {
-            if (!isRunningInApp && !sessionStorage.getItem('brytpay_prompt_dismissed') && installPromptUI) {
-                installPromptUI.style.display = 'flex';
-            }
-        }
-
-        if (installBtn) {
-            installBtn.addEventListener('click', async () => {
-                installPromptUI.style.display = 'none';
-
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    console.log(`User ${outcome} installation`);
-                    deferredPrompt = null;
-                } else {
-                    window.location.href = '/app/brytpay.apk';
-                }
-            });
-        }
-
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                installPromptUI.style.display = 'none';
-                sessionStorage.setItem('brytpay_prompt_dismissed', 'true');
-            });
-        }
-    </script>
+    
     <script>
   document.addEventListener('DOMContentLoaded', () => {
     if (window.Capacitor && window.Capacitor.Plugins.OtaKit) {

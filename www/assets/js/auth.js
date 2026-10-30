@@ -2,9 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ==========================================
     // 🧹 MASTER SECURITY RESET
     // ==========================================
-    // Wipe dashboard memory so every fresh login strictly requires the PIN
     sessionStorage.removeItem('bryt_unlocked');
-    sessionStorage.removeItem('bryt_dash_splash_shown');
 
     // ==========================================
     // 🚀 TEST & REVIEWER OVERRIDE CONFIG
@@ -31,40 +29,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // ==========================================
-    // ⏱️ AUTH SPLASH LOGIC & SESSION CHECK
+    // ⏱️ INSTANT SESSION CHECK (Web Version)
     // ==========================================
-    const splash = document.getElementById('app-splash');
-    const authSplashShown = sessionStorage.getItem('bryt_auth_splash_shown');
-
-    if (splash) {
-        if (authSplashShown === 'true') {
-            splash.remove();
-            const { data: { session } } = await window.db.auth.getSession();
-            if (session) {
-                handleSmartRedirect();
-                return;
-            }
-        } else {
-            const minSplashTime = new Promise(resolve => setTimeout(resolve, 1500));
-            const sessionPromise = window.db.auth.getSession();
-
-            const [_, { data: { session } }] = await Promise.all([minSplashTime, sessionPromise]);
-
-            if (session) {
-                handleSmartRedirect();
-                return;
-            }
-
-            splash.classList.add('hidden');
-            sessionStorage.setItem('bryt_auth_splash_shown', 'true');
-            setTimeout(() => splash.remove(), 500); 
-        }
-    } else {
-        const { data: { session } } = await window.db.auth.getSession();
-        if (session) {
-            handleSmartRedirect();
-            return;
-        }
+    const { data: { session } } = await window.db.auth.getSession();
+    if (session) {
+        handleSmartRedirect();
+        return;
     }
 
     const errorEl = document.getElementById('auth-error');
@@ -214,7 +184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             btn.disabled = true;
-            btn.textContent = 'Logging in...'; // 🚀 Updated to look natural
+            btn.textContent = 'Provisioning Account...'; // Updated text to show background process
 
             const { data, error } = await window.db.auth.verifyOtp({ email: verifyEmail, token, type: 'signup' });
 
@@ -252,7 +222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await window.db.from('wallets').upsert({ user_id: user.id, balance: 0.00 });
                 window.db.functions.invoke('send-welcome-email', { body: {} }).catch(err => console.error(err));
                 
-                // 🚀 INSTANT 9PSB PROVISIONING (Awaited silently in the background)
+                // 🚀 INSTANT 9PSB PROVISIONING (Awaited to prevent redirect cancellation)
                 try {
                     await window.db.functions.invoke('reserve-virtual-account', {
                         body: { action: 'reserve_basic', phoneNumber: securePhone }
