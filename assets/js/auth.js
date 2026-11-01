@@ -150,9 +150,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error) {
                 let customErrorMsg = error.message;
-                if (customErrorMsg.includes('Database error saving new user') || customErrorMsg.includes('duplicate key')) {
-                    customErrorMsg = 'This Phone Number is already registered. Please sign in instead.';
-                }
+                if (customErrorMsg.includes('duplicate key')) {
+    customErrorMsg = 'This Phone Number is already registered. Please sign in instead.';
+} else if (customErrorMsg.includes('Database error saving new user')) {
+    customErrorMsg = 'Backend Error: A database trigger failed during sign-up.';
+}
                 
                 showError(customErrorMsg);
                 btn.disabled = false;

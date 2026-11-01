@@ -4,6 +4,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ==========================================
     sessionStorage.removeItem('bryt_unlocked');
 
+    // 🚀 NEW: SAFELY HIDE THE SPLASH SCREEN
+    const splashScreen = document.getElementById('app-splash');
+    const hideSplash = () => {
+        if (splashScreen) {
+            splashScreen.classList.add('hidden');
+            setTimeout(() => splashScreen.remove(), 600); // Remove from DOM after fade
+        }
+    };
+
     // ==========================================
     // 🚀 TEST & REVIEWER OVERRIDE CONFIG
     // ==========================================
@@ -31,10 +40,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ==========================================
     // ⏱️ INSTANT SESSION CHECK (Web Version)
     // ==========================================
-    const { data: { session } } = await window.db.auth.getSession();
-    if (session) {
-        handleSmartRedirect();
-        return;
+    try {
+        const { data: { session } } = await window.db.auth.getSession();
+        
+        // Hide splash screen after successful database check
+        hideSplash();
+
+        if (session) {
+            handleSmartRedirect();
+            return;
+        }
+    } catch (error) {
+        console.error("Auth initialization failed:", error);
+        // Ensure splash hides even if there's a network error
+        hideSplash(); 
     }
 
     const errorEl = document.getElementById('auth-error');
@@ -150,9 +169,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error) {
                 let customErrorMsg = error.message;
-                if (customErrorMsg.includes('Database error saving new user') || customErrorMsg.includes('duplicate key')) {
-                    customErrorMsg = 'This Phone Number is already registered. Please sign in instead.';
-                }
+                if (customErrorMsg.includes('duplicate key')) {
+    customErrorMsg = 'This Phone Number is already registered. Please sign in instead.';
+} else if (customErrorMsg.includes('Database error saving new user')) {
+    customErrorMsg = 'Backend Error: A database trigger failed during sign-up.';
+}
                 
                 showError(customErrorMsg);
                 btn.disabled = false;
@@ -184,7 +205,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             btn.disabled = true;
-            btn.textContent = 'Provisioning Account...'; // Updated text to show background process
+            btn.textContent = 'Provisioning Account...'; 
 
             const { data, error } = await window.db.auth.verifyOtp({ email: verifyEmail, token, type: 'signup' });
 
@@ -222,7 +243,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await window.db.from('wallets').upsert({ user_id: user.id, balance: 0.00 });
                 window.db.functions.invoke('send-welcome-email', { body: {} }).catch(err => console.error(err));
                 
-                // 🚀 INSTANT 9PSB PROVISIONING (Awaited to prevent redirect cancellation)
+                // 🚀 INSTANT 9PSB PROVISIONING 
                 try {
                     await window.db.functions.invoke('reserve-virtual-account', {
                         body: { action: 'reserve_basic', phoneNumber: securePhone }
