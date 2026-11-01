@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.Capacitor && window.Capacitor.Plugins.OtaKit) {
         try {
             await window.Capacitor.Plugins.OtaKit.notifyAppReady();
-            console.log("OtaKit: App is ready and stable.");
+        //    console.log("OtaKit: App is ready and stable.");
         } catch (e) {
             console.error('OtaKit Ready Signal Failed:', e);
         }

@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 3. Listen for the generated device token and silently save it
         PushNotifications.addListener('registration', async (token) => {
-            console.log('Push token received: ', token.value);
+        //    console.log('Push token received: ', token.value);
             
             const { data: { session } } = await window.db.auth.getSession();
             if (session) {
