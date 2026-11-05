@@ -556,9 +556,10 @@
                 }
             }
 
+            // 🚀 UPDATED FEE RULES: ₦50 for under 10k, ₦100 for 10k and above
             function calculateFee(val) {
                 if (val < 100) return 0;
-                return val < 10000 ? 20 : 100;
+                return val < 10000 ? 50 : 100;
             }
 
             amountInput.addEventListener('input', () => {
