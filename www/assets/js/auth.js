@@ -139,6 +139,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const confirmPwd = confirmPwdInput.value;
             const isTestAccount = TEST_REVIEWER_EMAILS.includes(regEmail.toLowerCase());
 
+            // 🚀 Capture Referral Code
+            const refCodeInput = document.getElementById('referral-code');
+            const refCode = refCodeInput ? refCodeInput.value.trim().toUpperCase() : '';
+
             if (!/^\d{11}$/.test(regPhone)) return showError('Enter a valid 11-digit phone number.');
             if (!isTestAccount && !pwdRegex.test(pwd)) return showError('Password must contain at least one uppercase letter, one lowercase letter, and one number.');
             if (pwd !== confirmPwd) return showError('Passwords do not match. Please try again.');
@@ -170,10 +174,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (error) {
                 let customErrorMsg = error.message;
                 if (customErrorMsg.includes('duplicate key')) {
-    customErrorMsg = 'This Phone Number is already registered. Please sign in instead.';
-} else if (customErrorMsg.includes('Database error saving new user')) {
-    customErrorMsg = 'Backend Error: A database trigger failed during sign-up.';
-}
+                    customErrorMsg = 'This Phone Number is already registered. Please sign in instead.';
+                } else if (customErrorMsg.includes('Database error saving new user')) {
+                    customErrorMsg = 'Backend Error: A database trigger failed during sign-up.';
+                }
                 
                 showError(customErrorMsg);
                 btn.disabled = false;
@@ -188,6 +192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             localStorage.setItem('bryt_pending_email', regEmail);
             localStorage.setItem('bryt_pending_name', regName);
             localStorage.setItem('bryt_pending_phone', regPhone);
+            localStorage.setItem('bryt_pending_refcode', refCode); // Pass referral code to next step
 
             signupForm.style.display = 'none';
             document.getElementById('signup-otp-form').style.display = 'block';
@@ -198,6 +203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const btn = document.getElementById('verify-signup-btn');
             const token = document.getElementById('signup-otp-code').value.trim();
             const verifyEmail = regEmail || localStorage.getItem('bryt_pending_email');
+            const secureRefCode = localStorage.getItem('bryt_pending_refcode') || '';
             
             if (!verifyEmail) {
                 showError('Session lost. Please refresh and try signing up again.');
@@ -243,6 +249,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await window.db.from('wallets').upsert({ user_id: user.id, balance: 0.00 });
                 window.db.functions.invoke('send-welcome-email', { body: {} }).catch(err => console.error(err));
                 
+                // 🚀 REFERRAL SYSTEM LINKING
+                // 🚀 REFERRAL SYSTEM LINKING (Secure RPC Bypass)
+                if (secureRefCode && secureRefCode.length === 4) {
+                    try {
+                        await window.db.rpc('link_referral', { 
+                            p_ref_code: secureRefCode, 
+                            p_referred_id: user.id, 
+                            p_referred_name: secureFullName 
+                        });
+                    } catch (refErr) {
+                        console.error("Referral linking failed:", refErr);
+                    }
+                }
                 // 🚀 INSTANT 9PSB PROVISIONING 
                 try {
                     await window.db.functions.invoke('reserve-virtual-account', {
@@ -255,6 +274,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 localStorage.removeItem('bryt_pending_email');
                 localStorage.removeItem('bryt_pending_name');
                 localStorage.removeItem('bryt_pending_phone');
+                localStorage.removeItem('bryt_pending_refcode'); // Clear refcode
 
             } catch (err) {
                 console.error("Unexpected Profile Error: ", err);

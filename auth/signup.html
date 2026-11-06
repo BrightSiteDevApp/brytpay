@@ -48,11 +48,9 @@
         
         .auth-card { width: 100%; max-width: 440px; padding: 40px 32px; background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05); transition: 0.3s; }
         
-        /* Removed the white box and border radius */
         .auth-brand { display: flex; justify-content: center; margin-bottom: 24px; }
         .brand-logo-img { max-width: 180px; height: auto; object-fit: contain; display: block; transition: 0.3s; }
         
-        /* Subtle glow in dark mode so the black text remains readable */
         html.dark-theme .brand-logo-img { filter: drop-shadow(0px 2px 15px rgba(255, 255, 255, 0.15)); }
         
         .auth-header { text-align: center; margin-bottom: 32px; }
@@ -111,6 +109,12 @@
             <div class="form-group">
                 <label class="form-label" for="email">Email Address</label>
                 <input type="email" id="email" class="form-input" placeholder="name@example.com" required>
+            </div>
+            
+            <!-- 🚀 NEW: OPTIONAL REFERRAL CODE -->
+            <div class="form-group">
+                <label class="form-label" for="referral-code">Referral Code <span style="color: var(--bryt-primary); font-size: 0.65rem; text-transform: none;">(Optional)</span></label>
+                <input type="text" id="referral-code" class="form-input" placeholder="e.g. A1B2" maxlength="4" style="text-transform: uppercase;">
             </div>
             
             <div class="form-group">
