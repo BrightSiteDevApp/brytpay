@@ -63,24 +63,41 @@
         .btn-primary { background: var(--bryt-primary); color: #fff; border: none; padding: 14px; font-size: 0.9rem; font-weight: 800; border-radius: 12px; width: 100%; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
         .btn-primary:active { transform: scale(0.98); }
 
-        .section-header { font-size: 0.85rem; font-weight: 800; color: var(--text-main); text-transform: uppercase; margin: 24px 0 12px 4px; }
+        .section-header-wrap { display: flex; justify-content: space-between; align-items: center; margin: 24px 0 12px 4px; }
+        .section-header { font-size: 0.85rem; font-weight: 800; color: var(--text-main); text-transform: uppercase; margin: 0; }
+        .btn-how-it-works { background: none; border: none; color: var(--bryt-primary); font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: background 0.2s; }
+        .btn-how-it-works:active { background: rgba(29, 94, 208, 0.1); }
 
         .referral-item { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--bg-color); border: 1px solid var(--border-light); border-radius: 12px; margin-bottom: 8px; }
         .ref-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--card-bg); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; flex-shrink: 0; border: 1px solid var(--border-light); text-transform: uppercase; }
         .ref-info { flex: 1; min-width: 0; }
         .ref-name { font-size: 0.9rem; font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; text-transform: capitalize; }
         
-        /* Dynamic Status Badges */
         .status-badge { font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; text-transform: uppercase; }
         .status-pending-kyc { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
         .status-pending-fund { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
         .status-completed { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
 
-        .bryt-toast { position: fixed; top: 20px; left: 0; right: 0; margin: 0 auto; width: max-content; max-width: 90%; transform: translateY(-150px); background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-light); padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 999999; transition: transform 0.4s;}
+        .bryt-toast { position: fixed; top: 20px; left: 0; right: 0; margin: 0 auto; width: max-content; max-width: 90%; transform: translateY(-150px); background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-light); padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 999999; transition: transform 0.4s; }
         .bryt-toast.show { transform: translateY(0); }
 
         .empty-state { text-align: center; padding: 30px 20px; color: #64748b; font-size: 0.85rem; font-weight: 600; line-height: 1.5; }
         .empty-icon { width: 48px; height: 48px; margin: 0 auto 12px; color: var(--border-light); }
+
+        /* HOW IT WORKS MODAL */
+        .info-modal-overlay { position: fixed; inset: 0; background: rgba(11, 18, 32, 0.95); z-index: 20000; display: none; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity 0.25s ease; }
+        .info-modal-overlay.active { display: flex; opacity: 1; }
+        .info-bottom-sheet { background: var(--card-bg); width: 100%; max-width: 480px; border-radius: 24px 24px 0 0; padding: 16px 24px 32px; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.15); box-sizing: border-box; }
+        .info-modal-overlay.active .info-bottom-sheet { transform: translateY(0); }
+        .sheet-handle { width: 36px; height: 4px; background: #e2e8f0; border-radius: 10px; margin: 0 auto 20px; }
+        html.dark-theme .sheet-handle { background: #334155; }
+        
+        .steps-container { margin-top: 24px; }
+        .step-row { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .step-number { width: 28px; height: 28px; background: rgba(29, 94, 208, 0.1); color: var(--bryt-primary); font-weight: 800; font-size: 0.85rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; border: 1.5px solid rgba(29, 94, 208, 0.2); }
+        .step-content h4 { margin: 0 0 4px 0; font-size: 0.95rem; font-weight: 800; color: var(--text-main); }
+        .step-content p { margin: 0; font-size: 0.8rem; color: #64748b; line-height: 1.5; font-weight: 500; }
+        .step-highlight { color: var(--bryt-primary); font-weight: 800; }
     </style>
 </head>
 <body>
@@ -88,6 +105,55 @@
     <div id="bryt-toast" class="bryt-toast">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
         <div id="toast-text" style="font-size: 0.8rem; font-weight: 700;">Copied to clipboard</div>
+    </div>
+
+    <!-- HOW IT WORKS BOTTOM SHEET -->
+    <div id="how-it-works-modal" class="info-modal-overlay">
+        <div class="info-bottom-sheet">
+            <div class="sheet-handle"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; font-size: 1.25rem; font-weight: 900; color: var(--text-main);">How Referrals Work</h3>
+                <button id="close-info-modal" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #64748b; font-weight: bold; padding: 4px;">✕</button>
+            </div>
+            
+            <div class="steps-container">
+                <div class="step-row">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Share Your Code</h4>
+                        <p>Give your unique 4-character referral code to a friend to enter when they create a new BRYT Pay account.</p>
+                    </div>
+                </div>
+                
+                <div class="step-row">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>They Complete KYC</h4>
+                        <p>Your friend must verify their identity using their NIN or BVN to unlock their PalmPay / Moniepoint account.</p>
+                    </div>
+                </div>
+                
+                <div class="step-row">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>They Fund ₦1,000+</h4>
+                        <p>Your friend must make their very first wallet deposit of <span class="step-highlight">at least ₦1,000</span>.</p>
+                    </div>
+                </div>
+                
+                <div class="step-row">
+                    <div class="step-number" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.2);">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <div class="step-content">
+                        <h4>You Get Paid Instantly</h4>
+                        <p>Once step 2 and 3 are complete, you instantly receive <span class="step-highlight" style="color: #10b981;">10%</span> of their deposited amount straight into your wallet (Maximum ₦300 cap).</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="button" id="btn-got-it" class="btn-primary" style="margin-top: 12px;">Got It</button>
+        </div>
     </div>
 
     <header class="app-topbar">
@@ -127,7 +193,13 @@
             </button>
         </div>
 
-        <h3 class="section-header">Your Referrals</h3>
+        <div class="section-header-wrap">
+            <h3 class="section-header">Your Referrals</h3>
+            <button id="trigger-how-it-works" class="btn-how-it-works">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                How it works
+            </button>
+        </div>
         
         <div id="referrals-container">
             <div class="empty-state">Loading your network...</div>
@@ -143,6 +215,18 @@
             if (!session) { window.location.href = '/auth/login.html'; return; }
             
             const userId = session.user.id;
+
+            // Modal Logic
+            const infoModal = document.getElementById('how-it-works-modal');
+            document.getElementById('trigger-how-it-works').addEventListener('click', () => {
+                infoModal.classList.add('active');
+            });
+            document.getElementById('close-info-modal').addEventListener('click', () => {
+                infoModal.classList.remove('active');
+            });
+            document.getElementById('btn-got-it').addEventListener('click', () => {
+                infoModal.classList.remove('active');
+            });
 
             // 1. Fetch User's Unique Code (account_id)
             const { data: profile } = await window.db.from('profiles').select('account_id').eq('id', userId).single();
