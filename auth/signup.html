@@ -111,10 +111,10 @@
                 <input type="email" id="email" class="form-input" placeholder="name@example.com" required>
             </div>
             
-            <!-- 🚀 NEW: OPTIONAL REFERRAL CODE -->
+            <!-- 🚀 NEW: FORCED ALPHANUMERIC REFERRAL CODE -->
             <div class="form-group">
                 <label class="form-label" for="referral-code">Referral Code <span style="color: var(--bryt-primary); font-size: 0.65rem; text-transform: none;">(Optional)</span></label>
-                <input type="text" id="referral-code" class="form-input" placeholder="e.g. A1B2" maxlength="4" style="text-transform: uppercase;">
+                <input type="text" id="referral-code" class="form-input" placeholder="A1B2" maxlength="4" style="text-transform: uppercase;" oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase()">
             </div>
             
             <div class="form-group">

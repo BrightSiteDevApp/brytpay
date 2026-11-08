@@ -119,10 +119,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const pwd = pwdInput.value;
             const confirmPwd = confirmPwdInput.value;
             const isTestAccount = TEST_REVIEWER_EMAILS.includes(regEmail.toLowerCase());
-            
-            // Capture Referral Code
+
+            // 🚀 Capture & Sanitize Referral Code
             const refCodeInput = document.getElementById('referral-code');
-            const refCode = refCodeInput ? refCodeInput.value.trim().toUpperCase() : '';
+            const refCode = refCodeInput ? refCodeInput.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase() : '';
 
             if (!/^\d{11}$/.test(regPhone)) return showError('Enter a valid 11-digit phone number.');
             if (!isTestAccount && !pwdRegex.test(pwd)) return showError('Password must contain at least one uppercase letter, one lowercase letter, and one number.');
@@ -230,8 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await window.db.from('wallets').upsert({ user_id: user.id, balance: 0.00 });
                 window.db.functions.invoke('send-welcome-email', { body: {} }).catch(err => console.error(err));
                 
-                // 🚀 REFERRAL SYSTEM LINKING
-                // 🚀 REFERRAL SYSTEM LINKING (Secure RPC Bypass)
+                // 🚀 REFERRAL SYSTEM LINKING (Secure RPC Bypass with 4-char check)
                 if (secureRefCode && secureRefCode.length === 4) {
                     try {
                         await window.db.rpc('link_referral', { 
@@ -243,7 +242,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         console.error("Referral linking failed:", refErr);
                     }
                 }
-                // 🚀 INSTANT 9PSB PROVISIONING
+                
+                // 🚀 INSTANT 9PSB PROVISIONING 
                 try {
                     await window.db.functions.invoke('reserve-virtual-account', {
                         body: { action: 'reserve_basic', phoneNumber: securePhone }
