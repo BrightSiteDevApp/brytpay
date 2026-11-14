@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<body style="font-family: system-ui; max-width: 600px; margin: 40px auto; padding: 20px; background: #f8fafc;">
+    
+    <h2 style="color: #0f172a;">9PSB Auto-Backfill Dashboard</h2>
+    
+    <!-- 1. Target Specific User (IT04) -->
+    <div style="margin-bottom: 20px; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+        <h3 style="margin-top: 0;">1. Target Specific User</h3>
+        <input type="text" id="target-id" placeholder="e.g. IT04" style="padding: 10px; font-weight: bold; border-radius: 8px; border: 1px solid #cbd5e1;">
+        <button onclick="targetUser()" style="padding: 10px 16px; background: #1D5ED0; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Generate Now</button>
+        <p id="target-log" style="font-size: 0.85rem; color: #64748b; margin-bottom: 0;"></p>
+    </div>
+
+    <!-- 2. Process All Missing Users -->
+    <div style="padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+        <h3 style="margin-top: 0;">2. Auto-Process All Missing (486 users)</h3>
+        <button id="start-btn" onclick="startLoop()" style="padding: 10px 16px; background: #10b981; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Start Auto-Loop</button>
+        <p id="loop-log" style="font-size: 0.85rem; color: #64748b; font-weight: bold;"></p>
+    </div>
+
+    <script>
+        // Utilizing your exact Supabase URL from the screenshot
+        const webhookUrl = "https://yivxlmjaiczsnxakumof.supabase.co/functions/v1/backfill-9psb";
+
+        async function targetUser() {
+            const accId = document.getElementById("target-id").value;
+            const log = document.getElementById("target-log");
+            log.innerText = "Generating account for " + accId + "...";
+            try {
+                let res = await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ account_id: accId })
+                });
+                let data = await res.json();
+                log.innerText = JSON.stringify(data);
+            } catch (e) {
+                log.innerText = "Error: " + e.message;
+            }
+        }
+
+        async function startLoop() {
+            document.getElementById("start-btn").disabled = true;
+            const log = document.getElementById("loop-log");
+            let isDone = false;
+            let batchCount = 0;
+            
+            while(!isDone) {
+                batchCount++;
+                log.innerText = `Processing batch ${batchCount} (5 users)...`;
+                
+                try {
+                    let res = await fetch(webhookUrl, { method: "POST" });
+                    let data = await res.json();
+                    
+                    if(data.message === "DONE") {
+                        isDone = true;
+                        log.innerText = "✅ SUCCESS: All users have been processed!";
+                        log.style.color = "#10b981";
+                    } else {
+                        log.innerText = `Batch ${batchCount} complete. Generated: ${data.successCount}. Waiting 2 seconds before next batch...`;
+                        await new Promise(r => setTimeout(r, 2000)); // Rest for 2 seconds
+                    }
+                } catch (e) {
+                    log.innerText = `Network error on Batch ${batchCount}: ${e.message}. Retrying in 5 seconds...`;
+                    await new Promise(r => setTimeout(r, 5000));
+                }
+            }
+        }
+    </script>
+</body>
+</html>
