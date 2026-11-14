@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Transaction History — BRYT Pay</title>
 
-    <!-- Anti-Flash Dark Mode Script -->
     <script>
         if (localStorage.getItem('bryt_theme') === 'dark') {
             document.documentElement.classList.add('dark-theme');
@@ -104,6 +103,11 @@
         .status-pending { background: rgba(234, 179, 8, 0.1) !important; color: #ca8a04 !important; border: 1px solid rgba(234, 179, 8, 0.2); }
         .status-failed { background: rgba(239, 68, 68, 0.1) !important; color: #dc2626 !important; border: 1px solid rgba(239, 68, 68, 0.2); }
 
+        /* 🚀 SKELETON ANIMATIONS */
+        .skeleton { color: transparent !important; background: #e2e8f0; border-radius: 8px; animation: pulse 1.5s infinite; }
+        html.dark-theme .skeleton { background: #334155; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
         /* Native Bottom Nav */
         .mobile-nav { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: var(--card-bg) !important; z-index: 9999 !important; border-top: 1px solid var(--border-light) !important; display: flex !important; justify-content: space-around !important; padding: 12px 0 10px 0 !important; transition: background 0.3s, border 0.3s; }
         .mobile-nav .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; text-decoration: none; transition: color 0.2s; }
@@ -151,7 +155,48 @@
 
         <section class="tx-card">
             <div id="history-container">
-                <div style="padding: 32px 20px; text-align: center; color: #64748b; font-size: 0.85rem; font-weight: 600;">Loading transactions...</div>
+                <!-- 🚀 SKELETON PRELOADERS FOR TRANSACTIONS -->
+                <div class="tx-row">
+                    <div class="tx-left">
+                        <div class="tx-brand skeleton" style="border: none;"></div>
+                        <div class="tx-info">
+                            <div class="tx-title skeleton" style="height: 12px; width: 140px; margin-bottom: 6px;"></div>
+                            <div class="tx-date skeleton" style="height: 10px; width: 100px;"></div>
+                        </div>
+                    </div>
+                    <div class="tx-right">
+                        <div class="tx-amount skeleton" style="height: 14px; width: 70px; margin-bottom: 6px;"></div>
+                        <div class="tx-status skeleton" style="height: 12px; width: 50px;"></div>
+                    </div>
+                </div>
+
+                <div class="tx-row">
+                    <div class="tx-left">
+                        <div class="tx-brand skeleton" style="border: none;"></div>
+                        <div class="tx-info">
+                            <div class="tx-title skeleton" style="height: 12px; width: 120px; margin-bottom: 6px;"></div>
+                            <div class="tx-date skeleton" style="height: 10px; width: 90px;"></div>
+                        </div>
+                    </div>
+                    <div class="tx-right">
+                        <div class="tx-amount skeleton" style="height: 14px; width: 60px; margin-bottom: 6px;"></div>
+                        <div class="tx-status skeleton" style="height: 12px; width: 50px;"></div>
+                    </div>
+                </div>
+                
+                <div class="tx-row">
+                    <div class="tx-left">
+                        <div class="tx-brand skeleton" style="border: none;"></div>
+                        <div class="tx-info">
+                            <div class="tx-title skeleton" style="height: 12px; width: 150px; margin-bottom: 6px;"></div>
+                            <div class="tx-date skeleton" style="height: 10px; width: 110px;"></div>
+                        </div>
+                    </div>
+                    <div class="tx-right">
+                        <div class="tx-amount skeleton" style="height: 14px; width: 80px; margin-bottom: 6px;"></div>
+                        <div class="tx-status skeleton" style="height: 12px; width: 50px;"></div>
+                    </div>
+                </div>
             </div>
         </section>
     </main>

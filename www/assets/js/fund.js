@@ -3,10 +3,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!session || sessionErr) { window.location.href = '/auth/login.html'; return; }
 
     const user = session.user;
-    const stateLoading = document.getElementById('state-loading');
     const stateActive = document.getElementById('state-active');
-    const stateUnregistered = document.getElementById('state-unregistered'); // Fallback state
-    const btnTriggerBasic = document.getElementById('btn-trigger-basic'); // Manual generation trigger
+    const stateUnregistered = document.getElementById('state-unregistered'); 
+    const btnTriggerBasic = document.getElementById('btn-trigger-basic'); 
     
     const btnUpgradeKycInline = document.getElementById('btn-upgrade-kyc-inline');
     const kycModal = document.getElementById('kyc-modal');
@@ -66,19 +65,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function loadWalletBalance(userId) {
         const { data: wallet } = await window.db.from('wallets').select('balance').eq('user_id', userId).single();
-        if (wallet && wallet.balance !== null) renderBalance(wallet.balance);
+        if (wallet && wallet.balance !== null) {
+            renderBalance(wallet.balance);
+        }
     }
     
     function renderBalance(val) { 
         const balanceEl = document.getElementById('user-balance');
-        if(balanceEl) balanceEl.textContent = `₦${parseFloat(val).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`; 
+        if(balanceEl) {
+            balanceEl.textContent = `₦${parseFloat(val).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`; 
+            balanceEl.classList.remove('skeleton'); // 🚀 FIX: Removes the pulsing gray skeleton box
+        }
     }
 
     async function loadAccountState(userId) {
         try {
             const { data: profile } = await window.db.from('profiles').select('full_name, psb9_account_number, palmpay_account_number, payvessel_palmpay_account_number, moniepoint_account_number, virtual_account_name').eq('id', userId).single();
-            if(stateLoading) stateLoading.style.display = 'none';
-
+            
             if (profile && profile.psb9_account_number) {
                 const vaContainer = document.getElementById('virtual-accounts-container');
                 if (vaContainer) {
@@ -116,6 +119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         cardsHtml += buildCard('Moniepoint', profile.moniepoint_account_number, legacyTopifyName, 'Fixed fee: 1.5%');
                     }
 
+                    // 🚀 FIX: Replaces the skeleton cards with the actual loaded account data
                     vaContainer.innerHTML = cardsHtml;
                 }
 
@@ -131,18 +135,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if(stateUnregistered) stateUnregistered.style.display = 'none';
                 if(stateActive) stateActive.style.display = 'block';
             } else {
-                // If they don't have an account, show the manual trigger fallback
                 if(stateActive) stateActive.style.display = 'none';
                 if(stateUnregistered) stateUnregistered.style.display = 'block';
             }
         } catch (err) {
             console.error(err);
-            if(stateLoading) stateLoading.style.display = 'none';
             if(stateUnregistered) stateUnregistered.style.display = 'block';
         }
     }
 
-    // 🚀 MANUAL GENERATION LOGIC
+    // MANUAL GENERATION LOGIC
     if (btnTriggerBasic) {
         btnTriggerBasic.onclick = async () => {
             btnTriggerBasic.disabled = true;
@@ -163,8 +165,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                 window.showToast('Account generated successfully!', 'success');
                 
                 if(stateUnregistered) stateUnregistered.style.display = 'none';
-                if(stateLoading) stateLoading.style.display = 'block';
                 
+                // Show skeletons while reloading the new account state
+                const vaContainer = document.getElementById('virtual-accounts-container');
+                if (vaContainer) {
+                    vaContainer.innerHTML = `
+                        <div class="va-card">
+                            <div class="va-info-left">
+                                <div class="va-icon-wrap skeleton" style="border-radius: 10px;"></div>
+                                <div style="flex: 1;">
+                                    <div class="va-bank-title skeleton" style="height: 10px; width: 60px; margin-bottom: 6px;"></div>
+                                    <div class="va-acc-number skeleton" style="height: 16px; width: 100px; margin-bottom: 6px;"></div>
+                                    <div class="va-acc-name skeleton" style="height: 10px; width: 140px;"></div>
+                                </div>
+                            </div>
+                        </div>`;
+                }
+                if(stateActive) stateActive.style.display = 'block';
+
                 await loadAccountState(user.id);
             } catch (err) {
                 window.showToast(err.message, 'error');
@@ -204,8 +222,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!response.ok || !result.success) throw new Error(result.error || 'Failed to upgrade accounts.');
 
                 if(kycModal) kycModal.style.display = 'none';
-                if(stateActive) stateActive.style.display = 'none';
-                if(stateLoading) stateLoading.style.display = 'block';
                 
                 await loadAccountState(user.id);
                 window.showToast('Virtual accounts verified successfully!', 'success');

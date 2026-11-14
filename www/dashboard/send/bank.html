@@ -21,6 +21,11 @@
         .balance-label { font-size: 0.65rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
         .balance-amount { font-size: 1.4rem; font-weight: 800; line-height: 1; }
         
+        /* 🚀 SKELETON ANIMATIONS */
+        .skeleton { color: transparent !important; background: #e2e8f0; border-radius: 8px; animation: pulse 1.5s infinite; display: inline-block; min-width: 60px;}
+        html.dark-theme .skeleton { background: #334155; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
         .form-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-light); }
         .form-group { margin-bottom: 16px; }
         .form-group label { font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px; display: block; }
@@ -177,8 +182,9 @@
     </header>
 
     <main class="main-content">
+        <!-- 🚀 SKELETON APPLIED TO BALANCE -->
         <div class="balance-pill">
-            <div><div class="balance-label">Wallet Balance</div><div class="balance-amount" id="user-balance">₦0.00</div></div>
+            <div><div class="balance-label">Wallet Balance</div><div class="balance-amount skeleton" id="user-balance">0.00</div></div>
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--bryt-primary);"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
         </div>
 
@@ -342,6 +348,7 @@
             const btnSkipSave = document.getElementById('btn-skip-save');
             const beneficiaryNameInput = document.getElementById('beneficiary-name');
             const successDoneBtn = document.getElementById('success-done-btn');
+            const userBalanceEl = document.getElementById('user-balance');
 
             function showToast(msg) {
                 const toast = document.getElementById('bryt-toast');
@@ -359,6 +366,8 @@
 
             if (!isVerified) {
                 document.getElementById('kyc-blocker').style.display = 'block';
+                // 🚀 Removes skeleton if KYC blocked
+                if (userBalanceEl) userBalanceEl.classList.remove('skeleton');
                 return;
             }
             document.getElementById('transfer-wrapper').style.display = 'block';
@@ -367,15 +376,16 @@
                 const { data } = await window.db.from('wallets').select('balance').eq('user_id', session.user.id).single();
                 if (data) {
                     currentBalance = parseFloat(data.balance);
-                    document.getElementById('user-balance').textContent = `₦${currentBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+                    if (userBalanceEl) {
+                        userBalanceEl.textContent = `₦${currentBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+                        userBalanceEl.classList.remove('skeleton'); // 🚀 Removes skeleton
+                    }
                 }
             }
             
-            // 🚀 SMART FILTER: Load only non-telecom networks for the Bank page
             async function loadBeneficiaries() {
                 const { data } = await window.db.from('beneficiaries').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
                 if (data) {
-                    // Filter OUT airtime networks (and brytpay for future-proofing), keeping only numeric bank codes
                     allBeneficiaries = data.filter(b => !['mtn', 'airtel', 'glo', '9mobile', 'brytpay'].includes(b.network));
                 }
             }
@@ -556,7 +566,6 @@
                 }
             }
 
-            // 🚀 UPDATED FEE RULES: ₦50 for under 10k, ₦100 for 10k and above
             function calculateFee(val) {
                 if (val < 100) return 0;
                 return val < 10000 ? 50 : 100;

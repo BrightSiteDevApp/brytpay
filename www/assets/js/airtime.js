@@ -99,10 +99,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         '0809': '9mobile', '0818': '9mobile', '0817': '9mobile', '0909': '9mobile', '0908': '9mobile'
     };
 
-    // 🚀 FETCH BENEFICIARIES ON LOAD
+
+   // 🚀 FETCH ONLY AIRTIME/DATA BENEFICIARIES
     async function loadBeneficiaries() {
         try {
-            const { data, error } = await window.db.from('beneficiaries').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+            const { data, error } = await window.db.from('beneficiaries')
+                .select('*')
+                .eq('user_id', user.id)
+                // 🚀 FIX: This line strictly filters out bank accounts!
+                .in('network', ['mtn', 'airtel', 'glo', '9mobile']) 
+                .order('created_at', { ascending: false });
+                
             if (!error && data) {
                 allBeneficiaries = data;
             }

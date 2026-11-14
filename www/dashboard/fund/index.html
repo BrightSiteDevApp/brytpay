@@ -31,7 +31,7 @@
             border-radius: 14px; padding: 14px; display: flex; align-items: center; justify-content: space-between;
         }
         html.dark-theme .va-card { background: #1e293b; border-color: #334155; }
-        .va-info-left { display: flex; align-items: center; gap: 12px; }
+        .va-info-left { display: flex; align-items: center; gap: 12px; flex: 1;}
         .va-icon-wrap {
             width: 40px; height: 40px; border-radius: 10px;
             background: #e0e7ff; color: #4f46e5;
@@ -48,6 +48,11 @@
             cursor: pointer; display: flex; align-items: center; gap: 6px; flex-shrink: 0;
             transition: 0.2s;
         }
+
+        /* 🚀 SKELETON ANIMATIONS */
+        .skeleton { color: transparent !important; background: #e2e8f0; border-radius: 8px; animation: pulse 1.5s infinite; }
+        html.dark-theme .skeleton { background: #334155; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
         /* Upgrade Cards */
         .standalone-upgrade-card { background: rgba(29, 94, 208, 0.05); border: 1px solid var(--border-light); border-radius: 14px; padding: 16px; margin-bottom: 16px; display: none; }
@@ -91,20 +96,14 @@
         <div class="balance-pill">
             <div>
                 <div class="balance-label">Wallet Balance</div>
-                <div class="balance-amount" id="user-balance">₦0.00</div>
+                <!-- 🚀 ADDED SKELETON CLASS HERE -->
+                <div class="balance-amount skeleton" id="user-balance">0.00</div>
             </div>
             <div class="balance-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
             </div>
         </div>
 
-        <!-- Loading State -->
-        <div id="state-loading" style="text-align: center; padding: 40px 20px;">
-            <div style="display: inline-block; width: 28px; height: 28px; border: 3px solid var(--border-light); border-top-color: var(--bryt-primary); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
-            <p style="font-size: 0.75rem; color: #64748b; font-weight: 600; margin-top: 12px;">Loading accounts...</p>
-        </div>
-
-        <!-- 🚀 MANUAL FALLBACK STATE -->
         <div id="state-unregistered" style="display: none; text-align: center;">
             <div style="background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 14px; padding: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
                 <div style="width: 48px; height: 48px; background: rgba(234, 179, 8, 0.1); color: #ca8a04; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
@@ -116,12 +115,37 @@
             </div>
         </div>
 
-        <!-- Active Accounts State -->
-        <div id="state-active" style="display: none;">
+        <div id="state-active">
             <p style="font-size: 0.7rem; color: #64748b; margin-bottom: 16px; text-align: center; font-weight: 600;">Make a transfer to any account below and your wallet will be credited instantly.</p>
 
-            <!-- VIRTUAL ACCOUNTS LIST CONTAINER -->
-            <div id="virtual-accounts-container" class="va-list-wrapper"></div>
+            <!-- 🚀 VIRTUAL ACCOUNTS LIST CONTAINER WITH SKELETON PRELOADERS -->
+            <div id="virtual-accounts-container" class="va-list-wrapper">
+                
+                <!-- Skeleton Card 1 -->
+                <div class="va-card">
+                    <div class="va-info-left">
+                        <div class="va-icon-wrap skeleton" style="border-radius: 10px;"></div>
+                        <div style="flex: 1;">
+                            <div class="va-bank-title skeleton" style="height: 10px; width: 60px; margin-bottom: 6px;"></div>
+                            <div class="va-acc-number skeleton" style="height: 16px; width: 100px; margin-bottom: 6px;"></div>
+                            <div class="va-acc-name skeleton" style="height: 10px; width: 140px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skeleton Card 2 -->
+                <div class="va-card">
+                    <div class="va-info-left">
+                        <div class="va-icon-wrap skeleton" style="border-radius: 10px;"></div>
+                        <div style="flex: 1;">
+                            <div class="va-bank-title skeleton" style="height: 10px; width: 60px; margin-bottom: 6px;"></div>
+                            <div class="va-acc-number skeleton" style="height: 16px; width: 100px; margin-bottom: 6px;"></div>
+                            <div class="va-acc-name skeleton" style="height: 10px; width: 140px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
 
             <!-- KYC PROMPT -->
             <div id="inline-upgrade-box" class="standalone-upgrade-card">
