@@ -52,9 +52,12 @@
         .app-topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--card-bg); position: sticky; top: 0; z-index: 100; transition: background 0.3s; border-bottom: 1px solid var(--border-light); }
         .profile-container { display: flex; align-items: center; gap: 12px; }
         .profile-avatar { width: 42px; height: 42px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--bryt-primary); font-weight: 800; font-size: 1.2rem; text-decoration: none; cursor: pointer; }
-        .greeting-time { font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .greeting-name { font-size: 1.1rem; font-weight: 800; color: var(--text-main); line-height: 1.1; }
+        .greeting-time { font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+        .greeting-name { font-size: 1.1rem; font-weight: 800; color: var(--text-main); line-height: 1.1; margin-bottom: 2px; }
         
+        .account-badge-display { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 800; color: var(--bryt-primary); background: rgba(29, 94, 208, 0.1); padding: 2px 8px; border-radius: 6px; letter-spacing: 0.5px; border: 1px solid rgba(29, 94, 208, 0.2); }
+        html.dark-theme .account-badge-display { color: #60a5fa; background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); }
+
         .top-icons { display: flex; gap: 14px; align-items: center; }
         .icon-btn { color: var(--text-main); display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; border: none; padding: 4px; }
         .notif-dot { position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; border: 2px solid var(--card-bg); display: none; }
@@ -74,8 +77,10 @@
         .action-row { display: flex; gap: 12px; margin-bottom: 24px; }
         .slim-action-btn { flex: 1; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 0.85rem; text-decoration: none; transition: 0.2s; cursor: pointer;}
         .slim-action-btn svg { width: 18px; height: 18px; }
+        
         .btn-send { background: #1e293b; color: #ffffff; border: 1px solid #334155; }
         .btn-add { background: #ffffff; color: #0B1220; border: 1px solid #cbd5e1; }
+        
         html.dark-theme .btn-send { background: #1e293b; color: #f8fafc; border-color: #334155; }
         html.dark-theme .btn-add { background: var(--bryt-primary); color: #ffffff; border: none; }
 
@@ -119,7 +124,8 @@
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
         .toast-msg-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--bryt-primary); color: #ffffff; padding: 12px 20px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; z-index: 10000; display: none; align-items: center; gap: 8px; box-shadow: 0 10px 30px rgba(29, 94, 208, 0.3); border: 1px solid rgba(255,255,255,0.2); }
-        .bryt-toast { position: fixed; top: 20px; left: 0; right: 0; margin: 0 auto; width: max-content; max-width: 90%; transform: translateY(-150px); background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-light); padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 99999; transition: transform 0.4s;  }
+        
+        .bryt-toast { position: fixed; top: 20px; left: 0; right: 0; margin: 0 auto; width: max-content; max-width: 90%; transform: translateY(-150px); background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-light); padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 999999; transition: transform 0.4s;  }
         .bryt-toast.show { transform: translateY(0); }
         .toast-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
         .toast-success .toast-icon { background: #16a34a; }
@@ -144,8 +150,9 @@
         .keypad-btn { background: transparent; border: none; font-size: 1.6rem; font-weight: 700; color: var(--text-main); height: 60px; width: 60px; margin: 0 auto; cursor: pointer; border-radius: 50%; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
         .keypad-btn:active { background: rgba(29, 94, 208, 0.1); }
         
-        .btn-primary { width: 100%; padding: 14px; background: var(--bryt-primary); color: #fff; font-size: 0.9rem; border-radius: 12px; font-weight: 800; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary { width: 100%; padding: 14px; background: var(--bryt-primary); color: #fff; font-size: 0.9rem; border-radius: 12px; font-weight: 800; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     </style>
 </head>
 <body>
@@ -240,7 +247,16 @@
             </a>
             <div>
                 <div class="greeting-time" id="greeting-time">Good day,</div>
-                <div class="greeting-name skeleton" id="user-greeting">User</div>
+                
+                <!-- 🚀 Account ID Display integrated with Name -->
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="greeting-name skeleton" id="user-greeting">User</div>
+                    <div class="account-badge-display" id="display-account-id">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        ----
+                    </div>
+                </div>
+                
             </div>
         </div>
         
@@ -410,7 +426,7 @@
         });
     </script>
 
-    <!-- 🚀 PIN SETUP BOTTOM SHEET -->
+    <!-- 🚀 PIN SETUP BOTTOM SHEET (RE-ADDED) -->
     <div class="pin-modal-overlay" id="pin-setup-overlay">
         <div class="pin-bottom-sheet">
             <div style="width: 40px; height: 5px; background: #e2e8f0; border-radius: 10px; margin: 0 auto 20px;"></div>
