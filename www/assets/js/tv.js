@@ -214,7 +214,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         verifyBtn.disabled = true;
 
         try {
+            // 🚀 EXPLICIT POST DECLARATION TO FIX ANDROID CORS
             const { data: resData, error } = await window.db.functions.invoke('verify-tv-swift', {
+                method: 'POST',
                 body: { network: selectedNetwork, smartcard: smartcard }
             });
 
@@ -295,7 +297,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnConfirm.textContent = 'Processing...';
 
         try {
+            // 🚀 EXPLICIT POST DECLARATION TO FIX ANDROID CORS
             const { data: resData, error } = await window.db.functions.invoke('vend-tv-swift', {
+                method: 'POST',
                 body: { 
                     network: selectedNetwork, 
                     smartcard: smartcardInput.value.trim(), 
@@ -304,8 +308,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
 
-            if (error) throw new Error(error.message);
-            if (resData && !resData.success) throw new Error(resData.message);
+            if (error) throw new Error(error.message || "Connection to secure server failed.");
+            if (resData && !resData.success) throw new Error(resData.message || "Transaction failed.");
 
             pinModal.classList.remove('active');
             successOverlay.classList.add('active');
