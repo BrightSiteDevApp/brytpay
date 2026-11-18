@@ -151,7 +151,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { data, error } = await window.db.from('beneficiaries')
                 .select('*')
                 .eq('user_id', user.id)
-                // 🚀 FIX: This line strictly filters out bank accounts!
                 .in('network', ['mtn', 'airtel', 'glo', '9mobile']) 
                 .order('created_at', { ascending: false });
                 
@@ -446,7 +445,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         modalConfirm.textContent = 'Processing...';
 
         try {
+            // 🚀 CRITICAL FIX: Explicit POST request to bypass strict browser preflight errors on mobile
             const { data: resData, error } = await window.db.functions.invoke('vend-data-swift', {
+                method: 'POST',
                 body: { 
                     network: network, 
                     plan_code: plan_code, 
@@ -455,8 +456,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
 
-            if (error) throw new Error(error.message);
-            if (resData && resData.success === false) throw new Error(resData.message);
+            if (error) throw new Error(error.message || "Connection to secure server failed.");
+            if (resData && resData.success === false) throw new Error(resData.message || "Transaction failed.");
 
             pinModal.classList.remove('active');
             successOverlay.classList.add('active');

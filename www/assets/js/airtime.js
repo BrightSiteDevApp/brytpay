@@ -99,14 +99,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         '0809': '9mobile', '0818': '9mobile', '0817': '9mobile', '0909': '9mobile', '0908': '9mobile'
     };
 
-
-   // 🚀 FETCH ONLY AIRTIME/DATA BENEFICIARIES
+    // 🚀 FETCH ONLY AIRTIME/DATA BENEFICIARIES
     async function loadBeneficiaries() {
         try {
             const { data, error } = await window.db.from('beneficiaries')
                 .select('*')
                 .eq('user_id', user.id)
-                // 🚀 FIX: This line strictly filters out bank accounts!
                 .in('network', ['mtn', 'airtel', 'glo', '9mobile']) 
                 .order('created_at', { ascending: false });
                 
@@ -154,25 +152,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </button>
             `;
             
-            // 🚀 HANDLE CLICK VS CUSTOM DELETE MODAL
             item.addEventListener('click', (e) => {
-                
-                // If they clicked the trash can button
                 if (e.target.closest('.btn-del-ben')) {
-                    e.stopPropagation(); // Stops it from typing the number into the input field
-                    
+                    e.stopPropagation();
                     pendingDeleteId = ben.id;
                     pendingDeleteBtn = e.target.closest('.btn-del-ben');
                     deleteBenName.textContent = ben.name;
                     deleteModal.classList.add('active');
-                    
                     return;
                 }
-                
-                // If they clicked the body of the item, populate the input field
                 phoneInput.value = ben.phone;
                 benModalOverlay.classList.remove('active');
-                
                 const event = new Event('input', { bubbles: true });
                 phoneInput.dispatchEvent(event);
             });
@@ -181,7 +171,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Modal Triggers
     if (btnOpenBeneficiaries) {
         btnOpenBeneficiaries.addEventListener('click', () => {
             renderBeneficiaries(); 
@@ -199,7 +188,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
     
-    // 🚀 CUSTOM DELETE MODAL ACTIONS
     if (btnCancelDelete) {
         btnCancelDelete.addEventListener('click', () => {
             deleteModal.classList.remove('active');
@@ -296,7 +284,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // 🚀 KEYPAD LOGIC
     function updatePinUI() {
         pinDots.forEach((dot, idx) => {
             if (idx < currentPin.length) dot.classList.add('filled');
@@ -327,8 +314,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        if (isNaN(amount) || amount < 100) {
-            showToast('Minimum airtime purchase is ₦100.', 'error');
+        if (isNaN(amount) || amount < 50) {
+            showToast('Minimum airtime purchase is ₦50.', 'error');
             return;
         }
 
@@ -364,7 +351,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const amount = parseFloat(amountInput.value);
 
         try {
+            // 🚀 EXPLICITLY SET METHOD TO 'POST' AND HANDLE PROPER STATUS RESPONSE
             const { data, error } = await window.db.functions.invoke('vend-airtime-swift', {
+                method: 'POST',
                 body: {
                     network: selectedNetwork,
                     phone: phone,
@@ -373,13 +362,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
 
-            if (error) throw new Error(error.message);
-            if (data && data.success === false) throw new Error(data.message);
+            if (error) throw new Error(error.message || "Connection to secure server failed.");
+            if (data && data.status === false) throw new Error(data.message || "Transaction failed.");
 
             pinModal.classList.remove('active');
             successOverlay.classList.add('active');
             
-            // 🚀 BENEFICIARY CHECK HOOK
             const alreadySaved = allBeneficiaries.some(b => b.phone === phone);
             
             if (alreadySaved) {
@@ -399,7 +387,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // 🚀 SAVE BENEFICIARY BUTTON LOGIC
     btnSaveBeneficiary.addEventListener('click', async () => {
         const benName = beneficiaryNameInput.value.trim();
         const phone = phoneInput.value.trim();
