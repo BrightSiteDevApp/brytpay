@@ -70,6 +70,81 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    // ==========================================
+    // ⚙️ FIRST-TIME CREATE PIN SETUP (NEW USERS)
+    // ==========================================
+    function initPinSetup() {
+        const overlay = document.getElementById('pin-setup-overlay');
+        if (!overlay) return;
+
+        const dots = overlay.querySelectorAll('.pin-dot');
+        const keypadBtns = overlay.querySelectorAll('.keypad-btn');
+        const saveBtn = document.getElementById('btn-save-pin');
+        let currentPin = '';
+
+        overlay.classList.add('active');
+
+        function updateDots() {
+            dots.forEach((dot, idx) => {
+                if (idx < currentPin.length) dot.classList.add('filled');
+                else dot.classList.remove('filled');
+            });
+            saveBtn.disabled = currentPin.length !== 4;
+        }
+
+        function handleInput(val) {
+            if (val === 'back') {
+                currentPin = currentPin.slice(0, -1);
+            } else if (/^\d$/.test(val) && currentPin.length < 4) {
+                currentPin += val;
+            }
+            updateDots();
+        }
+
+        keypadBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                handleInput(btn.getAttribute('data-val'));
+            });
+        });
+
+        // Allow desktop keyboard entry while the Create PIN sheet is open
+        const onKeyDown = (e) => {
+            if (!overlay.classList.contains('active')) return;
+            if (/^\d$/.test(e.key)) {
+                handleInput(e.key);
+            } else if (e.key === 'Backspace') {
+                handleInput('back');
+            } else if (e.key === 'Enter' && currentPin.length === 4 && !saveBtn.disabled) {
+                saveBtn.click();
+            }
+        };
+        document.addEventListener('keydown', onKeyDown);
+
+        saveBtn.addEventListener('click', async () => {
+            if (currentPin.length !== 4) return;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = 'Saving...';
+            
+            const { error } = await window.db
+                .from('profiles')
+                .update({ transaction_pin: currentPin })
+                .eq('id', user.id);
+            
+            if (error) {
+                window.showToast('Connection error. Please try again.', 'error');
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = 'Save PIN';
+            } else {
+                saveBtn.style.background = '#10b981';
+                saveBtn.innerHTML = 'PIN Saved! ✓';
+                document.removeEventListener('keydown', onKeyDown);
+                setTimeout(() => {
+                    overlay.classList.remove('active');
+                }, 1000);
+            }
+        });
+    }
+
     async function checkUnreadNotifications() {
         const notifDot = document.getElementById('notif-dot');
         if (!notifDot) return;
@@ -95,13 +170,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function loadProfile() {
-        const { data } = await window.db.from('profiles').select('full_name, psb9_account_number, palmpay_account_number, payvessel_palmpay_account_number, moniepoint_account_number, virtual_account_name').eq('id', user.id).single();
+        const { data } = await window.db
+            .from('profiles')
+            .select('full_name, account_id, transaction_pin, psb9_account_number, palmpay_account_number, payvessel_palmpay_account_number, moniepoint_account_number, virtual_account_name')
+            .eq('id', user.id)
+            .single();
+
         const greetingEl = document.getElementById('user-greeting');
+        const displayIdEl = document.getElementById('display-account-id');
         
         if (data) {
             if (greetingEl) {
                 greetingEl.textContent = data.full_name ? data.full_name.split(' ')[0] : "User";
                 greetingEl.classList.remove('skeleton');
+            }
+
+            if (displayIdEl && data.account_id) {
+                const svg = displayIdEl.querySelector('svg');
+                displayIdEl.textContent = '';
+                if (svg) displayIdEl.appendChild(svg);
+                displayIdEl.appendChild(document.createTextNode(' ' + data.account_id));
             }
 
             // 🚀 SMART VIRTUAL ACCOUNTS
@@ -149,8 +237,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (cardsHtml) {
                     vaContainer.innerHTML = cardsHtml;
+                    vaContainer.style.display = 'flex';
                 } else {
                     vaContainer.style.display = 'none';
+                }
+            }
+
+            // 🚀 FORCE FIRST-TIME PIN CREATION FOR NEW USERS (NO UNLOCK SCREEN)
+            if (!data.transaction_pin) {
+                const pinSetupOverlay = document.getElementById('pin-setup-overlay');
+                if (pinSetupOverlay) {
+                    initPinSetup();
+                } else {
+                    window.location.replace('/dashboard/index.html');
+                    return;
                 }
             }
         }
