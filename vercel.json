@@ -28,6 +28,10 @@
     {
       "source": "/api/(.*)",
       "destination": "https://yivxlmjaiczsnxakumof.supabase.co/functions/v1/$1"
+    },
+    {
+      "source": "/share/:code",
+      "destination": "/share/index.html"
     }
   ]
 }

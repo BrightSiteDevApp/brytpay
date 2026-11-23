@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Airtime Gift — BRYT Pay</title>
+    <meta name="description" content="Claim your free instant airtime gift powered by BRYT Pay.">
+    <meta name="theme-color" content="#1D5ED0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/assets/css/main.css">
+
+    <script>
+        if (localStorage.getItem('bryt_theme') === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+        }
+    </script>
+
+    <style>
+        :root {
+            --bryt-primary: #1D5ED0;
+            --bryt-primary-hover: #174EB0;
+            --bryt-navy: #0B1220;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-main: #0B1220;
+            --border-light: #e2e8f0;
+        }
+
+        html.dark-theme {
+            --bryt-navy: #ffffff;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --border-light: #334155;
+        }
+
+        body {
+            background: linear-gradient(180deg, rgba(29, 94, 208, 0.08) 0%, var(--bg-color) 42%, var(--bg-color) 100%) !important;
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 32px !important;
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin: 0;
+        }
+
+        .share-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 32px 24px;
+        }
+
+        .gift-badge {
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 22px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #2D8EFF 0%, var(--bryt-primary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            box-shadow: 0 14px 28px rgba(29, 94, 208, 0.28);
+        }
+
+        .gift-badge.state-success {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            box-shadow: 0 14px 28px rgba(22, 163, 74, 0.25);
+        }
+
+        .gift-badge.state-muted {
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+            box-shadow: 0 12px 24px rgba(71, 85, 105, 0.2);
+        }
+
+        .share-title {
+            text-align: center;
+            font-size: 1.65rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin: 0 0 10px;
+            letter-spacing: -0.4px;
+        }
+
+        .share-subtitle {
+            text-align: center;
+            font-size: 0.92rem;
+            color: #64748b;
+            line-height: 1.5;
+            margin: 0 auto 30px;
+            max-width: 340px;
+            font-weight: 500;
+        }
+
+        .share-subtitle strong {
+            color: var(--text-main);
+            font-weight: 800;
+        }
+
+        .claim-label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .phone-field-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .phone-icon {
+            position: absolute;
+            left: 16px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .phone-input {
+            width: 100%;
+            padding: 16px 86px 16px 46px;
+            background: var(--card-bg);
+            border: 1.5px solid var(--border-light);
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(7, 26, 58, 0.03);
+        }
+
+        .phone-input:focus {
+            border-color: var(--bryt-primary);
+            box-shadow: 0 0 0 3px rgba(29, 94, 208, 0.12);
+        }
+
+        .carrier-badge {
+            position: absolute;
+            right: 14px;
+            background: rgba(29, 94, 208, 0.1);
+            color: var(--bryt-primary);
+            border: 1px solid rgba(29, 94, 208, 0.2);
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            display: none;
+        }
+
+        .carrier-badge.active {
+            display: inline-block;
+        }
+
+        /* Honeypot field (hidden from real users, catches bots) */
+        .hp-field {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .btn-claim {
+            width: 100%;
+            padding: 16px 20px;
+            background: var(--bryt-primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 10px 22px rgba(29, 94, 208, 0.25);
+            transition: background 0.2s, transform 0.15s;
+        }
+
+        .btn-claim:hover {
+            background: var(--bryt-primary-hover);
+        }
+
+        .btn-claim:active {
+            transform: scale(0.98);
+        }
+
+        .btn-claim:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-banner {
+            display: none;
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        .status-banner.error {
+            display: block;
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+
+        .status-banner.warning {
+            display: block;
+            background: rgba(245, 158, 11, 0.12);
+            color: #b45309;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        html.dark-theme .status-banner.warning {
+            color: #fbbf24;
+        }
+
+        .create-cta {
+            text-align: center;
+            margin-top: 26px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .create-cta a {
+            color: var(--bryt-primary);
+            text-decoration: none;
+            font-weight: 800;
+        }
+
+        .create-cta a:hover {
+            text-decoration: underline;
+        }
+
+        .receipt-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 14px rgba(7, 26, 58, 0.04);
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.82rem;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-light);
+        }
+
+        .receipt-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .receipt-row span {
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .receipt-row strong {
+            color: var(--text-main);
+            font-weight: 800;
+        }
+
+        .powered-footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        .powered-footer span {
+            color: var(--bryt-primary);
+            font-weight: 800;
+        }
+
+        .btn-spinner {
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255, 255, 255, 0.35);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        .bryt-toast {
+            position: fixed;
+            top: 20px;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            width: max-content;
+            max-width: 90%;
+            transform: translateY(-150px);
+            background: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-light);
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 999999;
+            transition: transform 0.35s;
+        }
+
+        .bryt-toast.show { transform: translateY(0); }
+        .toast-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+        .toast-success .toast-icon { background: #16a34a; }
+        .toast-error .toast-icon { background: #dc2626; }
+        .toast-text { font-size: 0.8rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <div id="bryt-toast" class="bryt-toast">
+        <div id="toast-icon-wrap" class="toast-icon"></div>
+        <div id="toast-text" class="toast-text">Message</div>
+    </div>
+
+    <main class="share-wrapper">
+        <!-- 1. LOADING VIEW -->
+        <section id="view-loading" class="view-section active" style="text-align: center;">
+            <div class="gift-badge">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+            </div>
+            <div class="skeleton" style="height: 28px; width: 180px; margin: 0 auto 12px;"></div>
+            <div class="skeleton" style="height: 16px; width: 260px; margin: 0 auto 28px;"></div>
+            <div class="skeleton" style="height: 54px; width: 100%; border-radius: 14px; margin-bottom: 16px;"></div>
+            <div class="skeleton" style="height: 54px; width: 100%; border-radius: 14px;"></div>
+        </section>
+
+        <!-- 2. ACTIVE CLAIM FORM VIEW -->
+        <section id="view-claim" class="view-section">
+            <div class="gift-badge">
+                <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+            </div>
+
+            <h1 class="share-title">Airtime Gift</h1>
+            <p class="share-subtitle">
+                Enter your phone number below and tap the button to load airtime gift from <strong id="sender-name">---</strong>.
+            </p>
+
+            <form id="claim-form" autocomplete="off">
+                <!-- Honeypot (invisible to real users) -->
+                <input type="text" id="hp-website" name="website" class="hp-field" tabindex="-1" autocomplete="off">
+
+                <label for="claim-phone" class="claim-label">Recipient:</label>
+                <div class="phone-field-wrap">
+                    <span class="phone-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                    </span>
+                    <input type="tel" id="claim-phone" class="phone-input" placeholder="08012345678" maxlength="11" inputmode="numeric" required>
+                    <span id="claim-carrier" class="carrier-badge">MTN</span>
+                </div>
+
+                <button type="submit" id="btn-claim" class="btn-claim">
+                    <span id="btn-claim-text">Get ₦100 Airtime</span>
+                </button>
+
+                <div id="claim-status-banner" class="status-banner"></div>
+            </form>
+
+            <div class="create-cta">
+                CREATE YOURS <a href="/dashboard/giveaway/index.html">HERE (FREE)</a>
+            </div>
+        </section>
+
+        <!-- 3. SUCCESS VIEW -->
+        <section id="view-success" class="view-section">
+            <div class="gift-badge state-success">
+                <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+
+            <h1 class="share-title">Airtime Sent!</h1>
+            <p class="share-subtitle" id="success-message">Your airtime gift has been delivered.</p>
+
+            <div class="receipt-box">
+                <div class="receipt-row">
+                    <span>Amount</span>
+                    <strong id="rec-amount" style="color: #16a34a;">₦0</strong>
+                </div>
+                <div class="receipt-row">
+                    <span>Network</span>
+                    <strong id="rec-network">---</strong>
+                </div>
+                <div class="receipt-row">
+                    <span>Recipient</span>
+                    <strong id="rec-phone">---</strong>
+                </div>
+                <div class="receipt-row">
+                    <span>Gifted By</span>
+                    <strong id="rec-sender">---</strong>
+                </div>
+            </div>
+
+            <a href="/auth/signup.html" class="btn-claim" style="text-decoration: none;">
+                Create Your Own Giveaway (Free)
+            </a>
+        </section>
+
+        <!-- 4. UNAVAILABLE / COMPLETED / EXPIRED VIEW -->
+        <section id="view-unavailable" class="view-section">
+            <div class="gift-badge state-muted">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </div>
+
+            <h1 class="share-title" id="unavail-title">Giveaway Ended</h1>
+            <p class="share-subtitle" id="unavail-desc">This airtime giveaway is no longer active.</p>
+
+            <a href="/auth/signup.html" class="btn-claim" style="text-decoration: none;">
+                Create Yours on BRYT Pay (Free)
+            </a>
+        </section>
+    </main>
+
+    <footer class="powered-footer">
+        Powered by <span>BRYT Pay</span> · Instant Airtime & Utility Payments
+    </footer>
+
+    <script src="/assets/js/share.js"></script>
+</body>
+</html>
