@@ -218,6 +218,12 @@
       background: var(--bg-light); border: 1px solid var(--border-color); color: var(--bryt-navy);
     }
 
+    .payout-breakdown {
+      background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+      padding: 12px 14px; margin-top: 12px; max-width: 560px; font-size: 0.82rem;
+      display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between;
+    }
+
     .table-wrap { overflow-x: auto; margin-top: 14px; }
     table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
     th {
@@ -726,14 +732,14 @@ Content-Type: application/json
       <!-- ==================== TAB: SETTLEMENTS ==================== -->
       <section id="tab-settlements" class="tab-panel hidden">
         <div class="alert alert-info">
-          <strong>Manual Payout Policy &amp; SLA:</strong> Withdrawals draw strictly from your <strong>Live Available Balance</strong> (minimum <strong>₦1,000.00</strong>). Requests are accepted daily from <strong>9:00 AM – 10:00 PM WAT</strong>, require a <strong>1-hour cooldown</strong> between requests, and are limited to <strong>2 pending withdrawals</strong> at a time. Payouts take <strong>30 minutes – 3 hours</strong> to be processed into your settlement bank account.
+          <strong>Manual Payout Policy &amp; SLA:</strong> Withdrawals draw strictly from your <strong>Live Available Balance</strong> (minimum <strong>₦1,000.00</strong>; flat <strong>₦50.00 payout fee</strong> deducted per transfer). Requests are accepted daily from <strong>9:00 AM – 10:00 PM WAT</strong>, require a <strong>1-hour cooldown</strong> between requests, and are limited to <strong>2 pending withdrawals</strong> at a time. Payouts are processed within <strong>30 minutes – 3 hours</strong>.
         </div>
 
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-label">Live Available to Withdraw</div>
             <div class="stat-value" id="wd-live-available">₦0.00</div>
-            <div class="stat-sub">Minimum payout: ₦1,000.00</div>
+            <div class="stat-sub">Min: ₦1,000.00 • Fee: ₦50.00 flat</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Live Pending Payout</div>
@@ -751,13 +757,14 @@ Content-Type: application/json
           <div class="flex-between">
             <div>
               <div class="card-title">Request Live Settlement Withdrawal</div>
-              <div class="text-muted">Processing time: <strong>30 minutes – 3 hours</strong> after submission</div>
+              <div class="text-muted">Processing time: <strong>30 minutes – 3 hours</strong> • Flat <strong>₦50.00</strong> bank transfer fee applies</div>
             </div>
             <span id="wd-window-badge" class="badge badge-success">Window Open (WAT)</span>
           </div>
 
           <div class="policy-pills">
             <span class="policy-pill">Min: ₦1,000</span>
+            <span class="policy-pill">Fee: ₦50 / payout</span>
             <span class="policy-pill">Hours: 9:00 AM – 10:00 PM WAT</span>
             <span class="policy-pill" id="wd-cooldown-pill">Cooldown: Ready</span>
             <span class="policy-pill" id="wd-slots-pill">Pending Slots: 0 / 2</span>
@@ -776,6 +783,12 @@ Content-Type: application/json
                 <button id="wd-submit-btn" type="submit" class="btn btn-primary" style="width:100%;">Submit Payout Request</button>
               </div>
             </div>
+
+            <div id="wd-fee-preview" class="payout-breakdown hidden">
+              <div><span class="text-muted">Requested:</span> <strong id="wd-prev-req">₦0.00</strong></div>
+              <div><span class="text-muted">Payout Fee:</span> <strong>₦50.00</strong></div>
+              <div><span class="text-muted">You Receive:</span> <strong id="wd-prev-net" style="color:var(--success-text);">₦0.00</strong></div>
+            </div>
           </form>
         </div>
 
@@ -786,7 +799,7 @@ Content-Type: application/json
               <thead>
                 <tr>
                   <th>Reference</th>
-                  <th>Amount</th>
+                  <th>Requested / Net</th>
                   <th>Destination Bank</th>
                   <th>Status</th>
                   <th>Bank Transfer Ref</th>
@@ -912,6 +925,7 @@ Content-Type: application/json
     const PORTAL_API = "/api/partner-portal";
     const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
     const MIN_WITHDRAWAL_NGN = 1000;
+    const WITHDRAWAL_FEE_NGN = 50;
     const MAX_PENDING_WITHDRAWALS = 2;
     const COOLDOWN_MS = 60 * 60 * 1000;
 
@@ -1043,7 +1057,6 @@ Content-Type: application/json
       return data;
     }
 
-    // Mirrors backend withdrawal guards in partner-portal
     function evaluateWithdrawalEligibility(withdrawals, partner) {
       const lagosHour = (new Date().getUTCHours() + 1) % 24;
       const windowOpen = lagosHour >= 9 && lagosHour < 22;
@@ -1073,6 +1086,19 @@ Content-Type: application/json
       }
 
       return { windowOpen, activePending, cooldownMinsLeft, canSubmit: reasons.length === 0, reasons };
+    }
+
+    function updateWithdrawalPreview() {
+      const raw = Number(document.getElementById("wd-amount").value);
+      const box = document.getElementById("wd-fee-preview");
+      if (!Number.isFinite(raw) || raw <= 0) {
+        box.classList.add("hidden");
+        return;
+      }
+      const net = Math.max(0, raw - WITHDRAWAL_FEE_NGN);
+      document.getElementById("wd-prev-req").textContent = fmtNaira(raw);
+      document.getElementById("wd-prev-net").textContent = fmtNaira(net);
+      box.classList.remove("hidden");
     }
 
     function showAuthView(message = "") {
@@ -1263,7 +1289,6 @@ Content-Type: application/json
         document.getElementById("wd-bank-sub").textContent = "Add your settlement bank account in Settings";
       }
 
-      // Live Withdrawal Eligibility & Status Strip
       const elig = evaluateWithdrawalEligibility(data.withdrawals, p);
       const winBadge = document.getElementById("wd-window-badge");
       winBadge.textContent = elig.windowOpen ? "Window Open (WAT)" : "Window Closed";
@@ -1289,16 +1314,23 @@ Content-Type: application/json
       if (!data.withdrawals.length) {
         wdBody.innerHTML = `<tr><td colspan="6" class="empty-state">No manual withdrawal requests yet.</td></tr>`;
       } else {
-        wdBody.innerHTML = data.withdrawals.map(wd => `
-          <tr>
-            <td class="mono" style="font-weight:700;color:var(--bryt-navy);">${esc(wd.reference)}</td>
-            <td><strong>${fmtNaira(wd.amount)}</strong></td>
-            <td><div style="font-weight:600;">${esc(wd.bank_name)}</div><div class="text-muted mono">${esc(wd.account_number)} • ${esc(wd.account_name)}</div></td>
-            <td>${statusBadge(wd.status)}</td>
-            <td class="mono">${esc(wd.external_transfer_ref || "—")}${wd.admin_notes ? `<div class="text-muted">${esc(wd.admin_notes)}</div>` : ""}</td>
-            <td class="text-muted">${fmtDate(wd.created_at)}</td>
-          </tr>
-        `).join("");
+        wdBody.innerHTML = data.withdrawals.map(wd => {
+          const feeAmt = wd.fee_amount != null ? Number(wd.fee_amount) : WITHDRAWAL_FEE_NGN;
+          const netAmt = wd.net_amount != null ? Number(wd.net_amount) : Math.max(0, Number(wd.amount) - feeAmt);
+          return `
+            <tr>
+              <td class="mono" style="font-weight:700;color:var(--bryt-navy);">${esc(wd.reference)}</td>
+              <td>
+                <strong>${fmtNaira(wd.amount)}</strong>
+                <div class="text-muted">Net: <strong style="color:var(--success-text);">${fmtNaira(netAmt)}</strong> (${fmtNaira(feeAmt)} fee)</div>
+              </td>
+              <td><div style="font-weight:600;">${esc(wd.bank_name)}</div><div class="text-muted mono">${esc(wd.account_number)} • ${esc(wd.account_name)}</div></td>
+              <td>${statusBadge(wd.status)}</td>
+              <td class="mono">${esc(wd.external_transfer_ref || "—")}${wd.admin_notes ? `<div class="text-muted">${esc(wd.admin_notes)}</div>` : ""}</td>
+              <td class="text-muted">${fmtDate(wd.created_at)}</td>
+            </tr>
+          `;
+        }).join("");
       }
 
       document.getElementById("set-fee-bearer").value = p.default_fee_bearer || "merchant";
@@ -1307,6 +1339,7 @@ Content-Type: application/json
       document.getElementById("set-acc-number").value = p.settlement_account_number || "";
       document.getElementById("set-acc-name").value = p.settlement_account_name || "";
       updateFeePreview();
+      updateWithdrawalPreview();
     }
 
     function updateFeePreview() {
@@ -1605,6 +1638,8 @@ Content-Type: application/json
       }
     });
 
+    document.getElementById("wd-amount").addEventListener("input", updateWithdrawalPreview);
+
     document.getElementById("withdrawal-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = document.getElementById("wd-submit-btn");
@@ -1623,7 +1658,14 @@ Content-Type: application/json
         return showToast(elig.reasons[0], "error");
       }
 
-      if (!confirm(`Request manual Live withdrawal of ${fmtNaira(amount)} to your configured settlement bank account?\n\nProcessing takes 30 minutes – 3 hours.`)) return;
+      const netReceive = Math.max(0, amount - WITHDRAWAL_FEE_NGN);
+      if (!confirm(
+        `Confirm Live Settlement Withdrawal:\n\n` +
+        `Requested: ${fmtNaira(amount)}\n` +
+        `Payout Fee: ${fmtNaira(WITHDRAWAL_FEE_NGN)}\n` +
+        `You Will Receive: ${fmtNaira(netReceive)}\n\n` +
+        `Processing time: 30 minutes – 3 hours.`
+      )) return;
 
       btn.disabled = true;
       try {
@@ -1633,7 +1675,8 @@ Content-Type: application/json
           amount
         });
         document.getElementById("wd-amount").value = "";
-        showToast("Withdrawal submitted! Processing takes 30 minutes – 3 hours.", "success");
+        updateWithdrawalPreview();
+        showToast(`Withdrawal submitted! Net payout: ${fmtNaira(netReceive)} (ETA: 30 min – 3 hrs).`, "success");
         await loadOverview();
       } catch (err) {
         showToast(err.message, "error");

@@ -56,7 +56,6 @@
     .mt-16 { margin-top: 16px; }
     .mt-20 { margin-top: 20px; }
 
-    /* Buttons */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
       padding: 10px 16px; border-radius: var(--radius-sm); border: 1.5px solid transparent;
@@ -66,8 +65,7 @@
     .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
     .btn-primary {
       background: linear-gradient(to right, var(--bryt-primary), var(--bryt-accent));
-      color: var(--bryt-white);
-      box-shadow: 0 4px 12px rgba(29, 94, 208, 0.22);
+      color: var(--bryt-white); box-shadow: 0 4px 12px rgba(29, 94, 208, 0.22);
     }
     .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(29, 94, 208, 0.32); }
     .btn-navy { background: var(--bryt-navy); color: var(--bryt-white); }
@@ -80,7 +78,6 @@
     .btn-danger:hover:not(:disabled) { background: #fecaca; }
     .btn-sm { padding: 6px 11px; font-size: 0.75rem; }
 
-    /* Badges */
     .badge {
       display: inline-flex; align-items: center; gap: 5px;
       padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700;
@@ -93,7 +90,6 @@
     .badge-navy { background: var(--bryt-navy); color: #fff; }
     .badge-muted { background: #E2E8F0; color: #475569; }
 
-    /* Forms */
     .form-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--bryt-navy); margin-bottom: 6px; }
     .form-input, .form-select, .form-textarea {
       width: 100%; padding: 11px 13px; border: 1.5px solid var(--border-color);
@@ -101,12 +97,10 @@
       background: var(--surface-white); outline: none; transition: var(--transition);
     }
     .form-input:focus, .form-select:focus, .form-textarea:focus {
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px rgba(29, 94, 208, 0.12);
+      border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(29, 94, 208, 0.12);
     }
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
 
-    /* Auth / Gate Shell */
     .auth-shell {
       min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
       background:
@@ -121,7 +115,6 @@
     }
     .auth-logo { height: 32px; width: auto; object-fit: contain; }
 
-    /* App Layout */
     .app-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
     .sidebar {
       background: var(--bryt-navy); color: #E2E8F0;
@@ -174,16 +167,12 @@
     }
     .content { padding: 24px; max-width: 1240px; width: 100%; margin: 0 auto; }
 
-    /* Cards & Stats */
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; margin-bottom: 20px; }
     .stat-card {
       background: var(--surface-white); border: 1px solid var(--border-color);
       border-radius: var(--radius-md); padding: 18px; box-shadow: var(--shadow-sm);
     }
-    .stat-card.navy {
-      background: var(--bryt-navy); color: #fff; border-color: transparent;
-      box-shadow: var(--shadow-md);
-    }
+    .stat-card.navy { background: var(--bryt-navy); color: #fff; border-color: transparent; box-shadow: var(--shadow-md); }
     .stat-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
     .stat-card.navy .stat-label { color: var(--bryt-accent); }
     .stat-value { font-size: 1.45rem; font-weight: 800; color: var(--bryt-navy); margin-top: 6px; }
@@ -220,7 +209,6 @@
       font-size: 0.77rem; font-weight: 600; color: var(--bryt-navy); cursor: pointer;
     }
 
-    /* Modals */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(7, 26, 58, 0.65); backdrop-filter: blur(4px);
       display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 200;
@@ -233,9 +221,12 @@
       background: var(--bg-light); border: 1px solid var(--border-color);
       border-radius: var(--radius-sm); padding: 14px; margin: 12px 0; font-size: 0.83rem;
     }
-    .summary-row { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; }
+    .summary-row { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; }
+    .summary-row.highlight {
+      margin-top: 6px; padding-top: 9px; border-top: 1px dashed var(--border-color);
+      font-size: 0.92rem;
+    }
 
-    /* Toast */
     #toast {
       position: fixed; bottom: 20px; right: 20px; z-index: 300;
       background: var(--bryt-navy); color: #fff; padding: 12px 18px; border-radius: var(--radius-md);
@@ -359,7 +350,7 @@
       <!-- GLOBAL ADMIN KPI STRIP -->
       <div class="stats-grid">
         <div class="stat-card navy">
-          <div class="stat-label">Pending Payout Queue</div>
+          <div class="stat-label">Pending Queue (Net to Send)</div>
           <div class="stat-value" id="kpi-pending-amount">₦0.00</div>
           <div class="stat-sub" id="kpi-pending-count">0 requests awaiting transfer</div>
         </div>
@@ -371,7 +362,7 @@
         <div class="stat-card">
           <div class="stat-label">BRYT API Fee Revenue (Live)</div>
           <div class="stat-value" id="kpi-live-fees">₦0.00</div>
-          <div class="stat-sub">Platform fee earnings</div>
+          <div class="stat-sub">Collection fee earnings</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Active Partners</div>
@@ -383,14 +374,14 @@
       <!-- ==================== TAB 1: WITHDRAWALS ==================== -->
       <section id="tab-withdrawals" class="tab-panel">
         <div class="alert alert-info">
-          <strong>Manual Settlement Workflow:</strong> 1) Verify the partner's balance &amp; bank details → 2) Transfer the exact NGN amount manually from BRYT's payout bank → 3) Click <strong>Mark Paid</strong> and paste the bank session/transfer reference (automatically fires a signed <span class="mono">withdrawal.paid</span> webhook). Rejecting a withdrawal atomically returns the held funds back to the partner's available balance.
+          <strong>Manual Payout Checklist (SLA: 30 min – 3 hrs):</strong> Every withdrawal includes a flat <strong>₦50.00 payout fee</strong> deducted from the requested amount. 1) Verify partner bank details → 2) Manually transfer the exact green <strong>Send to Bank (Net)</strong> amount → 3) Click <strong>Mark Paid</strong> with the bank session/transfer ref (fires signed <span class="mono">withdrawal.paid</span> webhook). Clicking <strong>Reject</strong> atomically refunds the full requested amount back to the partner's Live balance.
         </div>
 
         <div class="card">
           <div class="flex-between">
             <div>
               <div class="card-title">Partner Settlement Withdrawals</div>
-              <div class="text-muted">Live balance payout requests requiring manual bank verification</div>
+              <div class="text-muted">Operating window: 9:00 AM – 10:00 PM WAT • Min: ₦1,000 • Fee: ₦50/payout</div>
             </div>
             <div class="flex">
               <select id="wd-status-filter" class="form-select" style="width:auto;padding:8px 12px;">
@@ -409,7 +400,7 @@
                 <tr>
                   <th>Reference</th>
                   <th>Partner</th>
-                  <th>Amount</th>
+                  <th>Send to Bank / Requested</th>
                   <th>Destination Bank Account</th>
                   <th>Status</th>
                   <th>Transfer Ref / Notes</th>
@@ -545,6 +536,7 @@
   <div class="modal-content">
     <h3 id="rwd-title" style="font-size:1.1rem;font-weight:800;color:var(--bryt-navy);">Resolve Withdrawal</h3>
     <div id="rwd-summary" class="summary-box"></div>
+    <div id="rwd-action-note" class="alert alert-warning hidden"></div>
 
     <form id="resolve-wd-form">
       <input type="hidden" id="rwd-id" />
@@ -663,6 +655,7 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpdnhsbWphaWN6c254YWt1bW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMzIzNDMsImV4cCI6MjEwNDgwODM0M30.Niu_DNJKGCF1CClm3xl4hjYr2yGgvgOs37w85OuThGQ";
     const PORTAL_API = "/api/partner-portal";
     const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
+    const WITHDRAWAL_FEE_NGN = 50;
 
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
@@ -680,9 +673,6 @@
       withdrawals: []
     };
 
-    // =========================================================================
-    // HELPERS
-    // =========================================================================
     function esc(val) {
       return String(val ?? "")
         .replace(/&/g, "&amp;")
@@ -705,6 +695,13 @@
           hour: "2-digit", minute: "2-digit"
         }).format(new Date(iso));
       } catch { return "—"; }
+    }
+
+    function getWdBreakdown(wd) {
+      const gross = Number(wd.amount || 0);
+      const fee = wd.fee_amount != null ? Number(wd.fee_amount) : WITHDRAWAL_FEE_NGN;
+      const net = wd.net_amount != null ? Number(wd.net_amount) : Math.max(0, gross - fee);
+      return { gross, fee, net };
     }
 
     function statusBadge(status) {
@@ -759,9 +756,6 @@
       return data;
     }
 
-    // =========================================================================
-    // VIEW SWITCHING & BOOT
-    // =========================================================================
     function showAuthView(message = "") {
       state.user = null;
       document.getElementById("auth-view").classList.remove("hidden");
@@ -807,10 +801,7 @@
 
     async function bootAdmin() {
       const { data: { session } } = await sb.auth.getSession();
-      if (!session) {
-        showAuthView();
-        return;
-      }
+      if (!session) { showAuthView(); return; }
 
       try {
         const ctx = await apiCall({ action: "portal_context" });
@@ -836,9 +827,6 @@
       }
     }
 
-    // =========================================================================
-    // DATA LOADERS
-    // =========================================================================
     async function refreshAll() {
       try {
         await Promise.all([loadPartners(), loadWithdrawals()]);
@@ -867,7 +855,6 @@
       document.getElementById("kpi-live-fees").textContent = fmtNaira(totalLiveFees);
       document.getElementById("kpi-partners-count").textContent = `${activeCount} / ${state.partners.length}`;
 
-      // Populate audit partner dropdown
       const auditSel = document.getElementById("audit-partner-filter");
       const currentAuditPartner = auditSel.value;
       auditSel.innerHTML = `<option value="">All Partners</option>` + state.partners
@@ -922,17 +909,20 @@
       const res = await apiCall({ action: "admin_list_withdrawals", status: statusFilter });
       state.withdrawals = res.withdrawals || [];
 
-      // Always fetch unfiltered pending counts if filtered, or compute directly
       let pendingItems = state.withdrawals.filter(w => w.status === "pending" || w.status === "approved");
       if (statusFilter) {
-        const allPending = await apiCall({ action: "admin_list_withdrawals", status: "pending" });
-        const allApproved = await apiCall({ action: "admin_list_withdrawals", status: "approved" });
+        const [allPending, allApproved] = await Promise.all([
+          apiCall({ action: "admin_list_withdrawals", status: "pending" }),
+          apiCall({ action: "admin_list_withdrawals", status: "approved" })
+        ]);
         pendingItems = [...(allPending.withdrawals || []), ...(allApproved.withdrawals || [])];
       }
 
-      const pendingSum = pendingItems.reduce((acc, w) => acc + Number(w.amount || 0), 0);
-      document.getElementById("kpi-pending-amount").textContent = fmtNaira(pendingSum);
-      document.getElementById("kpi-pending-count").textContent = `${pendingItems.length} request(s) awaiting payout`;
+      const pendingNetSum = pendingItems.reduce((acc, w) => acc + getWdBreakdown(w).net, 0);
+      const pendingGrossSum = pendingItems.reduce((acc, w) => acc + getWdBreakdown(w).gross, 0);
+      document.getElementById("kpi-pending-amount").textContent = fmtNaira(pendingNetSum);
+      document.getElementById("kpi-pending-count").textContent =
+        `${pendingItems.length} request(s) • Gross: ${fmtNaira(pendingGrossSum)}`;
 
       const navBadge = document.getElementById("nav-pending-badge");
       navBadge.textContent = String(pendingItems.length);
@@ -947,6 +937,7 @@
       body.innerHTML = state.withdrawals.map(wd => {
         const partner = Array.isArray(wd.partner) ? wd.partner[0] : wd.partner;
         const canAct = wd.status === "pending" || wd.status === "approved";
+        const { gross, fee, net } = getWdBreakdown(wd);
 
         return `
           <tr>
@@ -958,7 +949,10 @@
               <strong>${esc(partner?.name || wd.partner_id)}</strong>
               <div class="text-muted">${esc(partner?.contact_email || "")}</div>
             </td>
-            <td><strong style="font-size:0.95rem;">${fmtNaira(wd.amount)}</strong></td>
+            <td>
+              <div style="font-weight:800;color:var(--success-text);font-size:0.95rem;">Send: ${fmtNaira(net)}</div>
+              <div class="text-muted">Req: ${fmtNaira(gross)} (${fmtNaira(fee)} fee)</div>
+            </td>
             <td>
               <div style="font-weight:600;">${esc(wd.bank_name)}</div>
               <div class="mono text-muted">${esc(wd.account_number)}</div>
@@ -1018,14 +1012,12 @@
       }).join("");
     }
 
-    // =========================================================================
-    // MODALS
-    // =========================================================================
     function openResolveModal(wd, resolution) {
       const partner = Array.isArray(wd.partner) ? wd.partner[0] : wd.partner;
+      const { gross, fee, net } = getWdBreakdown(wd);
       const titles = {
         approved: "Approve Withdrawal Request",
-        paid: "Confirm Manual Payout & Mark Paid",
+        paid: "Confirm Bank Transfer & Mark Paid",
         rejected: "Reject Withdrawal & Refund Balance"
       };
       document.getElementById("rwd-title").textContent = titles[resolution] || "Resolve Withdrawal";
@@ -1039,16 +1031,29 @@
       refWrap.classList.toggle("hidden", resolution !== "paid");
       refInput.required = resolution === "paid";
 
+      const actionNote = document.getElementById("rwd-action-note");
+      if (resolution === "paid") {
+        actionNote.textContent = `Confirm you have manually transferred exactly ${fmtNaira(net)} to the account above before marking paid.`;
+        actionNote.classList.remove("hidden");
+      } else if (resolution === "rejected") {
+        actionNote.textContent = `Rejecting this request immediately refunds the full ${fmtNaira(gross)} back to ${partner?.name || "the partner"}'s Live Available Balance.`;
+        actionNote.classList.remove("hidden");
+      } else {
+        actionNote.classList.add("hidden");
+      }
+
       const submitBtn = document.getElementById("rwd-submit-btn");
       submitBtn.className = "btn " + (resolution === "paid" ? "btn-success" : resolution === "rejected" ? "btn-danger" : "btn-primary");
-      submitBtn.textContent = resolution === "paid" ? "Mark Paid & Notify Partner" : resolution === "rejected" ? "Reject & Release Funds" : "Approve Request";
+      submitBtn.textContent = resolution === "paid" ? `Mark Paid (${fmtNaira(net)})` : resolution === "rejected" ? "Reject & Refund Full Amount" : "Approve Request";
 
       document.getElementById("rwd-summary").innerHTML = `
         <div class="summary-row"><span class="text-muted">Partner</span><strong>${esc(partner?.name || "—")}</strong></div>
         <div class="summary-row"><span class="text-muted">Reference</span><span class="mono">${esc(wd.reference)}</span></div>
-        <div class="summary-row"><span class="text-muted">Amount</span><strong style="color:var(--bryt-navy);">${fmtNaira(wd.amount)}</strong></div>
         <div class="summary-row"><span class="text-muted">Bank</span><span>${esc(wd.bank_name)} — <span class="mono">${esc(wd.account_number)}</span></span></div>
         <div class="summary-row"><span class="text-muted">Account Name</span><span>${esc(wd.account_name)}</span></div>
+        <div class="summary-row"><span class="text-muted">Requested Amount</span><span>${fmtNaira(gross)}</span></div>
+        <div class="summary-row"><span class="text-muted">Payout Fee (BRYT)</span><span>-${fmtNaira(fee)}</span></div>
+        <div class="summary-row highlight"><strong>SEND TO BANK (NET)</strong><strong style="color:var(--success-text);">${fmtNaira(net)}</strong></div>
       `;
 
       document.getElementById("resolve-wd-modal").classList.remove("hidden");
@@ -1079,9 +1084,6 @@
       document.getElementById("link-member-modal").classList.remove("hidden");
     }
 
-    // =========================================================================
-    // DELEGATED SAFE EVENT HANDLERS
-    // =========================================================================
     document.addEventListener("click", (e) => {
       const btn = e.target.closest("button[data-action]");
       if (!btn) return;
@@ -1102,9 +1104,6 @@
       }
     });
 
-    // =========================================================================
-    // FORM & CONTROL LISTENERS
-    // =========================================================================
     document.getElementById("login-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = document.getElementById("login-btn");
@@ -1143,7 +1142,6 @@
     document.getElementById("wd-status-filter").addEventListener("change", () => loadWithdrawals().catch(e => showToast(e.message, "error")));
     document.getElementById("audit-apply-btn").addEventListener("click", () => loadAuditLogs().catch(e => showToast(e.message, "error")));
 
-    // Auto-fill slug from partner name
     document.getElementById("np-name").addEventListener("input", (e) => {
       const slugInput = document.getElementById("np-slug");
       if (!slugInput.dataset.touched) {
