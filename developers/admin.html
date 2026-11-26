@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BRYT Pay Admin Console | Partner &amp; Settlement Operations</title>
+  <meta name="theme-color" content="#071A3A" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="/assets/img/brytpay-logo1.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bryt-primary: #1D5ED0;
+      --bryt-primary-hover: #174EB0;
+      --bryt-accent: #159FE3;
+      --bryt-navy: #071A3A;
+      --bryt-black: #0B1220;
+      --bryt-white: #FFFFFF;
+
+      --bg-light: #F5F8FC;
+      --surface-white: #FFFFFF;
+      --border-color: #E2E8F0;
+      --border-focus: #1D5ED0;
+      --text-main: #0B1220;
+      --text-muted: #64748B;
+
+      --success-text: #047857;
+      --success-bg: #D1FAE5;
+      --pending-text: #B45309;
+      --pending-bg: #FEF3C7;
+      --failed-text: #B91C1C;
+      --failed-bg: #FEE2E2;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 2px 8px rgba(7, 26, 58, 0.04);
+      --shadow-md: 0 10px 25px rgba(7, 26, 58, 0.08);
+      --transition: 0.2s ease;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { background: var(--bg-light); color: var(--text-main); line-height: 1.5; min-height: 100vh; overflow-x: hidden; }
+
+    .hidden { display: none !important; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.8rem; }
+    .text-muted { color: var(--text-muted); font-size: 0.82rem; }
+    .flex { display: flex; align-items: center; gap: 10px; }
+    .flex-wrap { flex-wrap: wrap; }
+    .flex-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-20 { margin-top: 20px; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 16px; border-radius: var(--radius-sm); border: 1.5px solid transparent;
+      font-size: 0.84rem; font-weight: 700; cursor: pointer; transition: var(--transition);
+      text-decoration: none; white-space: nowrap;
+    }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+    .btn-primary {
+      background: linear-gradient(to right, var(--bryt-primary), var(--bryt-accent));
+      color: var(--bryt-white);
+      box-shadow: 0 4px 12px rgba(29, 94, 208, 0.22);
+    }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(29, 94, 208, 0.32); }
+    .btn-navy { background: var(--bryt-navy); color: var(--bryt-white); }
+    .btn-navy:hover:not(:disabled) { background: #0d2b5c; }
+    .btn-success { background: var(--success-text); color: #fff; }
+    .btn-success:hover:not(:disabled) { background: #065f46; }
+    .btn-outline { background: var(--surface-white); border-color: var(--border-color); color: var(--bryt-navy); }
+    .btn-outline:hover:not(:disabled) { border-color: var(--bryt-primary); color: var(--bryt-primary); background: #F0F6FF; }
+    .btn-danger { background: var(--failed-bg); color: var(--failed-text); }
+    .btn-danger:hover:not(:disabled) { background: #fecaca; }
+    .btn-sm { padding: 6px 11px; font-size: 0.75rem; }
+
+    /* Badges */
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .badge-success { background: var(--success-bg); color: var(--success-text); }
+    .badge-pending { background: var(--pending-bg); color: var(--pending-text); }
+    .badge-failed { background: var(--failed-bg); color: var(--failed-text); }
+    .badge-primary { background: #F0F6FF; color: var(--bryt-primary); }
+    .badge-navy { background: var(--bryt-navy); color: #fff; }
+    .badge-muted { background: #E2E8F0; color: #475569; }
+
+    /* Forms */
+    .form-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--bryt-navy); margin-bottom: 6px; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%; padding: 11px 13px; border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-sm); font-size: 0.86rem; color: var(--text-main);
+      background: var(--surface-white); outline: none; transition: var(--transition);
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(29, 94, 208, 0.12);
+    }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+
+    /* Auth / Gate Shell */
+    .auth-shell {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+      background:
+        radial-gradient(circle at 90% 10%, rgba(21, 159, 227, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 10% 90%, rgba(7, 26, 58, 0.12) 0%, transparent 45%),
+        var(--bg-light);
+    }
+    .auth-card {
+      width: 100%; max-width: 440px; background: var(--surface-white);
+      border: 1px solid var(--border-color); border-radius: var(--radius-lg);
+      padding: 32px 28px; box-shadow: var(--shadow-md);
+    }
+    .auth-logo { height: 32px; width: auto; object-fit: contain; }
+
+    /* App Layout */
+    .app-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+    .sidebar {
+      background: var(--bryt-navy); color: #E2E8F0;
+      padding: 20px 16px; display: flex; flex-direction: column; gap: 18px;
+      position: sticky; top: 0; height: 100vh; overflow-y: auto; z-index: 60;
+    }
+    .sidebar-brand {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+    .sidebar-brand img { height: 26px; filter: brightness(0) invert(1); object-fit: contain; }
+    .admin-pill {
+      padding: 3px 9px; border-radius: 999px; background: rgba(21, 159, 227, 0.22);
+      color: #7DD3FC; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    .nav-list { display: flex; flex-direction: column; gap: 4px; }
+    .nav-btn {
+      width: 100%; text-align: left; padding: 11px 14px; border-radius: var(--radius-sm);
+      border: none; background: transparent; color: #CBD5E1;
+      font-size: 0.86rem; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px; transition: var(--transition);
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .nav-btn.active { background: var(--bryt-primary); color: #fff; font-weight: 700; }
+    .nav-btn-left { display: flex; align-items: center; gap: 10px; }
+    .nav-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .nav-count {
+      background: #EF4444; color: #fff; font-size: 0.68rem; font-weight: 800;
+      padding: 2px 7px; border-radius: 999px;
+    }
+
+    .sidebar-footer {
+      margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.12);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .btn-sidebar-ghost {
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+      color: #fff; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 0.78rem;
+      font-weight: 600; cursor: pointer; text-align: center; text-decoration: none;
+    }
+    .btn-sidebar-ghost:hover { background: rgba(255,255,255,0.15); }
+
+    .main-area { display: flex; flex-direction: column; min-width: 0; }
+    .topbar {
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color); padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      position: sticky; top: 0; z-index: 40;
+    }
+    .content { padding: 24px; max-width: 1240px; width: 100%; margin: 0 auto; }
+
+    /* Cards & Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .stat-card {
+      background: var(--surface-white); border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); padding: 18px; box-shadow: var(--shadow-sm);
+    }
+    .stat-card.navy {
+      background: var(--bryt-navy); color: #fff; border-color: transparent;
+      box-shadow: var(--shadow-md);
+    }
+    .stat-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-card.navy .stat-label { color: var(--bryt-accent); }
+    .stat-value { font-size: 1.45rem; font-weight: 800; color: var(--bryt-navy); margin-top: 6px; }
+    .stat-card.navy .stat-value { color: #fff; }
+    .stat-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+    .stat-card.navy .stat-sub { color: #94A3B8; }
+
+    .card {
+      background: var(--surface-white); border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow-sm);
+    }
+    .card + .card { margin-top: 18px; }
+    .card-title { font-size: 1rem; font-weight: 700; color: var(--bryt-navy); margin-bottom: 4px; }
+
+    .table-wrap { overflow-x: auto; margin-top: 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    th {
+      text-align: left; font-size: 0.71rem; text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--text-muted); padding: 10px 12px; border-bottom: 1px solid var(--border-color); white-space: nowrap;
+    }
+    td { padding: 13px 12px; border-bottom: 1px solid #F1F5F9; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    .empty-state { text-align: center; padding: 32px 16px; color: var(--text-muted); font-size: 0.86rem; }
+
+    .alert { padding: 12px 14px; border-radius: var(--radius-sm); font-size: 0.82rem; margin-bottom: 14px; }
+    .alert-danger { background: var(--failed-bg); color: var(--failed-text); border: 1px solid #FECACA; }
+    .alert-info { background: #F0F6FF; color: var(--bryt-navy); border: 1px solid #BFDBFE; }
+    .alert-warning { background: var(--pending-bg); color: var(--pending-text); border: 1px solid #FDE68A; }
+
+    .checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+    .check-pill {
+      display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px;
+      border: 1.5px solid var(--border-color); border-radius: var(--radius-sm);
+      font-size: 0.77rem; font-weight: 600; color: var(--bryt-navy); cursor: pointer;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(7, 26, 58, 0.65); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 200;
+    }
+    .modal-content {
+      background: var(--surface-white); border-radius: var(--radius-lg); width: 100%;
+      max-width: 540px; padding: 26px 24px; box-shadow: var(--shadow-md); max-height: 92vh; overflow-y: auto;
+    }
+    .summary-box {
+      background: var(--bg-light); border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm); padding: 14px; margin: 12px 0; font-size: 0.83rem;
+    }
+    .summary-row { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 20px; right: 20px; z-index: 300;
+      background: var(--bryt-navy); color: #fff; padding: 12px 18px; border-radius: var(--radius-md);
+      font-size: 0.84rem; font-weight: 600; box-shadow: var(--shadow-md);
+      transform: translateY(130%); transition: transform 0.2s ease; max-width: 380px;
+    }
+    #toast.show { transform: translateY(0); }
+    #toast.error { background: var(--failed-text); }
+    #toast.success { background: var(--success-text); }
+
+    .mobile-menu-btn { display: none; }
+    .drawer-backdrop { position: fixed; inset: 0; background: rgba(7, 26, 58, 0.5); z-index: 50; display: none; }
+    .drawer-backdrop.open { display: block; }
+
+    @media (max-width: 880px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed; left: -280px; top: 0; bottom: 0; width: 264px;
+        transition: left 0.22s ease; box-shadow: 8px 0 30px rgba(7, 26, 58, 0.25);
+      }
+      .sidebar.open { left: 0; }
+      .mobile-menu-btn { display: inline-flex; }
+      .content { padding: 16px; }
+      .topbar { padding: 12px 16px; }
+    }
+  </style>
+</head>
+<body class="landing-page">
+
+<!-- ===================== LOGIN VIEW ===================== -->
+<div id="auth-view" class="auth-shell">
+  <div class="auth-card">
+    <div class="flex-between">
+      <img src="/assets/img/brytpay-logo.png" alt="BRYT Pay" class="auth-logo" />
+      <span class="badge badge-navy">Admin Console</span>
+    </div>
+    <h1 style="font-size:1.3rem;font-weight:800;color:var(--bryt-navy);margin-top:20px;">BRYT Admin Sign In</h1>
+    <p class="text-muted mt-12">Restricted to authorized BRYT Technologies administrators for partner governance and manual payout approvals.</p>
+
+    <div id="auth-error" class="alert alert-danger hidden mt-12"></div>
+
+    <form id="login-form" class="mt-20">
+      <div>
+        <label class="form-label" for="login-email">Admin Email</label>
+        <input id="login-email" class="form-input" type="email" required placeholder="admin@brytpay.name.ng" autocomplete="email" />
+      </div>
+      <div class="mt-12">
+        <label class="form-label" for="login-password">Password</label>
+        <input id="login-password" class="form-input" type="password" required placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <button id="login-btn" type="submit" class="btn btn-navy mt-20" style="width:100%;">Verify Admin Access</button>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== FORBIDDEN VIEW ===================== -->
+<div id="forbidden-view" class="auth-shell hidden">
+  <div class="auth-card" style="text-align:center;">
+    <img src="/assets/img/brytpay-logo.png" alt="BRYT Pay" class="auth-logo" style="margin:0 auto;" />
+    <h2 style="margin-top:18px;font-size:1.2rem;color:var(--failed-text);">Admin Access Required</h2>
+    <p class="text-muted mt-12" id="forbidden-email"></p>
+    <p class="text-muted mt-12">This console is locked strictly to accounts listed in <span class="mono">public.admins</span>.</p>
+    <div class="flex mt-20" style="justify-content:center;">
+      <a href="/developers/" class="btn btn-primary">Partner Portal</a>
+      <button id="forbidden-logout-btn" class="btn btn-outline" type="button">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MAIN ADMIN SHELL ===================== -->
+<div id="admin-view" class="app-shell hidden">
+  <div id="drawer-backdrop" class="drawer-backdrop"></div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-brand">
+      <img src="/assets/img/brytpay-logo.png" alt="BRYT Pay" />
+      <span class="admin-pill">Admin</span>
+    </div>
+
+    <nav class="nav-list" aria-label="Admin Navigation">
+      <button class="nav-btn active" type="button" data-tab="withdrawals">
+        <span class="nav-btn-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          Withdrawals
+        </span>
+        <span id="nav-pending-badge" class="nav-count hidden">0</span>
+      </button>
+      <button class="nav-btn" type="button" data-tab="partners">
+        <span class="nav-btn-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Partners
+        </span>
+      </button>
+      <button class="nav-btn" type="button" data-tab="audit">
+        <span class="nav-btn-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Security Logs
+        </span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/developers/" class="btn-sidebar-ghost">Switch to Partner Portal</a>
+      <div id="admin-email-badge" style="font-size:0.74rem;color:#94A3B8;word-break:break-all;"></div>
+      <button id="logout-btn" class="btn-sidebar-ghost" type="button">Sign Out</button>
+    </div>
+  </aside>
+
+  <div class="main-area">
+    <header class="topbar">
+      <div class="flex">
+        <button id="mobile-menu-btn" class="btn btn-outline btn-sm mobile-menu-btn" type="button">Menu</button>
+        <strong id="topbar-title" style="font-size:1.05rem;color:var(--bryt-navy);">Manual Settlement Withdrawals</strong>
+      </div>
+      <div class="flex">
+        <button id="refresh-btn" class="btn btn-outline btn-sm" type="button">Refresh Data</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- GLOBAL ADMIN KPI STRIP -->
+      <div class="stats-grid">
+        <div class="stat-card navy">
+          <div class="stat-label">Pending Payout Queue</div>
+          <div class="stat-value" id="kpi-pending-amount">₦0.00</div>
+          <div class="stat-sub" id="kpi-pending-count">0 requests awaiting transfer</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Live Volume</div>
+          <div class="stat-value" id="kpi-live-collected">₦0.00</div>
+          <div class="stat-sub">Across all API partners</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">BRYT API Fee Revenue (Live)</div>
+          <div class="stat-value" id="kpi-live-fees">₦0.00</div>
+          <div class="stat-sub">Platform fee earnings</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active Partners</div>
+          <div class="stat-value" id="kpi-partners-count">0 / 0</div>
+          <div class="stat-sub">Active / Total registered</div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 1: WITHDRAWALS ==================== -->
+      <section id="tab-withdrawals" class="tab-panel">
+        <div class="alert alert-info">
+          <strong>Manual Settlement Workflow:</strong> 1) Verify the partner's balance &amp; bank details → 2) Transfer the exact NGN amount manually from BRYT's payout bank → 3) Click <strong>Mark Paid</strong> and paste the bank session/transfer reference (automatically fires a signed <span class="mono">withdrawal.paid</span> webhook). Rejecting a withdrawal atomically returns the held funds back to the partner's available balance.
+        </div>
+
+        <div class="card">
+          <div class="flex-between">
+            <div>
+              <div class="card-title">Partner Settlement Withdrawals</div>
+              <div class="text-muted">Live balance payout requests requiring manual bank verification</div>
+            </div>
+            <div class="flex">
+              <select id="wd-status-filter" class="form-select" style="width:auto;padding:8px 12px;">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending Only</option>
+                <option value="approved">Approved (Awaiting Transfer)</option>
+                <option value="paid">Paid</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Partner</th>
+                  <th>Amount</th>
+                  <th>Destination Bank Account</th>
+                  <th>Status</th>
+                  <th>Transfer Ref / Notes</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-withdrawals-body">
+                <tr><td colspan="7" class="empty-state">Loading withdrawal queue...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 2: PARTNERS ==================== -->
+      <section id="tab-partners" class="tab-panel hidden">
+        <div class="card">
+          <div class="card-title">Onboard New API Partner</div>
+          <div class="text-muted">Automatically provisions isolated Test &amp; Live settlement wallets and optionally links their owner account.</div>
+
+          <form id="create-partner-form" class="mt-16">
+            <div class="form-grid">
+              <div>
+                <label class="form-label" for="np-name">Partner Organization Name</label>
+                <input id="np-name" class="form-input" type="text" required placeholder="e.g. EduHub Nigeria" maxlength="80" />
+              </div>
+              <div>
+                <label class="form-label" for="np-slug">Partner Slug (lowercase)</label>
+                <input id="np-slug" class="form-input mono" type="text" required placeholder="e.g. eduhub-ng" pattern="[a-z0-9][a-z0-9-]{1,48}[a-z0-9]" />
+              </div>
+              <div>
+                <label class="form-label" for="np-email">Technical Contact Email</label>
+                <input id="np-email" class="form-input" type="email" required placeholder="tech@eduhub.ng" />
+              </div>
+              <div>
+                <label class="form-label" for="np-owner-email">Link BRYT Login Email (Optional)</label>
+                <input id="np-owner-email" class="form-input" type="email" placeholder="existing BRYT Pay user email" />
+              </div>
+              <div>
+                <label class="form-label" for="np-fee">Fee Percent (%)</label>
+                <input id="np-fee" class="form-input" type="number" step="0.05" min="0" max="20" value="1.5" required />
+              </div>
+              <div>
+                <label class="form-label" for="np-cap">Fee Cap in NGN (Optional)</label>
+                <input id="np-cap" class="form-input" type="number" step="1" min="0" placeholder="Leave blank for no cap" />
+              </div>
+              <div>
+                <label class="form-label" for="np-bearer">Default Fee Bearer</label>
+                <select id="np-bearer" class="form-select">
+                  <option value="merchant">Merchant (deducted)</option>
+                  <option value="customer">Customer (added on top)</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" for="np-rpm">Rate Limit (req/min)</label>
+                <input id="np-rpm" class="form-input" type="number" min="5" max="10000" value="60" required />
+              </div>
+            </div>
+            <button id="np-submit-btn" type="submit" class="btn btn-primary mt-16">Register Partner Organization</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Registered API Partners</div>
+          <div class="text-muted">Manage status, fee rates, rate limits, scopes, and linked developer accounts.</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Partner</th>
+                  <th>Status</th>
+                  <th>Fee &amp; Quota</th>
+                  <th>Live Balance</th>
+                  <th>Test Balance</th>
+                  <th>Settlement Bank</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-partners-body">
+                <tr><td colspan="7" class="empty-state">Loading partners...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 3: SECURITY & API AUDIT LOGS ==================== -->
+      <section id="tab-audit" class="tab-panel hidden">
+        <div class="card">
+          <div class="flex-between">
+            <div>
+              <div class="card-title">API Security &amp; Request Audit Trail</div>
+              <div class="text-muted">Latest 50 requests logged by the <span class="mono">api-v1</span> security gateway</div>
+            </div>
+            <div class="flex flex-wrap">
+              <select id="audit-partner-filter" class="form-select" style="width:auto;padding:8px 12px;">
+                <option value="">All Partners</option>
+              </select>
+              <label class="check-pill">
+                <input id="audit-errors-only" type="checkbox" />
+                Errors Only
+              </label>
+              <button id="audit-apply-btn" class="btn btn-primary btn-sm" type="button">Filter</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Env</th>
+                  <th>Request</th>
+                  <th>HTTP / Error</th>
+                  <th>Payment Ref</th>
+                  <th>Latency</th>
+                  <th>Request ID</th>
+                </tr>
+              </thead>
+              <tbody id="admin-audit-body">
+                <tr><td colspan="7" class="empty-state">Loading audit logs...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- ===================== MODAL: RESOLVE WITHDRAWAL ===================== -->
+<div id="resolve-wd-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+  <div class="modal-content">
+    <h3 id="rwd-title" style="font-size:1.1rem;font-weight:800;color:var(--bryt-navy);">Resolve Withdrawal</h3>
+    <div id="rwd-summary" class="summary-box"></div>
+
+    <form id="resolve-wd-form">
+      <input type="hidden" id="rwd-id" />
+      <input type="hidden" id="rwd-resolution" />
+
+      <div id="rwd-ref-wrap" class="mt-12">
+        <label class="form-label" for="rwd-external-ref">External Bank Transfer Reference / Session ID (Required for Paid)</label>
+        <input id="rwd-external-ref" class="form-input mono" type="text" placeholder="e.g. NIP-20261126-99881122" maxlength="120" />
+      </div>
+
+      <div class="mt-12">
+        <label class="form-label" for="rwd-notes">Admin Notes (Optional — visible to partner)</label>
+        <textarea id="rwd-notes" class="form-textarea" rows="3" placeholder="e.g. Disbursed via GTBank corporate transfer" maxlength="250"></textarea>
+      </div>
+
+      <div class="flex mt-20" style="justify-content:flex-end;">
+        <button id="rwd-cancel-btn" class="btn btn-outline" type="button">Cancel</button>
+        <button id="rwd-submit-btn" class="btn btn-primary" type="submit">Confirm Action</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== MODAL: EDIT PARTNER GOVERNANCE ===================== -->
+<div id="edit-partner-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+  <div class="modal-content">
+    <h3 style="font-size:1.1rem;font-weight:800;color:var(--bryt-navy);">Partner Governance Controls</h3>
+    <p id="ep-subtitle" class="text-muted mt-12"></p>
+
+    <form id="edit-partner-form" class="mt-16">
+      <input type="hidden" id="ep-id" />
+      <div class="form-grid">
+        <div>
+          <label class="form-label" for="ep-status">Partner Status</label>
+          <select id="ep-status" class="form-select">
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="suspended">Suspended (Blocks All API Keys)</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label" for="ep-fee">Fee Percent (%)</label>
+          <input id="ep-fee" class="form-input" type="number" step="0.05" min="0" max="20" required />
+        </div>
+        <div>
+          <label class="form-label" for="ep-cap">Fee Cap NGN (Blank = None)</label>
+          <input id="ep-cap" class="form-input" type="number" step="1" min="0" />
+        </div>
+        <div>
+          <label class="form-label" for="ep-rpm">Rate Limit (req/min)</label>
+          <input id="ep-rpm" class="form-input" type="number" min="5" max="10000" required />
+        </div>
+      </div>
+
+      <div class="mt-16">
+        <label class="check-pill">
+          <input id="ep-override" type="checkbox" />
+          Allow per-payment fee_bearer override in API requests
+        </label>
+      </div>
+
+      <div class="mt-16">
+        <label class="form-label">Partner Allowed Scopes</label>
+        <div class="checkbox-group">
+          <label class="check-pill"><input type="checkbox" name="ep-scope" value="payments:write" /> payments:write</label>
+          <label class="check-pill"><input type="checkbox" name="ep-scope" value="payments:read" /> payments:read</label>
+          <label class="check-pill"><input type="checkbox" name="ep-scope" value="transactions:read" /> transactions:read</label>
+          <label class="check-pill"><input type="checkbox" name="ep-scope" value="balance:read" /> balance:read</label>
+          <label class="check-pill"><input type="checkbox" name="ep-scope" value="webhooks:write" /> webhooks:write</label>
+        </div>
+      </div>
+
+      <div class="flex mt-20" style="justify-content:flex-end;">
+        <button id="ep-cancel-btn" class="btn btn-outline" type="button">Cancel</button>
+        <button id="ep-submit-btn" class="btn btn-primary" type="submit">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== MODAL: LINK PARTNER USER ===================== -->
+<div id="link-member-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+  <div class="modal-content">
+    <h3 style="font-size:1.1rem;font-weight:800;color:var(--bryt-navy);">Link Developer Account</h3>
+    <p id="lm-subtitle" class="text-muted mt-12"></p>
+
+    <form id="link-member-form" class="mt-16">
+      <input type="hidden" id="lm-partner-id" />
+      <div>
+        <label class="form-label" for="lm-email">Existing BRYT Pay User Email</label>
+        <input id="lm-email" class="form-input" type="email" required placeholder="developer@company.com" />
+      </div>
+      <div class="mt-12">
+        <label class="form-label" for="lm-role">Workspace Role</label>
+        <select id="lm-role" class="form-select">
+          <option value="owner">Owner (Full access: Keys, Webhooks, Bank &amp; Withdrawals)</option>
+          <option value="developer">Developer (API Keys &amp; Webhooks only)</option>
+          <option value="finance">Finance (Payments, Bank Settings &amp; Withdrawals)</option>
+        </select>
+      </div>
+      <div class="flex mt-20" style="justify-content:flex-end;">
+        <button id="lm-cancel-btn" class="btn btn-outline" type="button">Cancel</button>
+        <button id="lm-submit-btn" class="btn btn-primary" type="submit">Link Account</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  (() => {
+    "use strict";
+
+    const SUPABASE_URL = "https://yivxlmjaiczsnxakumof.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpdnhsbWphaWN6c254YWt1bW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMzIzNDMsImV4cCI6MjEwNDgwODM0M30.Niu_DNJKGCF1CClm3xl4hjYr2yGgvgOs37w85OuThGQ";
+    const PORTAL_API = "/api/partner-portal";
+    const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
+
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        storageKey: "bryt-dev-portal-auth",
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false
+      }
+    });
+
+    const state = {
+      user: null,
+      activeTab: "withdrawals",
+      partners: [],
+      withdrawals: []
+    };
+
+    // =========================================================================
+    // HELPERS
+    // =========================================================================
+    function esc(val) {
+      return String(val ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function fmtNaira(amount) {
+      const n = Number(amount || 0);
+      return "₦" + n.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return "—";
+      try {
+        return new Intl.DateTimeFormat("en-GB", {
+          day: "2-digit", month: "short", year: "numeric",
+          hour: "2-digit", minute: "2-digit"
+        }).format(new Date(iso));
+      } catch { return "—"; }
+    }
+
+    function statusBadge(status) {
+      const s = String(status || "").toLowerCase();
+      if (["paid", "active"].includes(s)) return `<span class="badge badge-success">${esc(s)}</span>`;
+      if (["pending", "approved"].includes(s)) return `<span class="badge badge-pending">${esc(s)}</span>`;
+      if (["suspended", "rejected", "failed"].includes(s)) return `<span class="badge badge-failed">${esc(s)}</span>`;
+      return `<span class="badge badge-muted">${esc(s)}</span>`;
+    }
+
+    let toastTimer;
+    function showToast(msg, type = "") {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.className = "show" + (type ? " " + type : "");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.className = ""; }, 3800);
+    }
+
+    let idleTimer;
+    function resetIdleTimer() {
+      clearTimeout(idleTimer);
+      if (!state.user) return;
+      idleTimer = setTimeout(() => handleLogout(true), IDLE_TIMEOUT_MS);
+    }
+    ["click", "keydown", "mousemove", "touchstart"].forEach(evt => {
+      document.addEventListener(evt, resetIdleTimer, { passive: true });
+    });
+
+    async function apiCall(payload) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) {
+        showAuthView();
+        throw new Error("Session expired. Please sign in again.");
+      }
+      const res = await fetch(PORTAL_API, {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + session.access_token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401) {
+        await handleLogout(false);
+        throw new Error("Session expired.");
+      }
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || `Request failed (HTTP ${res.status})`);
+      }
+      return data;
+    }
+
+    // =========================================================================
+    // VIEW SWITCHING & BOOT
+    // =========================================================================
+    function showAuthView(message = "") {
+      state.user = null;
+      document.getElementById("auth-view").classList.remove("hidden");
+      document.getElementById("admin-view").classList.add("hidden");
+      document.getElementById("forbidden-view").classList.add("hidden");
+      const errEl = document.getElementById("auth-error");
+      if (message) {
+        errEl.textContent = message;
+        errEl.classList.remove("hidden");
+      } else {
+        errEl.classList.add("hidden");
+      }
+    }
+
+    async function handleLogout(isIdle = false) {
+      clearTimeout(idleTimer);
+      await sb.auth.signOut().catch(() => {});
+      ["admin-withdrawals-body", "admin-partners-body", "admin-audit-body"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = "";
+      });
+      showAuthView(isIdle ? "Signed out automatically after 30 minutes of inactivity." : "");
+    }
+
+    function setMobileDrawer(open) {
+      document.getElementById("sidebar").classList.toggle("open", open);
+      document.getElementById("drawer-backdrop").classList.toggle("open", open);
+    }
+
+    function switchTab(tab) {
+      state.activeTab = tab;
+      const titles = {
+        withdrawals: "Manual Settlement Withdrawals",
+        partners: "Partner Organizations & Governance",
+        audit: "Security & API Audit Logs"
+      };
+      document.getElementById("topbar-title").textContent = titles[tab] || "Admin Console";
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("hidden", p.id !== "tab-" + tab));
+      setMobileDrawer(false);
+      if (tab === "audit") loadAuditLogs();
+    }
+
+    async function bootAdmin() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) {
+        showAuthView();
+        return;
+      }
+
+      try {
+        const ctx = await apiCall({ action: "portal_context" });
+        state.user = ctx.user;
+        resetIdleTimer();
+
+        if (!ctx.user.is_admin) {
+          document.getElementById("auth-view").classList.add("hidden");
+          document.getElementById("admin-view").classList.add("hidden");
+          document.getElementById("forbidden-view").classList.remove("hidden");
+          document.getElementById("forbidden-email").textContent = `Signed in as ${ctx.user.email}`;
+          return;
+        }
+
+        document.getElementById("auth-view").classList.add("hidden");
+        document.getElementById("forbidden-view").classList.add("hidden");
+        document.getElementById("admin-view").classList.remove("hidden");
+        document.getElementById("admin-email-badge").textContent = ctx.user.email;
+
+        await refreshAll();
+      } catch (err) {
+        showAuthView(err.message);
+      }
+    }
+
+    // =========================================================================
+    // DATA LOADERS
+    // =========================================================================
+    async function refreshAll() {
+      try {
+        await Promise.all([loadPartners(), loadWithdrawals()]);
+        if (state.activeTab === "audit") await loadAuditLogs();
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+
+    async function loadPartners() {
+      const res = await apiCall({ action: "admin_list_partners" });
+      state.partners = res.partners || [];
+
+      let totalLiveCollected = 0;
+      let totalLiveFees = 0;
+      let activeCount = 0;
+
+      for (const p of state.partners) {
+        if (p.status === "active") activeCount++;
+        const live = p.wallets?.live || {};
+        totalLiveCollected += Number(live.total_collected || 0);
+        totalLiveFees += Number(live.total_fees || 0);
+      }
+
+      document.getElementById("kpi-live-collected").textContent = fmtNaira(totalLiveCollected);
+      document.getElementById("kpi-live-fees").textContent = fmtNaira(totalLiveFees);
+      document.getElementById("kpi-partners-count").textContent = `${activeCount} / ${state.partners.length}`;
+
+      // Populate audit partner dropdown
+      const auditSel = document.getElementById("audit-partner-filter");
+      const currentAuditPartner = auditSel.value;
+      auditSel.innerHTML = `<option value="">All Partners</option>` + state.partners
+        .map(p => `<option value="${esc(p.id)}">${esc(p.name)} (${esc(p.slug)})</option>`)
+        .join("");
+      auditSel.value = currentAuditPartner;
+
+      const body = document.getElementById("admin-partners-body");
+      if (!state.partners.length) {
+        body.innerHTML = `<tr><td colspan="7" class="empty-state">No partners registered yet.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = state.partners.map(p => {
+        const live = p.wallets?.live || {};
+        const test = p.wallets?.test || {};
+        const bankText = p.settlement_account_number
+          ? `<div>${esc(p.settlement_bank_name || p.settlement_bank_code)}</div><div class="mono text-muted">${esc(p.settlement_account_number)} • ${esc(p.settlement_account_name || "")}</div>`
+          : `<span class="text-muted">Not configured</span>`;
+
+        return `
+          <tr>
+            <td>
+              <strong style="color:var(--bryt-navy);">${esc(p.name)}</strong>
+              <div class="mono text-muted">${esc(p.slug)} • ${p.member_count} user(s)</div>
+              <div class="text-muted">${esc(p.contact_email)}</div>
+            </td>
+            <td>${statusBadge(p.status)}</td>
+            <td>
+              <div><strong>${Number(p.fee_percent)}%</strong>${p.fee_cap ? ` (cap ${fmtNaira(p.fee_cap)})` : ""}</div>
+              <div class="text-muted">${esc(p.default_fee_bearer)} • ${p.rate_limit_rpm} rpm</div>
+            </td>
+            <td>
+              <div><strong>${fmtNaira(live.available_balance)}</strong></div>
+              <div class="text-muted">Pend: ${fmtNaira(live.pending_withdrawal_balance)}</div>
+            </td>
+            <td class="text-muted">${fmtNaira(test.available_balance)}</td>
+            <td>${bankText}</td>
+            <td>
+              <div class="flex flex-wrap">
+                <button class="btn btn-outline btn-sm" type="button" data-action="edit-partner" data-id="${esc(p.id)}">Governance</button>
+                <button class="btn btn-primary btn-sm" type="button" data-action="link-member" data-id="${esc(p.id)}">Link User</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function loadWithdrawals() {
+      const statusFilter = document.getElementById("wd-status-filter").value;
+      const res = await apiCall({ action: "admin_list_withdrawals", status: statusFilter });
+      state.withdrawals = res.withdrawals || [];
+
+      // Always fetch unfiltered pending counts if filtered, or compute directly
+      let pendingItems = state.withdrawals.filter(w => w.status === "pending" || w.status === "approved");
+      if (statusFilter) {
+        const allPending = await apiCall({ action: "admin_list_withdrawals", status: "pending" });
+        const allApproved = await apiCall({ action: "admin_list_withdrawals", status: "approved" });
+        pendingItems = [...(allPending.withdrawals || []), ...(allApproved.withdrawals || [])];
+      }
+
+      const pendingSum = pendingItems.reduce((acc, w) => acc + Number(w.amount || 0), 0);
+      document.getElementById("kpi-pending-amount").textContent = fmtNaira(pendingSum);
+      document.getElementById("kpi-pending-count").textContent = `${pendingItems.length} request(s) awaiting payout`;
+
+      const navBadge = document.getElementById("nav-pending-badge");
+      navBadge.textContent = String(pendingItems.length);
+      navBadge.classList.toggle("hidden", pendingItems.length === 0);
+
+      const body = document.getElementById("admin-withdrawals-body");
+      if (!state.withdrawals.length) {
+        body.innerHTML = `<tr><td colspan="7" class="empty-state">No withdrawal requests match this filter.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = state.withdrawals.map(wd => {
+        const partner = Array.isArray(wd.partner) ? wd.partner[0] : wd.partner;
+        const canAct = wd.status === "pending" || wd.status === "approved";
+
+        return `
+          <tr>
+            <td>
+              <div class="mono" style="font-weight:700;color:var(--bryt-navy);">${esc(wd.reference)}</div>
+              <div class="text-muted">${fmtDate(wd.created_at)}</div>
+            </td>
+            <td>
+              <strong>${esc(partner?.name || wd.partner_id)}</strong>
+              <div class="text-muted">${esc(partner?.contact_email || "")}</div>
+            </td>
+            <td><strong style="font-size:0.95rem;">${fmtNaira(wd.amount)}</strong></td>
+            <td>
+              <div style="font-weight:600;">${esc(wd.bank_name)}</div>
+              <div class="mono text-muted">${esc(wd.account_number)}</div>
+              <div class="text-muted">${esc(wd.account_name)}</div>
+            </td>
+            <td>${statusBadge(wd.status)}</td>
+            <td>
+              <div class="mono">${esc(wd.external_transfer_ref || "—")}</div>
+              ${wd.admin_notes ? `<div class="text-muted">${esc(wd.admin_notes)}</div>` : ""}
+            </td>
+            <td>
+              ${canAct ? `
+                <div class="flex flex-wrap">
+                  ${wd.status === "pending" ? `<button class="btn btn-outline btn-sm" type="button" data-action="wd-approve" data-id="${esc(wd.id)}">Approve</button>` : ""}
+                  <button class="btn btn-success btn-sm" type="button" data-action="wd-paid" data-id="${esc(wd.id)}">Mark Paid</button>
+                  <button class="btn btn-danger btn-sm" type="button" data-action="wd-reject" data-id="${esc(wd.id)}">Reject</button>
+                </div>
+              ` : `<span class="text-muted">Finalized ${fmtDate(wd.processed_at)}</span>`}
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function loadAuditLogs() {
+      const partnerId = document.getElementById("audit-partner-filter").value || null;
+      const onlyErrors = document.getElementById("audit-errors-only").checked;
+      const res = await apiCall({
+        action: "admin_audit_logs",
+        partner_id: partnerId,
+        only_errors: onlyErrors
+      });
+      const logs = res.logs || [];
+      const body = document.getElementById("admin-audit-body");
+
+      if (!logs.length) {
+        body.innerHTML = `<tr><td colspan="7" class="empty-state">No audit logs found.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = logs.map(l => {
+        const httpClass = l.status_code >= 500 ? "badge-failed" : l.status_code >= 400 ? "badge-pending" : "badge-success";
+        return `
+          <tr>
+            <td class="text-muted">${fmtDate(l.created_at)}</td>
+            <td>${l.environment ? `<span class="badge ${l.environment === "live" ? "badge-success" : "badge-pending"}">${esc(l.environment)}</span>` : `<span class="text-muted">—</span>`}</td>
+            <td class="mono"><strong>${esc(l.method)}</strong> ${esc(l.path)}</td>
+            <td>
+              <span class="badge ${httpClass}">${esc(l.status_code)}</span>
+              ${l.error_code ? `<div class="mono text-muted" style="margin-top:3px;">${esc(l.error_code)}</div>` : ""}
+            </td>
+            <td class="mono text-muted">${esc(l.payment_reference || "—")}</td>
+            <td class="mono text-muted">${l.duration_ms != null ? `${l.duration_ms}ms` : "—"}</td>
+            <td class="mono text-muted">${esc(l.request_id)}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // =========================================================================
+    // MODALS
+    // =========================================================================
+    function openResolveModal(wd, resolution) {
+      const partner = Array.isArray(wd.partner) ? wd.partner[0] : wd.partner;
+      const titles = {
+        approved: "Approve Withdrawal Request",
+        paid: "Confirm Manual Payout & Mark Paid",
+        rejected: "Reject Withdrawal & Refund Balance"
+      };
+      document.getElementById("rwd-title").textContent = titles[resolution] || "Resolve Withdrawal";
+      document.getElementById("rwd-id").value = wd.id;
+      document.getElementById("rwd-resolution").value = resolution;
+      document.getElementById("rwd-external-ref").value = "";
+      document.getElementById("rwd-notes").value = "";
+
+      const refWrap = document.getElementById("rwd-ref-wrap");
+      const refInput = document.getElementById("rwd-external-ref");
+      refWrap.classList.toggle("hidden", resolution !== "paid");
+      refInput.required = resolution === "paid";
+
+      const submitBtn = document.getElementById("rwd-submit-btn");
+      submitBtn.className = "btn " + (resolution === "paid" ? "btn-success" : resolution === "rejected" ? "btn-danger" : "btn-primary");
+      submitBtn.textContent = resolution === "paid" ? "Mark Paid & Notify Partner" : resolution === "rejected" ? "Reject & Release Funds" : "Approve Request";
+
+      document.getElementById("rwd-summary").innerHTML = `
+        <div class="summary-row"><span class="text-muted">Partner</span><strong>${esc(partner?.name || "—")}</strong></div>
+        <div class="summary-row"><span class="text-muted">Reference</span><span class="mono">${esc(wd.reference)}</span></div>
+        <div class="summary-row"><span class="text-muted">Amount</span><strong style="color:var(--bryt-navy);">${fmtNaira(wd.amount)}</strong></div>
+        <div class="summary-row"><span class="text-muted">Bank</span><span>${esc(wd.bank_name)} — <span class="mono">${esc(wd.account_number)}</span></span></div>
+        <div class="summary-row"><span class="text-muted">Account Name</span><span>${esc(wd.account_name)}</span></div>
+      `;
+
+      document.getElementById("resolve-wd-modal").classList.remove("hidden");
+    }
+
+    function openEditPartnerModal(p) {
+      document.getElementById("ep-id").value = p.id;
+      document.getElementById("ep-subtitle").textContent = `${p.name} (${p.slug})`;
+      document.getElementById("ep-status").value = p.status;
+      document.getElementById("ep-fee").value = Number(p.fee_percent);
+      document.getElementById("ep-cap").value = p.fee_cap !== null ? Number(p.fee_cap) : "";
+      document.getElementById("ep-rpm").value = Number(p.rate_limit_rpm || 60);
+      document.getElementById("ep-override").checked = Boolean(p.allow_fee_bearer_override);
+
+      const allowed = new Set(p.allowed_scopes || []);
+      document.querySelectorAll('input[name="ep-scope"]').forEach(cb => {
+        cb.checked = allowed.has(cb.value);
+      });
+
+      document.getElementById("edit-partner-modal").classList.remove("hidden");
+    }
+
+    function openLinkMemberModal(p) {
+      document.getElementById("lm-partner-id").value = p.id;
+      document.getElementById("lm-subtitle").textContent = `Grant portal access to ${p.name} (${p.slug})`;
+      document.getElementById("lm-email").value = "";
+      document.getElementById("lm-role").value = "owner";
+      document.getElementById("link-member-modal").classList.remove("hidden");
+    }
+
+    // =========================================================================
+    // DELEGATED SAFE EVENT HANDLERS
+    // =========================================================================
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      const action = btn.dataset.action;
+      const id = btn.dataset.id;
+
+      if (action === "edit-partner") {
+        const p = state.partners.find(x => x.id === id);
+        if (p) openEditPartnerModal(p);
+      } else if (action === "link-member") {
+        const p = state.partners.find(x => x.id === id);
+        if (p) openLinkMemberModal(p);
+      } else if (action === "wd-approve" || action === "wd-paid" || action === "wd-reject") {
+        const wd = state.withdrawals.find(x => x.id === id);
+        if (!wd) return;
+        const map = { "wd-approve": "approved", "wd-paid": "paid", "wd-reject": "rejected" };
+        openResolveModal(wd, map[action]);
+      }
+    });
+
+    // =========================================================================
+    // FORM & CONTROL LISTENERS
+    // =========================================================================
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("login-btn");
+      const errEl = document.getElementById("auth-error");
+      errEl.classList.add("hidden");
+      btn.disabled = true;
+      btn.textContent = "Verifying...";
+
+      try {
+        const { error } = await sb.auth.signInWithPassword({
+          email: document.getElementById("login-email").value.trim(),
+          password: document.getElementById("login-password").value
+        });
+        if (error) throw error;
+        document.getElementById("login-password").value = "";
+        await bootAdmin();
+      } catch (err) {
+        errEl.textContent = err.message || "Sign in failed.";
+        errEl.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Verify Admin Access";
+      }
+    });
+
+    document.getElementById("logout-btn").addEventListener("click", () => handleLogout(false));
+    document.getElementById("forbidden-logout-btn").addEventListener("click", () => handleLogout(false));
+    document.getElementById("mobile-menu-btn").addEventListener("click", () => setMobileDrawer(true));
+    document.getElementById("drawer-backdrop").addEventListener("click", () => setMobileDrawer(false));
+    document.getElementById("refresh-btn").addEventListener("click", refreshAll);
+
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+      btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+    });
+
+    document.getElementById("wd-status-filter").addEventListener("change", () => loadWithdrawals().catch(e => showToast(e.message, "error")));
+    document.getElementById("audit-apply-btn").addEventListener("click", () => loadAuditLogs().catch(e => showToast(e.message, "error")));
+
+    // Auto-fill slug from partner name
+    document.getElementById("np-name").addEventListener("input", (e) => {
+      const slugInput = document.getElementById("np-slug");
+      if (!slugInput.dataset.touched) {
+        slugInput.value = e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 50);
+      }
+    });
+    document.getElementById("np-slug").addEventListener("input", (e) => {
+      e.target.dataset.touched = e.target.value ? "1" : "";
+    });
+
+    document.getElementById("create-partner-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("np-submit-btn");
+      btn.disabled = true;
+      try {
+        const capVal = document.getElementById("np-cap").value.trim();
+        const res = await apiCall({
+          action: "admin_create_partner",
+          name: document.getElementById("np-name").value.trim(),
+          slug: document.getElementById("np-slug").value.trim(),
+          contact_email: document.getElementById("np-email").value.trim(),
+          owner_email: document.getElementById("np-owner-email").value.trim(),
+          fee_percent: Number(document.getElementById("np-fee").value),
+          fee_cap: capVal === "" ? null : Number(capVal),
+          default_fee_bearer: document.getElementById("np-bearer").value,
+          rate_limit_rpm: Number(document.getElementById("np-rpm").value)
+        });
+        e.target.reset();
+        document.getElementById("np-slug").dataset.touched = "";
+        showToast(res.message, "success");
+        await loadPartners();
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById("resolve-wd-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("rwd-submit-btn");
+      const resolution = document.getElementById("rwd-resolution").value;
+      const extRef = document.getElementById("rwd-external-ref").value.trim();
+      if (resolution === "paid" && !extRef) {
+        return showToast("External bank transfer reference is required to mark paid", "error");
+      }
+
+      btn.disabled = true;
+      try {
+        const res = await apiCall({
+          action: "admin_resolve_withdrawal",
+          withdrawal_id: document.getElementById("rwd-id").value,
+          resolution,
+          external_transfer_ref: extRef || null,
+          admin_notes: document.getElementById("rwd-notes").value.trim() || null
+        });
+        document.getElementById("resolve-wd-modal").classList.add("hidden");
+        showToast(res.message, "success");
+        await refreshAll();
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById("edit-partner-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("ep-submit-btn");
+      const scopes = Array.from(document.querySelectorAll('input[name="ep-scope"]:checked')).map(c => c.value);
+      const capVal = document.getElementById("ep-cap").value.trim();
+      btn.disabled = true;
+      try {
+        await apiCall({
+          action: "admin_update_partner",
+          partner_id: document.getElementById("ep-id").value,
+          status: document.getElementById("ep-status").value,
+          fee_percent: Number(document.getElementById("ep-fee").value),
+          fee_cap: capVal === "" ? null : Number(capVal),
+          rate_limit_rpm: Number(document.getElementById("ep-rpm").value),
+          allow_fee_bearer_override: document.getElementById("ep-override").checked,
+          allowed_scopes: scopes
+        });
+        document.getElementById("edit-partner-modal").classList.add("hidden");
+        showToast("Partner governance updated", "success");
+        await loadPartners();
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById("link-member-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("lm-submit-btn");
+      btn.disabled = true;
+      try {
+        const res = await apiCall({
+          action: "admin_add_member",
+          partner_id: document.getElementById("lm-partner-id").value,
+          email: document.getElementById("lm-email").value.trim(),
+          role: document.getElementById("lm-role").value
+        });
+        document.getElementById("link-member-modal").classList.add("hidden");
+        showToast(res.message, "success");
+        await loadPartners();
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById("rwd-cancel-btn").addEventListener("click", () => {
+      document.getElementById("resolve-wd-modal").classList.add("hidden");
+    });
+    document.getElementById("ep-cancel-btn").addEventListener("click", () => {
+      document.getElementById("edit-partner-modal").classList.add("hidden");
+    });
+    document.getElementById("lm-cancel-btn").addEventListener("click", () => {
+      document.getElementById("link-member-modal").classList.add("hidden");
+    });
+
+    bootAdmin();
+  })();
+</script>
+</body>
+</html>
