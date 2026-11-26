@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BRYT Pay Developers | Partner API &amp; Settlement Portal</title>
+  <meta name="theme-color" content="#1D5ED0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="/assets/img/brytpay-logo1.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      /* Official BRYT Brand Colors (from main.css) */
+      --bryt-primary: #1D5ED0;
+      --bryt-primary-hover: #174EB0;
+      --bryt-accent: #159FE3;
+      --bryt-navy: #071A3A;
+      --bryt-black: #0B1220;
+      --bryt-white: #FFFFFF;
+
+      /* Surfaces & Text */
+      --bg-light: #F5F8FC;
+      --surface-white: #FFFFFF;
+      --border-color: #E2E8F0;
+      --border-focus: #1D5ED0;
+      --text-main: #0B1220;
+      --text-muted: #64748B;
+
+      /* Status Colors */
+      --success-text: #047857;
+      --success-bg: #D1FAE5;
+      --pending-text: #B45309;
+      --pending-bg: #FEF3C7;
+      --failed-text: #B91C1C;
+      --failed-bg: #FEE2E2;
+
+      /* Radius & Shadows */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 2px 8px rgba(7, 26, 58, 0.04);
+      --shadow-md: 0 10px 25px rgba(7, 26, 58, 0.08);
+      --transition: 0.2s ease;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body {
+      background-color: var(--bg-light);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .hidden { display: none !important; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.8rem; }
+    .text-muted { color: var(--text-muted); font-size: 0.82rem; }
+    .flex { display: flex; align-items: center; gap: 10px; }
+    .flex-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-20 { margin-top: 20px; }
+
+    /* Buttons matching BRYT Fintech UI */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px 18px; border-radius: var(--radius-sm); border: 1.5px solid transparent;
+      font-size: 0.86rem; font-weight: 700; cursor: pointer; transition: var(--transition);
+      text-decoration: none; white-space: nowrap;
+    }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+    .btn-primary {
+      background: linear-gradient(to right, var(--bryt-primary), var(--bryt-accent));
+      color: var(--bryt-white);
+      box-shadow: 0 4px 12px rgba(29, 94, 208, 0.22);
+    }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(29, 94, 208, 0.32); }
+    .btn-navy { background: var(--bryt-navy); color: var(--bryt-white); }
+    .btn-navy:hover:not(:disabled) { background: #0c2754; }
+    .btn-outline { background: var(--surface-white); border-color: var(--border-color); color: var(--bryt-navy); }
+    .btn-outline:hover:not(:disabled) { border-color: var(--bryt-primary); color: var(--bryt-primary); background: #F0F6FF; }
+    .btn-danger { background: var(--failed-bg); color: var(--failed-text); }
+    .btn-danger:hover:not(:disabled) { background: #fecaca; }
+    .btn-sm { padding: 7px 12px; font-size: 0.76rem; }
+
+    /* Badges */
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .badge-success { background: var(--success-bg); color: var(--success-text); }
+    .badge-pending { background: var(--pending-bg); color: var(--pending-text); }
+    .badge-failed { background: var(--failed-bg); color: var(--failed-text); }
+    .badge-primary { background: #F0F6FF; color: var(--bryt-primary); }
+    .badge-muted { background: #E2E8F0; color: #475569; }
+
+    /* Forms */
+    .form-label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--bryt-navy); margin-bottom: 6px; }
+    .form-input, .form-select {
+      width: 100%; padding: 12px 14px; border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-sm); font-size: 0.88rem; color: var(--text-main);
+      background: var(--surface-white); outline: none; transition: var(--transition);
+    }
+    .form-input:focus, .form-select:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(29, 94, 208, 0.12);
+    }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+
+    /* Auth Shell */
+    .auth-shell {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+      background:
+        radial-gradient(circle at 90% 10%, rgba(21, 159, 227, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 10% 90%, rgba(29, 94, 208, 0.10) 0%, transparent 45%),
+        var(--bg-light);
+    }
+    .auth-card {
+      width: 100%; max-width: 440px; background: var(--surface-white);
+      border: 1px solid var(--border-color); border-radius: var(--radius-lg);
+      padding: 34px 28px; box-shadow: var(--shadow-md);
+    }
+    .auth-logo { height: 34px; width: auto; object-fit: contain; }
+    .dev-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 999px; background: #F0F6FF; color: var(--bryt-primary);
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    /* Main App Layout */
+    .app-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+
+    .sidebar {
+      background: var(--surface-white); border-right: 1px solid var(--border-color);
+      padding: 20px 16px; display: flex; flex-direction: column; gap: 18px;
+      position: sticky; top: 0; height: 100vh; overflow-y: auto; z-index: 60;
+    }
+    .sidebar-brand {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 14px; border-bottom: 1px solid var(--border-color);
+    }
+    .sidebar-brand img { height: 28px; width: auto; object-fit: contain; }
+
+    .nav-list { display: flex; flex-direction: column; gap: 4px; }
+    .nav-btn {
+      width: 100%; text-align: left; padding: 11px 14px; border-radius: var(--radius-sm);
+      border: none; background: transparent; color: var(--text-muted);
+      font-size: 0.86rem; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; gap: 10px; transition: var(--transition);
+    }
+    .nav-btn:hover { background: var(--bg-light); color: var(--bryt-navy); }
+    .nav-btn.active { background: #F0F6FF; color: var(--bryt-primary); font-weight: 700; }
+    .nav-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .sidebar-footer {
+      margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-color);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .main-area { display: flex; flex-direction: column; min-width: 0; }
+    .topbar {
+      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color); padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      position: sticky; top: 0; z-index: 40;
+    }
+
+    .env-toggle {
+      display: inline-flex; background: var(--bg-light); padding: 4px;
+      border-radius: var(--radius-sm); border: 1px solid var(--border-color);
+    }
+    .env-btn {
+      padding: 6px 14px; border-radius: 6px; border: none; background: transparent;
+      font-size: 0.78rem; font-weight: 700; cursor: pointer; color: var(--text-muted); transition: var(--transition);
+    }
+    .env-btn.active-test { background: var(--pending-bg); color: var(--pending-text); }
+    .env-btn.active-live { background: var(--success-bg); color: var(--success-text); }
+
+    .env-banner {
+      padding: 9px 24px; font-size: 0.78rem; font-weight: 600;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    }
+    .env-banner.test { background: #FFFBEB; color: var(--pending-text); border-bottom: 1px solid #FDE68A; }
+    .env-banner.live { background: #ECFDF5; color: var(--success-text); border-bottom: 1px solid #A7F3D0; }
+
+    .content { padding: 24px; max-width: 1180px; width: 100%; margin: 0 auto; }
+
+    /* Signature BRYT Navy Settlement Hero Card */
+    .settlement-hero {
+      background: var(--bryt-navy); border-radius: var(--radius-lg); padding: 26px 24px;
+      color: var(--bryt-white); box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+      margin-bottom: 18px;
+    }
+    .settlement-hero::after {
+      content: ''; position: absolute; top: -60px; right: -40px; width: 240px; height: 240px;
+      background: radial-gradient(circle, rgba(29, 94, 208, 0.45) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .settlement-hero-grid {
+      position: relative; z-index: 2; display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; align-items: end;
+    }
+    .hero-kicker {
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px;
+      color: var(--bryt-accent); font-weight: 700;
+    }
+    .hero-amount { font-size: 2rem; font-weight: 800; margin-top: 6px; letter-spacing: -0.5px; }
+    .hero-metric-label { font-size: 0.72rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+    .hero-metric-val { font-size: 1.2rem; font-weight: 700; margin-top: 4px; }
+    .btn-ghost-light {
+      background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 0.74rem; font-weight: 600; cursor: pointer;
+    }
+    .btn-ghost-light:hover { background: rgba(255, 255, 255, 0.2); }
+
+    /* Cards & Tables */
+    .card {
+      background: var(--surface-white); border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow-sm);
+    }
+    .card + .card { margin-top: 18px; }
+    .card-title { font-size: 1rem; font-weight: 700; color: var(--bryt-navy); margin-bottom: 4px; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .stat-card {
+      background: var(--surface-white); border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); padding: 18px; box-shadow: var(--shadow-sm);
+    }
+    .stat-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 1.4rem; font-weight: 800; color: var(--bryt-navy); margin-top: 6px; }
+    .stat-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+
+    .table-wrap { overflow-x: auto; margin-top: 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+    th {
+      text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--text-muted); padding: 10px 12px; border-bottom: 1px solid var(--border-color); white-space: nowrap;
+    }
+    td { padding: 13px 12px; border-bottom: 1px solid #F1F5F9; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    .empty-state { text-align: center; padding: 32px 16px; color: var(--text-muted); font-size: 0.88rem; }
+
+    /* Code Snippet & Alerts */
+    .code-block {
+      background: #080D18; color: #E2E8F0; border-radius: var(--radius-md);
+      padding: 14px 16px; overflow-x: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.78rem; line-height: 1.6; margin-top: 12px;
+    }
+    .alert { padding: 12px 14px; border-radius: var(--radius-sm); font-size: 0.83rem; margin-bottom: 14px; }
+    .alert-danger { background: var(--failed-bg); color: var(--failed-text); border: 1px solid #FECACA; }
+    .alert-info { background: #F0F6FF; color: var(--bryt-navy); border: 1px solid #BFDBFE; }
+    .alert-warning { background: var(--pending-bg); color: var(--pending-text); border: 1px solid #FDE68A; }
+
+    .checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+    .check-pill {
+      display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px;
+      border: 1.5px solid var(--border-color); border-radius: var(--radius-sm);
+      font-size: 0.78rem; font-weight: 600; color: var(--bryt-navy); cursor: pointer;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(7, 26, 58, 0.65); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 200;
+    }
+    .modal-content {
+      background: var(--surface-white); border-radius: var(--radius-lg); width: 100%;
+      max-width: 520px; padding: 26px 24px; box-shadow: var(--shadow-md);
+    }
+    .secret-box {
+      background: #080D18; color: #38BDF8; padding: 12px 14px; border-radius: var(--radius-sm);
+      word-break: break-all; font-family: ui-monospace, monospace; font-size: 0.82rem; margin: 10px 0;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 20px; right: 20px; z-index: 300;
+      background: var(--bryt-navy); color: #fff; padding: 12px 18px; border-radius: var(--radius-md);
+      font-size: 0.84rem; font-weight: 600; box-shadow: var(--shadow-md);
+      transform: translateY(130%); transition: transform 0.2s ease; max-width: 360px;
+    }
+    #toast.show { transform: translateY(0); }
+    #toast.error { background: var(--failed-text); }
+    #toast.success { background: var(--success-text); }
+
+    /* Mobile Drawer */
+    .mobile-menu-btn { display: none; }
+    .drawer-backdrop {
+      position: fixed; inset: 0; background: rgba(7, 26, 58, 0.45); z-index: 50; display: none;
+    }
+    .drawer-backdrop.open { display: block; }
+
+    @media (max-width: 880px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed; left: -280px; top: 0; bottom: 0; width: 264px;
+        transition: left 0.22s ease; box-shadow: 8px 0 30px rgba(7, 26, 58, 0.18);
+      }
+      .sidebar.open { left: 0; }
+      .mobile-menu-btn { display: inline-flex; }
+      .content { padding: 16px; }
+      .topbar { padding: 12px 16px; }
+      .env-banner { padding: 9px 16px; }
+      .hero-amount { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body class="landing-page">
+
+<!-- ===================== LOGIN VIEW ===================== -->
+<div id="auth-view" class="auth-shell">
+  <div class="auth-card">
+    <div class="flex-between">
+      <img src="/assets/img/brytpay-logo.png" alt="BRYT Pay" class="auth-logo" />
+      <span class="dev-pill">Developers</span>
+    </div>
+
+    <h1 style="font-size:1.35rem;font-weight:800;color:var(--bryt-navy);margin-top:20px;">Sign In to Partner Portal</h1>
+    <p class="text-muted mt-12">Manage your BRYT Pay API keys, dynamic bank transfer collections, webhooks, and settlement withdrawals.</p>
+
+    <div id="auth-error" class="alert alert-danger hidden mt-12"></div>
+
+    <form id="login-form" class="mt-20" autocomplete="on">
+      <div>
+        <label class="form-label" for="login-email">BRYT Pay Account Email</label>
+        <input id="login-email" class="form-input" type="email" required placeholder="developer@company.com" autocomplete="email" />
+      </div>
+      <div class="mt-12">
+        <label class="form-label" for="login-password">Password</label>
+        <input id="login-password" class="form-input" type="password" required placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <button id="login-btn" type="submit" class="btn btn-primary mt-20" style="width:100%;">Sign In Securely</button>
+    </form>
+
+    <p class="text-muted mt-20" style="text-align:center;font-size:0.75rem;">
+      Protected by BRYT Pay Role-Based Access Control &amp; 30-minute idle auto-lock.
+    </p>
+  </div>
+</div>
+
+<!-- ===================== NO WORKSPACE VIEW ===================== -->
+<div id="empty-workspace-view" class="auth-shell hidden">
+  <div class="auth-card" style="text-align:center;">
+    <img src="/assets/img/brytpay-logo.png" alt="BRYT Pay" class="auth-logo" style="margin:0 auto;" />
+    <h2 style="margin-top:20px;font-size:1.2rem;color:var(--bryt-navy);">No Partner Workspace Linked</h2>
+    <p class="text-muted mt-12" id="empty-ws-email"></p>
+    <p class="text-muted mt-12">Your BRYT Pay account has not been assigned to a partner organization yet. Contact BRYT Technologies support to complete partner onboarding.</p>
+    <div class="flex mt-20" style="justify-content:center;">
+      <a id="empty-admin-link" href="/admin" class="btn btn-primary hidden">Open Admin Console</a>
+      <button id="empty-logout-btn" class="btn btn-outline" type="button">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MAIN DEVELOPER PORTAL ===================== -->
+<div id="portal-view" class="app-shell hidden">
+  <div id="drawer-backdrop" class="drawer-backdrop"></div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-brand">
+      <img src="/assets/img/brytpay-logo.png" alt="BRYT Pay" />
+      <span class="dev-pill">API v1</span>
+    </div>
+
+    <div>
+      <label class="form-label" for="workspace-select">Partner Workspace</label>
+      <select id="workspace-select" class="form-select" style="padding:9px 10px;font-size:0.84rem;"></select>
+    </div>
+
+    <nav class="nav-list" aria-label="Developer Portal Navigation">
+      <button class="nav-btn active" type="button" data-tab="overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        Overview
+      </button>
+      <button class="nav-btn" type="button" data-tab="payments">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Payments
+      </button>
+      <button class="nav-btn" type="button" data-tab="keys">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        API Keys
+      </button>
+      <button class="nav-btn" type="button" data-tab="webhooks">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 16.98h-5.99c-1.1 0-1.95.94-2.48 1.9A4 4 0 0 1 2 17c.01-.7.2-1.4.57-2"/><path d="m6 17 3.13-5.78c.53-.97.1-2.18-.5-3.1a4 4 0 1 1 6.89-4.06"/><path d="m12 6 3.13 5.73C15.66 12.7 16.9 13 18 13a4 4 0 0 1 0 8"/></svg>
+        Webhooks
+      </button>
+      <button class="nav-btn" type="button" data-tab="settlements">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        Settlements
+      </button>
+      <button class="nav-btn" type="button" data-tab="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a id="admin-console-link" href="/admin" class="btn btn-navy btn-sm hidden">BRYT Admin Console</a>
+      <div id="user-email-badge" class="text-muted" style="font-size:0.75rem;word-break:break-all;"></div>
+      <button id="logout-btn" class="btn btn-outline btn-sm" type="button">Sign Out</button>
+    </div>
+  </aside>
+
+  <div class="main-area">
+    <header class="topbar">
+      <div class="flex">
+        <button id="mobile-menu-btn" class="btn btn-outline btn-sm mobile-menu-btn" type="button">Menu</button>
+        <div class="flex">
+          <strong id="topbar-title" style="font-size:1.05rem;color:var(--bryt-navy);">Overview</strong>
+          <span id="partner-status-badge" class="badge badge-success">ACTIVE</span>
+        </div>
+      </div>
+
+      <div class="flex">
+        <div class="env-toggle" role="group" aria-label="Environment Switch">
+          <button id="btn-env-test" class="env-btn active-test" type="button">Test Mode</button>
+          <button id="btn-env-live" class="env-btn" type="button">Live Mode</button>
+        </div>
+        <button id="refresh-btn" class="btn btn-outline btn-sm" type="button">Refresh</button>
+      </div>
+    </header>
+
+    <div id="env-banner" class="env-banner test">
+      <span id="env-banner-text">SANDBOX MODE — Simulated transfers &amp; test balances only. No real NGN is moved.</span>
+      <span class="mono" style="font-weight:700;">https://brytpay.name.ng/api/v1</span>
+    </div>
+
+    <main class="content">
+      <!-- ==================== TAB: OVERVIEW ==================== -->
+      <section id="tab-overview" class="tab-panel">
+        <div class="settlement-hero">
+          <div class="flex-between" style="position:relative;z-index:2;margin-bottom:14px;">
+            <span class="hero-kicker" id="hero-env-kicker">Test Settlement Balance</span>
+            <button id="toggle-balance-btn" class="btn-ghost-light" type="button">Hide Balances</button>
+          </div>
+          <div class="settlement-hero-grid">
+            <div>
+              <div class="hero-metric-label">Available Balance</div>
+              <div class="hero-amount" id="stat-available">₦0.00</div>
+            </div>
+            <div>
+              <div class="hero-metric-label">Pending Withdrawals</div>
+              <div class="hero-metric-val" id="stat-pending">₦0.00</div>
+            </div>
+            <div>
+              <div class="hero-metric-label">Total Collected</div>
+              <div class="hero-metric-val" id="stat-collected">₦0.00</div>
+            </div>
+            <div>
+              <div class="hero-metric-label" id="stat-fee-rate">Platform Fees (1.5%)</div>
+              <div class="hero-metric-val" id="stat-fees">₦0.00</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="flex-between">
+            <div>
+              <div class="card-title">API Quick Reference</div>
+              <div class="text-muted">Server-to-server configuration for <strong id="cfg-partner-name">—</strong></div>
+            </div>
+            <button class="btn btn-outline btn-sm" type="button" data-copy="https://brytpay.name.ng/api/v1">Copy Base URL</button>
+          </div>
+          <div class="form-grid mt-16">
+            <div>
+              <div class="text-muted">Partner Slug</div>
+              <div class="mono" id="cfg-slug" style="font-weight:700;color:var(--bryt-navy);">—</div>
+            </div>
+            <div>
+              <div class="text-muted">Transaction Fee</div>
+              <div id="cfg-fee" style="font-weight:700;color:var(--bryt-navy);">—</div>
+            </div>
+            <div>
+              <div class="text-muted">Default Fee Bearer</div>
+              <div id="cfg-bearer" style="font-weight:700;color:var(--bryt-navy);">—</div>
+            </div>
+            <div>
+              <div class="text-muted">Rate Limit</div>
+              <div id="cfg-rpm" style="font-weight:700;color:var(--bryt-navy);">—</div>
+            </div>
+          </div>
+
+          <pre class="code-block" id="quick-curl-snippet">POST https://brytpay.name.ng/api/v1/payments/initialize
+Authorization: Bearer bryt_test_sk_YOUR_SECRET_KEY
+Idempotency-Key: order_1001_unique
+Content-Type: application/json
+
+{ "amount": 5000, "customer_email": "student@example.com", "customer_name": "Amina Musa" }</pre>
+        </div>
+
+        <div class="card">
+          <div class="flex-between">
+            <div>
+              <div class="card-title">Recent Payments</div>
+              <div class="text-muted">Latest dynamic bank transfer payments</div>
+            </div>
+            <button class="btn btn-outline btn-sm" type="button" data-goto="payments">View All</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Customer</th>
+                  <th>Expected</th>
+                  <th>Fee / Net</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="overview-payments-body">
+                <tr><td colspan="6" class="empty-state">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Immutable Settlement Ledger</div>
+          <div class="text-muted">Append-only audit trail of every credit, fee, and withdrawal hold</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Entry Type</th>
+                  <th>Reference</th>
+                  <th>Amount</th>
+                  <th>Balance After</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="overview-ledger-body">
+                <tr><td colspan="6" class="empty-state">No ledger entries yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB: PAYMENTS ==================== -->
+      <section id="tab-payments" class="tab-panel hidden">
+        <div class="card">
+          <div class="card-title">Payment Transactions</div>
+          <div class="text-muted">Search and filter Flow B bank transfer collections</div>
+
+          <div class="form-grid mt-12">
+            <div>
+              <input id="pay-search" class="form-input" type="text" placeholder="Search BRYT ref, partner ref, or email..." />
+            </div>
+            <div>
+              <select id="pay-status" class="form-select">
+                <option value="">All Statuses</option>
+                <option value="paid">Paid</option>
+                <option value="pending">Pending</option>
+                <option value="underpaid">Underpaid</option>
+                <option value="failed">Failed</option>
+                <option value="expired">Expired</option>
+              </select>
+            </div>
+            <div class="flex">
+              <button id="pay-filter-btn" class="btn btn-primary" type="button">Filter</button>
+              <button id="pay-reset-btn" class="btn btn-outline" type="button">Reset</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Virtual Account</th>
+                  <th>Customer</th>
+                  <th>Expected / Received</th>
+                  <th>Fee &amp; Net</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody id="payments-table-body">
+                <tr><td colspan="7" class="empty-state">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flex-between mt-16">
+            <span id="pay-page-info" class="text-muted">Page 1 of 1</span>
+            <div class="flex">
+              <button id="pay-prev-btn" class="btn btn-outline btn-sm" type="button">Previous</button>
+              <button id="pay-next-btn" class="btn btn-outline btn-sm" type="button">Next</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB: API KEYS ==================== -->
+      <section id="tab-keys" class="tab-panel hidden">
+        <div class="alert alert-info">
+          <strong>Security Rule:</strong> Secret keys (<span class="mono">bryt_live_sk_...</span> / <span class="mono">bryt_test_sk_...</span>) are hashed with SHA-256 and displayed <strong>only once</strong>. Never embed secret keys in browser JavaScript or mobile APKs.
+        </div>
+
+        <div class="card">
+          <div class="card-title">Generate New API Key</div>
+          <div class="text-muted">Create separate least-privilege keys for Test and Live backends.</div>
+
+          <form id="create-key-form" class="mt-16">
+            <div class="form-grid">
+              <div>
+                <label class="form-label" for="key-name">Key Label</label>
+                <input id="key-name" class="form-input" type="text" required placeholder="e.g. Campus Pulse Production Edge" maxlength="80" />
+              </div>
+              <div>
+                <label class="form-label" for="key-env">Environment</label>
+                <select id="key-env" class="form-select">
+                  <option value="test">Test (Sandbox)</option>
+                  <option value="live">Live (Production)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-16">
+              <label class="form-label">Allowed Scopes</label>
+              <div class="checkbox-group">
+                <label class="check-pill"><input type="checkbox" name="key-scope" value="payments:write" checked /> payments:write</label>
+                <label class="check-pill"><input type="checkbox" name="key-scope" value="payments:read" checked /> payments:read</label>
+                <label class="check-pill"><input type="checkbox" name="key-scope" value="transactions:read" checked /> transactions:read</label>
+                <label class="check-pill"><input type="checkbox" name="key-scope" value="balance:read" checked /> balance:read</label>
+                <label class="check-pill"><input type="checkbox" name="key-scope" value="webhooks:write" checked /> webhooks:write</label>
+              </div>
+            </div>
+
+            <div class="mt-12">
+              <label class="check-pill">
+                <input id="key-require-hmac" type="checkbox" />
+                Enforce Inbound HMAC Request Signing &amp; Nonce Replay Protection
+              </label>
+            </div>
+
+            <button id="create-key-btn" type="submit" class="btn btn-primary mt-16">Generate Secret Key</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Active &amp; Revoked Keys</div>
+          <div class="text-muted">Revoking a key blocks all requests using it immediately.</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name &amp; Scopes</th>
+                  <th>Environment</th>
+                  <th>Key Prefix</th>
+                  <th>HMAC</th>
+                  <th>Last Used</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="keys-table-body">
+                <tr><td colspan="7" class="empty-state">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB: WEBHOOKS ==================== -->
+      <section id="tab-webhooks" class="tab-panel hidden">
+        <div class="card">
+          <div class="card-title">Register Webhook Endpoint (<span id="wh-env-label">TEST</span>)</div>
+          <div class="text-muted">Public HTTPS endpoints on port 443 only. Every delivery is signed with HMAC-SHA256 and protected against SSRF.</div>
+
+          <form id="create-webhook-form" class="mt-16">
+            <div class="form-grid">
+              <div>
+                <label class="form-label" for="wh-url">HTTPS Endpoint URL</label>
+                <input id="wh-url" class="form-input" type="url" required placeholder="https://your-project.supabase.co/functions/v1/bryt-webhook" />
+              </div>
+              <div>
+                <label class="form-label" for="wh-desc">Description</label>
+                <input id="wh-desc" class="form-input" type="text" placeholder="e.g. Order Fulfilment Webhook" maxlength="120" />
+              </div>
+            </div>
+
+            <div class="mt-16">
+              <label class="form-label">Subscribed Events</label>
+              <div class="checkbox-group">
+                <label class="check-pill"><input type="checkbox" name="wh-event" value="payment.successful" checked /> payment.successful</label>
+                <label class="check-pill"><input type="checkbox" name="wh-event" value="payment.failed" checked /> payment.failed</label>
+                <label class="check-pill"><input type="checkbox" name="wh-event" value="payment.expired" checked /> payment.expired</label>
+                <label class="check-pill"><input type="checkbox" name="wh-event" value="withdrawal.paid" checked /> withdrawal.paid</label>
+              </div>
+            </div>
+
+            <button id="create-wh-btn" type="submit" class="btn btn-primary mt-16">Register Endpoint</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Configured Endpoints</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Endpoint URL</th>
+                  <th>Secret Prefix</th>
+                  <th>Failures</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="webhooks-endpoints-body">
+                <tr><td colspan="5" class="empty-state">No webhook endpoints registered yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Recent Deliveries</div>
+          <div class="text-muted">Failed deliveries retry automatically via exponential backoff (1m → 5m → 15m → 1h → 6h).</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Status</th>
+                  <th>HTTP</th>
+                  <th>Attempts</th>
+                  <th>Last Error</th>
+                  <th>Time</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="webhooks-deliveries-body">
+                <tr><td colspan="7" class="empty-state">No deliveries yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB: SETTLEMENTS ==================== -->
+      <section id="tab-settlements" class="tab-panel hidden">
+        <div class="alert alert-info">
+          <strong>Manual Payout Verification:</strong> Withdrawals draw strictly from your <strong>Live Available Balance</strong>. Once requested, funds move to Pending while BRYT Technologies verifies and transfers directly to your configured settlement bank account.
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Live Available to Withdraw</div>
+            <div class="stat-value" id="wd-live-available">₦0.00</div>
+            <div class="stat-sub">Minimum payout: ₦1,000.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Live Pending Payout</div>
+            <div class="stat-value" id="wd-live-pending">₦0.00</div>
+            <div class="stat-sub">Held awaiting bank transfer</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Settlement Destination</div>
+            <div style="font-weight:700;margin-top:8px;font-size:0.95rem;color:var(--bryt-navy);" id="wd-bank-display">Not Configured</div>
+            <div class="stat-sub" id="wd-bank-sub">Configure in Settings tab first</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Request Live Settlement Withdrawal</div>
+          <form id="withdrawal-form" class="mt-16">
+            <div class="form-grid" style="max-width:560px;">
+              <div>
+                <label class="form-label" for="wd-amount">Withdrawal Amount (NGN)</label>
+                <input id="wd-amount" class="form-input" type="number" min="1000" step="0.01" required placeholder="e.g. 25000" />
+              </div>
+              <div style="display:flex;align-items:flex-end;">
+                <button id="wd-submit-btn" type="submit" class="btn btn-primary" style="width:100%;">Submit Payout Request</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Withdrawal History</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Amount</th>
+                  <th>Destination Bank</th>
+                  <th>Status</th>
+                  <th>Bank Transfer Ref</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="withdrawals-table-body">
+                <tr><td colspan="6" class="empty-state">No withdrawal requests yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB: SETTINGS ==================== -->
+      <section id="tab-settings" class="tab-panel hidden">
+        <div class="card">
+          <div class="card-title">Fee Bearer Preferences</div>
+          <div class="text-muted">Choose whether your business absorbs the BRYT Pay fee or passes it to the paying customer.</div>
+
+          <form id="fee-settings-form" class="mt-16">
+            <div class="form-grid" style="max-width:580px;">
+              <div>
+                <label class="form-label" for="set-fee-bearer">Default Fee Bearer</label>
+                <select id="set-fee-bearer" class="form-select">
+                  <option value="merchant">Merchant bears fee (Deducted from settlement)</option>
+                  <option value="customer">Customer bears fee (Added to transfer amount)</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" for="set-contact-phone">Technical Contact Phone</label>
+                <input id="set-contact-phone" class="form-input" type="text" placeholder="08012345678" maxlength="20" />
+              </div>
+            </div>
+            <div id="fee-preview-box" class="alert alert-info mt-12" style="max-width:580px;"></div>
+            <button id="save-fee-btn" type="submit" class="btn btn-primary">Save Fee Preferences</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Settlement Bank Account</div>
+          <div class="text-muted">Verified Nigerian bank account for receiving manual settlement transfers.</div>
+
+          <form id="bank-settings-form" class="mt-16">
+            <div class="form-grid">
+              <div>
+                <label class="form-label" for="set-bank-select">Bank Name</label>
+                <select id="set-bank-select" class="form-select" required>
+                  <option value="">Select Bank...</option>
+                  <option value="044">Access Bank</option>
+                  <option value="050">Ecobank Nigeria</option>
+                  <option value="070">Fidelity Bank</option>
+                  <option value="011">First Bank of Nigeria</option>
+                  <option value="214">First City Monument Bank (FCMB)</option>
+                  <option value="058">Guaranty Trust Bank (GTBank)</option>
+                  <option value="030">Heritage Bank</option>
+                  <option value="301">Jaiz Bank</option>
+                  <option value="082">Keystone Bank</option>
+                  <option value="50211">Kuda Microfinance Bank</option>
+                  <option value="50515">Moniepoint MFB</option>
+                  <option value="999992">OPay (Paycom)</option>
+                  <option value="999991">PalmPay</option>
+                  <option value="076">Polaris Bank</option>
+                  <option value="101">Providus Bank</option>
+                  <option value="221">Stanbic IBTC Bank</option>
+                  <option value="232">Sterling Bank</option>
+                  <option value="033">United Bank for Africa (UBA)</option>
+                  <option value="032">Union Bank of Nigeria</option>
+                  <option value="215">Unity Bank</option>
+                  <option value="035">Wema Bank</option>
+                  <option value="057">Zenith Bank</option>
+                  <option value="120001">9Payment Service Bank (9PSB)</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" for="set-acc-number">Account Number (10-digit NUBAN)</label>
+                <input id="set-acc-number" class="form-input" type="text" pattern="\d{10}" maxlength="10" required placeholder="0123456789" />
+              </div>
+              <div>
+                <label class="form-label" for="set-acc-name">Account Holder Name</label>
+                <input id="set-acc-name" class="form-input" type="text" required placeholder="CAMPUS PULSE TECHNOLOGIES" maxlength="100" />
+              </div>
+            </div>
+            <button id="save-bank-btn" type="submit" class="btn btn-primary mt-16">Save Settlement Account</button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- ===================== ONE-TIME SECRET MODAL ===================== -->
+<div id="secret-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="secret-modal-title">
+  <div class="modal-content">
+    <h3 id="secret-modal-title" style="font-size:1.1rem;font-weight:800;color:var(--bryt-navy);">Copy Your Secret Now</h3>
+    <div class="alert alert-warning mt-12">
+      For security, this secret will <strong>never be displayed again</strong>. Copy it to your backend environment variables right now.
+    </div>
+    <div id="secret-primary-label" class="form-label">Secret Key</div>
+    <div id="secret-primary-value" class="secret-box"></div>
+    <button id="copy-primary-secret-btn" class="btn btn-primary btn-sm" type="button">Copy Secret</button>
+
+    <div id="secret-secondary-wrap" class="hidden mt-16">
+      <div class="form-label">HMAC Signing Secret</div>
+      <div id="secret-secondary-value" class="secret-box"></div>
+      <button id="copy-secondary-secret-btn" class="btn btn-outline btn-sm" type="button">Copy Signing Secret</button>
+    </div>
+
+    <div style="text-align:right;margin-top:22px;">
+      <button id="secret-modal-close" class="btn btn-outline" type="button">I Have Saved It Safely</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  (() => {
+    "use strict";
+
+    // Isolated Developer Portal Supabase Auth Client (no retail scripts)
+    const SUPABASE_URL = "https://yivxlmjaiczsnxakumof.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpdnhsbWphaWN6c254YWt1bW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMzIzNDMsImV4cCI6MjEwNDgwODM0M30.Niu_DNJKGCF1CClm3xl4hjYr2yGgvgOs37w85OuThGQ";
+    const PORTAL_API = "/api/partner-portal";
+    const IDLE_TIMEOUT_MS = 30 * 60 * 1000; // 30-minute auto-lock
+
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        storageKey: "bryt-dev-portal-auth",
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false
+      }
+    });
+
+    const state = {
+      user: null,
+      workspaces: [],
+      partnerId: null,
+      environment: "test",
+      activeTab: "overview",
+      overviewData: null,
+      hideBalances: false,
+      paymentsPage: 1,
+      paymentsTotalPages: 1
+    };
+
+    // =========================================================================
+    // SECURITY & FORMATTING HELPERS
+    // =========================================================================
+    function esc(val) {
+      return String(val ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function fmtNaira(amount, maskable = false) {
+      if (maskable && state.hideBalances) return "₦ •••••••";
+      const n = Number(amount || 0);
+      return "₦" + n.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return "—";
+      try {
+        return new Intl.DateTimeFormat("en-GB", {
+          day: "2-digit", month: "short", year: "numeric",
+          hour: "2-digit", minute: "2-digit"
+        }).format(new Date(iso));
+      } catch { return "—"; }
+    }
+
+    function statusBadge(status) {
+      const s = String(status || "").toLowerCase();
+      if (["paid", "active", "delivered"].includes(s)) return `<span class="badge badge-success">${esc(s)}</span>`;
+      if (["pending", "retrying", "approved"].includes(s)) return `<span class="badge badge-pending">${esc(s)}</span>`;
+      if (["failed", "underpaid", "suspended", "revoked", "rejected", "dead_letter"].includes(s)) return `<span class="badge badge-failed">${esc(s)}</span>`;
+      return `<span class="badge badge-muted">${esc(s)}</span>`;
+    }
+
+    let toastTimer;
+    function showToast(msg, type = "") {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.className = "show" + (type ? " " + type : "");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.className = ""; }, 3500);
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("Copied to clipboard", "success");
+      } catch {
+        showToast("Copy blocked by browser — select and copy manually", "error");
+      }
+    }
+
+    function openSecretModal(title, label, secret, signingSecret = null) {
+      document.getElementById("secret-modal-title").textContent = title;
+      document.getElementById("secret-primary-label").textContent = label;
+      document.getElementById("secret-primary-value").textContent = secret;
+      const secWrap = document.getElementById("secret-secondary-wrap");
+      if (signingSecret) {
+        document.getElementById("secret-secondary-value").textContent = signingSecret;
+        secWrap.classList.remove("hidden");
+      } else {
+        document.getElementById("secret-secondary-value").textContent = "";
+        secWrap.classList.add("hidden");
+      }
+      document.getElementById("secret-modal").classList.remove("hidden");
+    }
+
+    function closeAndScrubSecretModal() {
+      document.getElementById("secret-primary-value").textContent = "";
+      document.getElementById("secret-secondary-value").textContent = "";
+      document.getElementById("secret-modal").classList.add("hidden");
+    }
+
+    // Idle auto-lock timer
+    let idleTimer;
+    function resetIdleTimer() {
+      clearTimeout(idleTimer);
+      if (!state.user) return;
+      idleTimer = setTimeout(async () => {
+        await handleLogout(true);
+      }, IDLE_TIMEOUT_MS);
+    }
+    ["click", "keydown", "mousemove", "touchstart"].forEach(evt => {
+      document.addEventListener(evt, resetIdleTimer, { passive: true });
+    });
+
+    async function apiCall(payload) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) {
+        showAuthView();
+        throw new Error("Session expired. Please sign in again.");
+      }
+      const res = await fetch(PORTAL_API, {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + session.access_token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401) {
+        await handleLogout(false);
+        throw new Error("Session expired. Please sign in again.");
+      }
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || `Request failed (HTTP ${res.status})`);
+      }
+      return data;
+    }
+
+    // =========================================================================
+    // VIEW MANAGEMENT & BOOT
+    // =========================================================================
+    function showAuthView(message = "") {
+      closeAndScrubSecretModal();
+      state.user = null;
+      state.overviewData = null;
+      document.getElementById("auth-view").classList.remove("hidden");
+      document.getElementById("portal-view").classList.add("hidden");
+      document.getElementById("empty-workspace-view").classList.add("hidden");
+      const errEl = document.getElementById("auth-error");
+      if (message) {
+        errEl.textContent = message;
+        errEl.classList.remove("hidden");
+      } else {
+        errEl.classList.add("hidden");
+      }
+    }
+
+    async function handleLogout(isIdle = false) {
+      clearTimeout(idleTimer);
+      await sb.auth.signOut().catch(() => {});
+      // Scrub rendered financial tables on sign-out
+      ["overview-payments-body", "overview-ledger-body", "payments-table-body", "keys-table-body", "webhooks-endpoints-body", "webhooks-deliveries-body", "withdrawals-table-body"]
+        .forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ""; });
+      showAuthView(isIdle ? "Signed out automatically after 30 minutes of inactivity." : "");
+    }
+
+    async function bootPortal() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) {
+        showAuthView();
+        return;
+      }
+
+      try {
+        const ctx = await apiCall({ action: "portal_context" });
+        state.user = ctx.user;
+        state.workspaces = ctx.workspaces || [];
+        resetIdleTimer();
+
+        if (state.workspaces.length === 0) {
+          document.getElementById("auth-view").classList.add("hidden");
+          document.getElementById("portal-view").classList.add("hidden");
+          document.getElementById("empty-workspace-view").classList.remove("hidden");
+          document.getElementById("empty-ws-email").textContent = `Signed in as ${ctx.user.email}`;
+          document.getElementById("empty-admin-link").classList.toggle("hidden", !ctx.user.is_admin);
+          return;
+        }
+
+        document.getElementById("auth-view").classList.add("hidden");
+        document.getElementById("empty-workspace-view").classList.add("hidden");
+        document.getElementById("portal-view").classList.remove("hidden");
+        document.getElementById("user-email-badge").textContent = ctx.user.email;
+        document.getElementById("admin-console-link").classList.toggle("hidden", !ctx.user.is_admin);
+
+        const wsSelect = document.getElementById("workspace-select");
+        wsSelect.innerHTML = state.workspaces
+          .map(w => `<option value="${esc(w.id)}">${esc(w.name)} (${esc(w.member_role)})</option>`)
+          .join("");
+
+        state.partnerId = state.workspaces[0].id;
+        await loadActiveTab();
+      } catch (err) {
+        showAuthView(err.message);
+      }
+    }
+
+    function updateEnvUI() {
+      const isLive = state.environment === "live";
+      document.getElementById("btn-env-test").className = "env-btn" + (!isLive ? " active-test" : "");
+      document.getElementById("btn-env-live").className = "env-btn" + (isLive ? " active-live" : "");
+      const banner = document.getElementById("env-banner");
+      banner.className = "env-banner " + (isLive ? "live" : "test");
+      document.getElementById("env-banner-text").textContent = isLive
+        ? "LIVE PRODUCTION MODE — Real NGN transfers and partner settlement balances."
+        : "SANDBOX MODE — Simulated transfers & test balances only. No real NGN is moved.";
+      document.getElementById("hero-env-kicker").textContent = isLive ? "Live Settlement Balance" : "Test Settlement Balance";
+      document.getElementById("wh-env-label").textContent = isLive ? "LIVE" : "TEST";
+      document.getElementById("key-env").value = state.environment;
+      const prefixSample = isLive ? "bryt_live_sk_YOUR_SECRET_KEY" : "bryt_test_sk_YOUR_SECRET_KEY";
+      document.getElementById("quick-curl-snippet").textContent =
+`POST https://brytpay.name.ng/api/v1/payments/initialize
+Authorization: Bearer ${prefixSample}
+Idempotency-Key: order_1001_unique
+Content-Type: application/json
+
+{ "amount": 5000, "customer_email": "student@example.com", "customer_name": "Amina Musa" }`;
+    }
+
+    function setMobileDrawer(open) {
+      document.getElementById("sidebar").classList.toggle("open", open);
+      document.getElementById("drawer-backdrop").classList.toggle("open", open);
+    }
+
+    function switchTab(tab) {
+      state.activeTab = tab;
+      const titles = {
+        overview: "Overview", payments: "Payments", keys: "API Keys",
+        webhooks: "Webhooks", settlements: "Settlements", settings: "Settings"
+      };
+      document.getElementById("topbar-title").textContent = titles[tab] || "Overview";
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("hidden", p.id !== "tab-" + tab));
+      setMobileDrawer(false);
+      loadActiveTab();
+    }
+
+    async function loadActiveTab() {
+      if (!state.partnerId) return;
+      updateEnvUI();
+      try {
+        if (["overview", "settlements", "settings"].includes(state.activeTab)) await loadOverview();
+        if (state.activeTab === "payments") await loadPayments();
+        if (state.activeTab === "keys") await loadKeys();
+        if (state.activeTab === "webhooks") await loadWebhooks();
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+
+    // =========================================================================
+    // DATA RENDERERS
+    // =========================================================================
+    function renderBalances() {
+      if (!state.overviewData) return;
+      const w = state.overviewData.wallets[state.environment] || {};
+      const liveW = state.overviewData.wallets.live || {};
+      document.getElementById("stat-available").textContent = fmtNaira(w.available_balance, true);
+      document.getElementById("stat-pending").textContent = fmtNaira(w.pending_withdrawal_balance, true);
+      document.getElementById("stat-collected").textContent = fmtNaira(w.total_collected, true);
+      document.getElementById("stat-fees").textContent = fmtNaira(w.total_fees, true);
+      document.getElementById("wd-live-available").textContent = fmtNaira(liveW.available_balance, true);
+      document.getElementById("wd-live-pending").textContent = fmtNaira(liveW.pending_withdrawal_balance, true);
+      document.getElementById("toggle-balance-btn").textContent = state.hideBalances ? "Show Balances" : "Hide Balances";
+    }
+
+    async function loadOverview() {
+      const data = await apiCall({
+        action: "partner_overview",
+        partner_id: state.partnerId,
+        environment: state.environment
+      });
+      state.overviewData = data;
+      const p = data.partner;
+
+      const badge = document.getElementById("partner-status-badge");
+      badge.textContent = p.status.toUpperCase();
+      badge.className = "badge " + (p.status === "active" ? "badge-success" : p.status === "suspended" ? "badge-failed" : "badge-pending");
+
+      document.getElementById("stat-fee-rate").textContent = `Platform Fees (${Number(p.fee_percent)}%)`;
+      document.getElementById("cfg-partner-name").textContent = p.name;
+      document.getElementById("cfg-slug").textContent = p.slug;
+      document.getElementById("cfg-fee").textContent = `${Number(p.fee_percent)}%${p.fee_cap ? ` (cap ${fmtNaira(p.fee_cap)})` : ""}`;
+      document.getElementById("cfg-bearer").textContent = p.default_fee_bearer === "customer" ? "Customer (added on top)" : "Merchant (deducted)";
+      document.getElementById("cfg-rpm").textContent = `${p.rate_limit_rpm} req/min`;
+      renderBalances();
+
+      const pBody = document.getElementById("overview-payments-body");
+      if (!data.recent_payments.length) {
+        pBody.innerHTML = `<tr><td colspan="6" class="empty-state">No ${esc(state.environment)} payments recorded yet.</td></tr>`;
+      } else {
+        pBody.innerHTML = data.recent_payments.slice(0, 8).map(tx => `
+          <tr>
+            <td><div class="mono" style="font-weight:700;color:var(--bryt-navy);">${esc(tx.reference)}</div><div class="text-muted">${esc(tx.partner_reference || "")}</div></td>
+            <td><div style="font-weight:600;">${esc(tx.customer_name)}</div><div class="text-muted">${esc(tx.customer_email)}</div></td>
+            <td><strong>${fmtNaira(tx.expected_amount)}</strong></td>
+            <td><div class="text-muted">Fee: ${fmtNaira(tx.fee_amount)}</div><div style="font-weight:700;color:var(--bryt-navy);">Net: ${fmtNaira(tx.net_amount)}</div></td>
+            <td>${statusBadge(tx.status)}</td>
+            <td class="text-muted">${fmtDate(tx.created_at)}</td>
+          </tr>
+        `).join("");
+      }
+
+      const lBody = document.getElementById("overview-ledger-body");
+      if (!data.ledger.length) {
+        lBody.innerHTML = `<tr><td colspan="6" class="empty-state">No ledger entries in ${esc(state.environment)} mode yet.</td></tr>`;
+      } else {
+        lBody.innerHTML = data.ledger.map(l => `
+          <tr>
+            <td><span class="badge badge-primary">${esc(l.entry_type)}</span></td>
+            <td class="mono">${esc(l.reference)}</td>
+            <td><strong>${fmtNaira(l.amount)}</strong></td>
+            <td>${fmtNaira(l.balance_after)}</td>
+            <td class="text-muted">${esc(l.description || "—")}</td>
+            <td class="text-muted">${fmtDate(l.created_at)}</td>
+          </tr>
+        `).join("");
+      }
+
+      if (p.settlement_account_number) {
+        document.getElementById("wd-bank-display").textContent = `${p.settlement_bank_name || p.settlement_bank_code} — ${p.settlement_account_number}`;
+        document.getElementById("wd-bank-sub").textContent = p.settlement_account_name || "";
+      } else {
+        document.getElementById("wd-bank-display").textContent = "Not Configured";
+        document.getElementById("wd-bank-sub").textContent = "Add your settlement bank account in Settings";
+      }
+
+      const wdBody = document.getElementById("withdrawals-table-body");
+      if (!data.withdrawals.length) {
+        wdBody.innerHTML = `<tr><td colspan="6" class="empty-state">No manual withdrawal requests yet.</td></tr>`;
+      } else {
+        wdBody.innerHTML = data.withdrawals.map(wd => `
+          <tr>
+            <td class="mono" style="font-weight:700;color:var(--bryt-navy);">${esc(wd.reference)}</td>
+            <td><strong>${fmtNaira(wd.amount)}</strong></td>
+            <td><div style="font-weight:600;">${esc(wd.bank_name)}</div><div class="text-muted mono">${esc(wd.account_number)} • ${esc(wd.account_name)}</div></td>
+            <td>${statusBadge(wd.status)}</td>
+            <td class="mono">${esc(wd.external_transfer_ref || "—")}${wd.admin_notes ? `<div class="text-muted">${esc(wd.admin_notes)}</div>` : ""}</td>
+            <td class="text-muted">${fmtDate(wd.created_at)}</td>
+          </tr>
+        `).join("");
+      }
+
+      document.getElementById("set-fee-bearer").value = p.default_fee_bearer || "merchant";
+      document.getElementById("set-contact-phone").value = p.contact_phone || "";
+      if (p.settlement_bank_code) document.getElementById("set-bank-select").value = p.settlement_bank_code;
+      document.getElementById("set-acc-number").value = p.settlement_account_number || "";
+      document.getElementById("set-acc-name").value = p.settlement_account_name || "";
+      updateFeePreview();
+    }
+
+    function updateFeePreview() {
+      const rate = Number(state.overviewData?.partner?.fee_percent ?? 1.5);
+      const bearer = document.getElementById("set-fee-bearer").value;
+      const fee = Math.round((1000 * rate) / 100 * 100) / 100;
+      const box = document.getElementById("fee-preview-box");
+      box.textContent = "";
+      const strong = document.createElement("strong");
+      strong.textContent = `Example on ₦1,000.00 (${rate}%): `;
+      box.appendChild(strong);
+      box.appendChild(document.createTextNode(
+        bearer === "customer"
+          ? `Customer transfers ${fmtNaira(1000 + fee)} → You settle ₦1,000.00.`
+          : `Customer transfers ₦1,000.00 → BRYT fee is ${fmtNaira(fee)} → You settle ${fmtNaira(1000 - fee)}.`
+      ));
+    }
+
+    async function loadPayments() {
+      const data = await apiCall({
+        action: "partner_payments",
+        partner_id: state.partnerId,
+        environment: state.environment,
+        page: state.paymentsPage,
+        limit: 15,
+        status: document.getElementById("pay-status").value,
+        search: document.getElementById("pay-search").value.trim()
+      });
+
+      state.paymentsTotalPages = Math.max(1, data.pagination.total_pages || 1);
+      document.getElementById("pay-page-info").textContent = `Page ${data.pagination.page} of ${state.paymentsTotalPages} (${data.pagination.total} total)`;
+      document.getElementById("pay-prev-btn").disabled = state.paymentsPage <= 1;
+      document.getElementById("pay-next-btn").disabled = state.paymentsPage >= state.paymentsTotalPages;
+
+      const body = document.getElementById("payments-table-body");
+      if (!data.items.length) {
+        body.innerHTML = `<tr><td colspan="7" class="empty-state">No matching payments found.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = data.items.map(tx => `
+        <tr>
+          <td><div class="mono" style="font-weight:700;color:var(--bryt-navy);">${esc(tx.reference)}</div><div class="text-muted mono">${esc(tx.partner_reference || "—")}</div></td>
+          <td><div>${esc(tx.virtual_account_bank)}</div><div class="mono text-muted">${esc(tx.virtual_account_number)}</div></td>
+          <td><div>${esc(tx.customer_name)}</div><div class="text-muted">${esc(tx.customer_email)}</div></td>
+          <td><div>Exp: ${fmtNaira(tx.expected_amount)}</div><div class="text-muted">Rcvd: ${fmtNaira(tx.amount_received)}</div></td>
+          <td><div>Net: <strong>${fmtNaira(tx.net_amount)}</strong></div><div class="text-muted">Fee (${esc(tx.fee_bearer)}): ${fmtNaira(tx.fee_amount)}</div></td>
+          <td>${statusBadge(tx.status)}</td>
+          <td class="text-muted">${fmtDate(tx.created_at)}</td>
+        </tr>
+      `).join("");
+    }
+
+    async function loadKeys() {
+      const data = await apiCall({ action: "partner_list_keys", partner_id: state.partnerId });
+      const body = document.getElementById("keys-table-body");
+      if (!data.keys.length) {
+        body.innerHTML = `<tr><td colspan="7" class="empty-state">No API keys created yet.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = data.keys.map(k => `
+        <tr>
+          <td><strong style="color:var(--bryt-navy);">${esc(k.name)}</strong><div class="text-muted">${esc((k.scopes || []).join(", "))}</div></td>
+          <td><span class="badge ${k.environment === "live" ? "badge-success" : "badge-pending"}">${esc(k.environment)}</span></td>
+          <td class="mono">${esc(k.key_prefix)}</td>
+          <td>${k.require_hmac ? '<span class="badge badge-primary">Enforced</span>' : '<span class="text-muted">Optional</span>'}</td>
+          <td class="text-muted">${k.last_used_at ? fmtDate(k.last_used_at) : "Never"}</td>
+          <td>${statusBadge(k.status)}</td>
+          <td>
+            ${k.status === "active"
+              ? `<button class="btn btn-danger btn-sm" type="button" data-action="revoke-key" data-id="${esc(k.id)}" data-label="${esc(k.key_prefix)}">Revoke</button>`
+              : `<span class="text-muted">Revoked</span>`}
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    async function loadWebhooks() {
+      const data = await apiCall({
+        action: "partner_list_webhooks",
+        partner_id: state.partnerId,
+        environment: state.environment
+      });
+
+      const epBody = document.getElementById("webhooks-endpoints-body");
+      if (!data.endpoints.length) {
+        epBody.innerHTML = `<tr><td colspan="5" class="empty-state">No webhook endpoints registered for ${esc(state.environment)} mode.</td></tr>`;
+      } else {
+        epBody.innerHTML = data.endpoints.map(ep => `
+          <tr>
+            <td><div class="mono" style="word-break:break-all;font-weight:700;color:var(--bryt-navy);">${esc(ep.url)}</div><div class="text-muted">${esc(ep.description || "")}</div></td>
+            <td class="mono">${esc(ep.secret_prefix)}</td>
+            <td>${ep.consecutive_failures > 0 ? `<span class="badge badge-failed">${ep.consecutive_failures}</span>` : "0"}</td>
+            <td>${ep.is_active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-muted">Paused</span>'}</td>
+            <td>
+              <div class="flex">
+                <button class="btn btn-outline btn-sm" type="button" data-action="rotate-wh" data-id="${esc(ep.id)}">Rotate Secret</button>
+                <button class="btn btn-outline btn-sm" type="button" data-action="toggle-wh" data-id="${esc(ep.id)}" data-next="${ep.is_active ? "false" : "true"}">${ep.is_active ? "Pause" : "Enable"}</button>
+              </div>
+            </td>
+          </tr>
+        `).join("");
+      }
+
+      const delBody = document.getElementById("webhooks-deliveries-body");
+      if (!data.deliveries.length) {
+        delBody.innerHTML = `<tr><td colspan="7" class="empty-state">No webhook deliveries in ${esc(state.environment)} mode yet.</td></tr>`;
+      } else {
+        delBody.innerHTML = data.deliveries.map(d => `
+          <tr>
+            <td><div class="mono" style="font-weight:700;color:var(--bryt-navy);">${esc(d.event_type)}</div><div class="text-muted mono">${esc(d.event_id)}</div></td>
+            <td>${statusBadge(d.status)}</td>
+            <td class="mono">${d.last_http_status ?? "—"}</td>
+            <td>${d.attempt_count} / ${d.max_attempts}</td>
+            <td class="text-muted" style="max-width:220px;word-break:break-word;">${esc(d.last_error || "—")}</td>
+            <td class="text-muted">${fmtDate(d.delivered_at || d.created_at)}</td>
+            <td><button class="btn btn-outline btn-sm" type="button" data-action="replay-wh" data-id="${esc(d.id)}">Replay</button></td>
+          </tr>
+        `).join("");
+      }
+    }
+
+    // =========================================================================
+    // DELEGATED SAFE EVENT HANDLERS (ZERO INLINE ONCLICK)
+    // =========================================================================
+    document.addEventListener("click", async (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+
+      if (btn.dataset.copy) {
+        await copyText(btn.dataset.copy);
+        return;
+      }
+
+      if (btn.dataset.goto) {
+        switchTab(btn.dataset.goto);
+        return;
+      }
+
+      const action = btn.dataset.action;
+      if (!action) return;
+
+      const id = btn.dataset.id;
+      btn.disabled = true;
+      try {
+        if (action === "revoke-key") {
+          const label = btn.dataset.label || "this key";
+          if (!confirm(`Revoke API key ${label} immediately? Any server using it will fail instantly.`)) return;
+          await apiCall({ action: "partner_revoke_key", partner_id: state.partnerId, key_id: id });
+          showToast("API key revoked immediately", "success");
+          await loadKeys();
+        } else if (action === "rotate-wh") {
+          if (!confirm("Rotate signing secret? Your previous secret remains valid for 24 hours so you can update without downtime.")) return;
+          const res = await apiCall({ action: "partner_rotate_webhook_secret", partner_id: state.partnerId, endpoint_id: id });
+          openSecretModal("Webhook Secret Rotated", "New Signing Secret (Previous valid 24h)", res.signing_secret_once);
+          await loadWebhooks();
+        } else if (action === "toggle-wh") {
+          const nextState = btn.dataset.next === "true";
+          await apiCall({ action: "partner_toggle_webhook", partner_id: state.partnerId, endpoint_id: id, is_active: nextState });
+          showToast(nextState ? "Endpoint enabled" : "Endpoint paused", "success");
+          await loadWebhooks();
+        } else if (action === "replay-wh") {
+          const res = await apiCall({ action: "partner_replay_delivery", partner_id: state.partnerId, delivery_id: id });
+          const st = res.results?.[0]?.status || "replayed";
+          showToast(`Replay status: ${st}`, st === "delivered" ? "success" : "error");
+          await loadWebhooks();
+        }
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // =========================================================================
+    // FORM & CONTROL LISTENERS
+    // =========================================================================
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("login-btn");
+      const errEl = document.getElementById("auth-error");
+      errEl.classList.add("hidden");
+      btn.disabled = true;
+      btn.textContent = "Verifying...";
+
+      try {
+        const { error } = await sb.auth.signInWithPassword({
+          email: document.getElementById("login-email").value.trim(),
+          password: document.getElementById("login-password").value
+        });
+        if (error) throw error;
+        document.getElementById("login-password").value = "";
+        await bootPortal();
+      } catch (err) {
+        errEl.textContent = err.message || "Invalid email or password.";
+        errEl.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Sign In Securely";
+      }
+    });
+
+    document.getElementById("logout-btn").addEventListener("click", () => handleLogout(false));
+    document.getElementById("empty-logout-btn").addEventListener("click", () => handleLogout(false));
+    document.getElementById("mobile-menu-btn").addEventListener("click", () => setMobileDrawer(true));
+    document.getElementById("drawer-backdrop").addEventListener("click", () => setMobileDrawer(false));
+
+    document.getElementById("toggle-balance-btn").addEventListener("click", () => {
+      state.hideBalances = !state.hideBalances;
+      renderBalances();
+    });
+
+    document.getElementById("workspace-select").addEventListener("change", (e) => {
+      state.partnerId = e.target.value;
+      state.paymentsPage = 1;
+      loadActiveTab();
+    });
+
+    document.getElementById("btn-env-test").addEventListener("click", () => {
+      state.environment = "test";
+      state.paymentsPage = 1;
+      loadActiveTab();
+    });
+
+    document.getElementById("btn-env-live").addEventListener("click", () => {
+      state.environment = "live";
+      state.paymentsPage = 1;
+      loadActiveTab();
+    });
+
+    document.getElementById("refresh-btn").addEventListener("click", () => loadActiveTab());
+
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+      btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+    });
+
+    document.getElementById("pay-filter-btn").addEventListener("click", () => { state.paymentsPage = 1; loadPayments(); });
+    document.getElementById("pay-reset-btn").addEventListener("click", () => {
+      document.getElementById("pay-search").value = "";
+      document.getElementById("pay-status").value = "";
+      state.paymentsPage = 1;
+      loadPayments();
+    });
+    document.getElementById("pay-prev-btn").addEventListener("click", () => {
+      if (state.paymentsPage > 1) { state.paymentsPage--; loadPayments(); }
+    });
+    document.getElementById("pay-next-btn").addEventListener("click", () => {
+      if (state.paymentsPage < state.paymentsTotalPages) { state.paymentsPage++; loadPayments(); }
+    });
+
+    document.getElementById("create-key-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("create-key-btn");
+      const env = document.getElementById("key-env").value;
+      const scopes = Array.from(document.querySelectorAll('input[name="key-scope"]:checked')).map(c => c.value);
+      if (!scopes.length) return showToast("Select at least one scope", "error");
+      if (env === "live" && !confirm("Generate a LIVE production secret key? Treat it with the same care as a bank credential.")) return;
+
+      btn.disabled = true;
+      try {
+        const res = await apiCall({
+          action: "partner_create_key",
+          partner_id: state.partnerId,
+          environment: env,
+          name: document.getElementById("key-name").value.trim(),
+          require_hmac: document.getElementById("key-require-hmac").checked,
+          scopes
+        });
+        document.getElementById("key-name").value = "";
+        document.getElementById("key-require-hmac").checked = false;
+        openSecretModal(
+          `${env.toUpperCase()} API Key Created`,
+          "Secret API Key (Shown Once)",
+          res.secret_key_once,
+          res.signing_secret_once
+        );
+        await loadKeys();
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById("create-webhook-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("create-wh-btn");
+      const events = Array.from(document.querySelectorAll('input[name="wh-event"]:checked')).map(c => c.value);
+      if (!events.length) return showToast("Select at least one webhook event", "error");
+
+      btn.disabled = true;
+      try {
+        const res = await apiCall({
+          action: "partner_create_webhook",
+          partner_id: state.partnerId,
+          environment: state.environment,
+          url: document.getElementById("wh-url").value.trim(),
+          description: document.getElementById("wh-desc").value.trim(),
+          subscribed_events: events
+        });
+        document.getElementById("wh-url").value = "";
+        document.getElementById("wh-desc").value = "";
+        openSecretModal("Webhook Endpoint Registered", "Webhook Signing Secret (whsec_)", res.signing_secret_once);
+        await loadWebhooks();
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById("withdrawal-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("wd-submit-btn");
+      const amount = Number(document.getElementById("wd-amount").value);
+      if (!confirm(`Request manual Live withdrawal of ${fmtNaira(amount)} to your configured settlement bank account?`)) return;
+
+      btn.disabled = true;
+      try {
+        await apiCall({
+          action: "partner_request_withdrawal",
+          partner_id: state.partnerId,
+          amount
+        });
+        document.getElementById("wd-amount").value = "";
+        showToast("Withdrawal submitted! BRYT Admin has been notified.", "success");
+        await loadOverview();
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById("set-fee-bearer").addEventListener("change", updateFeePreview);
+
+    document.getElementById("fee-settings-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("save-fee-btn");
+      btn.disabled = true;
+      try {
+        await apiCall({
+          action: "partner_update_settings",
+          partner_id: state.partnerId,
+          default_fee_bearer: document.getElementById("set-fee-bearer").value,
+          contact_phone: document.getElementById("set-contact-phone").value.trim()
+        });
+        showToast("Fee preferences saved", "success");
+        await loadOverview();
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById("bank-settings-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("save-bank-btn");
+      const bankSel = document.getElementById("set-bank-select");
+      const bankCode = bankSel.value;
+      const bankName = bankSel.options[bankSel.selectedIndex]?.text || bankCode;
+      btn.disabled = true;
+      try {
+        await apiCall({
+          action: "partner_update_settings",
+          partner_id: state.partnerId,
+          settlement_bank_code: bankCode,
+          settlement_bank_name: bankName,
+          settlement_account_number: document.getElementById("set-acc-number").value.trim(),
+          settlement_account_name: document.getElementById("set-acc-name").value.trim()
+        });
+        showToast("Settlement bank account saved", "success");
+        await loadOverview();
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById("copy-primary-secret-btn").addEventListener("click", () => {
+      copyText(document.getElementById("secret-primary-value").textContent);
+    });
+    document.getElementById("copy-secondary-secret-btn").addEventListener("click", () => {
+      copyText(document.getElementById("secret-secondary-value").textContent);
+    });
+    document.getElementById("secret-modal-close").addEventListener("click", closeAndScrubSecretModal);
+
+    bootPortal();
+  })();
+</script>
+</body>
+</html>
