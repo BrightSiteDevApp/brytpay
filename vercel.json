@@ -18,9 +18,24 @@
         { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type, payvessel-http-signature, HTTP_PAYVESSEL_HTTP_SIGNATURE" }
       ]
+    },
+    {
+      "source": "/api/v1/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Access-Control-Allow-Origin", "value": "https://brytpay.name.ng" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Authorization, Content-Type, Idempotency-Key, X-BRYT-Timestamp, X-BRYT-Nonce, X-BRYT-Signature" }
+      ]
     }
   ],
   "rewrites": [
+    {
+      "source": "/api/v1/:path*",
+      "destination": "https://yivxlmjaiczsnxakumof.supabase.co/functions/v1/api-v1/:path*"
+    },
     {
       "source": "/api/payvessel-webhook",
       "destination": "https://yivxlmjaiczsnxakumof.supabase.co/functions/v1/payvessel-webhook"
