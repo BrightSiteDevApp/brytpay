@@ -14,7 +14,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      /* Official BRYT Brand Colors (from main.css) */
       --bryt-primary: #1D5ED0;
       --bryt-primary-hover: #174EB0;
       --bryt-accent: #159FE3;
@@ -22,7 +21,6 @@
       --bryt-black: #0B1220;
       --bryt-white: #FFFFFF;
 
-      /* Surfaces & Text */
       --bg-light: #F5F8FC;
       --surface-white: #FFFFFF;
       --border-color: #E2E8F0;
@@ -30,7 +28,6 @@
       --text-main: #0B1220;
       --text-muted: #64748B;
 
-      /* Status Colors */
       --success-text: #047857;
       --success-bg: #D1FAE5;
       --pending-text: #B45309;
@@ -38,7 +35,6 @@
       --failed-text: #B91C1C;
       --failed-bg: #FEE2E2;
 
-      /* Radius & Shadows */
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
@@ -48,13 +44,7 @@
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif; }
-    body {
-      background-color: var(--bg-light);
-      color: var(--text-main);
-      line-height: 1.5;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+    body { background-color: var(--bg-light); color: var(--text-main); line-height: 1.5; min-height: 100vh; overflow-x: hidden; }
 
     .hidden { display: none !important; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.8rem; }
@@ -65,7 +55,6 @@
     .mt-16 { margin-top: 16px; }
     .mt-20 { margin-top: 20px; }
 
-    /* Buttons matching BRYT Fintech UI */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
       padding: 11px 18px; border-radius: var(--radius-sm); border: 1.5px solid transparent;
@@ -75,8 +64,7 @@
     .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
     .btn-primary {
       background: linear-gradient(to right, var(--bryt-primary), var(--bryt-accent));
-      color: var(--bryt-white);
-      box-shadow: 0 4px 12px rgba(29, 94, 208, 0.22);
+      color: var(--bryt-white); box-shadow: 0 4px 12px rgba(29, 94, 208, 0.22);
     }
     .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(29, 94, 208, 0.32); }
     .btn-navy { background: var(--bryt-navy); color: var(--bryt-white); }
@@ -87,7 +75,6 @@
     .btn-danger:hover:not(:disabled) { background: #fecaca; }
     .btn-sm { padding: 7px 12px; font-size: 0.76rem; }
 
-    /* Badges */
     .badge {
       display: inline-flex; align-items: center; gap: 5px;
       padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700;
@@ -99,20 +86,15 @@
     .badge-primary { background: #F0F6FF; color: var(--bryt-primary); }
     .badge-muted { background: #E2E8F0; color: #475569; }
 
-    /* Forms */
     .form-label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--bryt-navy); margin-bottom: 6px; }
     .form-input, .form-select {
       width: 100%; padding: 12px 14px; border: 1.5px solid var(--border-color);
       border-radius: var(--radius-sm); font-size: 0.88rem; color: var(--text-main);
       background: var(--surface-white); outline: none; transition: var(--transition);
     }
-    .form-input:focus, .form-select:focus {
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px rgba(29, 94, 208, 0.12);
-    }
+    .form-input:focus, .form-select:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(29, 94, 208, 0.12); }
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
 
-    /* Auth Shell */
     .auth-shell {
       min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
       background:
@@ -132,7 +114,6 @@
       font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
     }
 
-    /* Main App Layout */
     .app-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
 
     .sidebar {
@@ -190,7 +171,6 @@
 
     .content { padding: 24px; max-width: 1180px; width: 100%; margin: 0 auto; }
 
-    /* Signature BRYT Navy Settlement Hero Card */
     .settlement-hero {
       background: var(--bryt-navy); border-radius: var(--radius-lg); padding: 26px 24px;
       color: var(--bryt-white); box-shadow: var(--shadow-md); position: relative; overflow: hidden;
@@ -205,10 +185,7 @@
       position: relative; z-index: 2; display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; align-items: end;
     }
-    .hero-kicker {
-      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px;
-      color: var(--bryt-accent); font-weight: 700;
-    }
+    .hero-kicker { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--bryt-accent); font-weight: 700; }
     .hero-amount { font-size: 2rem; font-weight: 800; margin-top: 6px; letter-spacing: -0.5px; }
     .hero-metric-label { font-size: 0.72rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
     .hero-metric-val { font-size: 1.2rem; font-weight: 700; margin-top: 4px; }
@@ -218,7 +195,6 @@
     }
     .btn-ghost-light:hover { background: rgba(255, 255, 255, 0.2); }
 
-    /* Cards & Tables */
     .card {
       background: var(--surface-white); border: 1px solid var(--border-color);
       border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow-sm);
@@ -235,6 +211,13 @@
     .stat-value { font-size: 1.4rem; font-weight: 800; color: var(--bryt-navy); margin-top: 6px; }
     .stat-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
 
+    .policy-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .policy-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;
+      background: var(--bg-light); border: 1px solid var(--border-color); color: var(--bryt-navy);
+    }
+
     .table-wrap { overflow-x: auto; margin-top: 14px; }
     table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
     th {
@@ -245,7 +228,6 @@
     tr:last-child td { border-bottom: none; }
     .empty-state { text-align: center; padding: 32px 16px; color: var(--text-muted); font-size: 0.88rem; }
 
-    /* Code Snippet & Alerts */
     .code-block {
       background: #080D18; color: #E2E8F0; border-radius: var(--radius-md);
       padding: 14px 16px; overflow-x: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -263,7 +245,6 @@
       font-size: 0.78rem; font-weight: 600; color: var(--bryt-navy); cursor: pointer;
     }
 
-    /* Modals */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(7, 26, 58, 0.65); backdrop-filter: blur(4px);
       display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 200;
@@ -278,22 +259,18 @@
       border: 1px solid rgba(56, 189, 248, 0.25);
     }
 
-    /* Toast */
     #toast {
       position: fixed; bottom: 20px; right: 20px; z-index: 300;
       background: var(--bryt-navy); color: #fff; padding: 12px 18px; border-radius: var(--radius-md);
       font-size: 0.84rem; font-weight: 600; box-shadow: var(--shadow-md);
-      transform: translateY(130%); transition: transform 0.2s ease; max-width: 360px;
+      transform: translateY(130%); transition: transform 0.2s ease; max-width: 380px;
     }
     #toast.show { transform: translateY(0); }
     #toast.error { background: var(--failed-text); }
     #toast.success { background: var(--success-text); }
 
-    /* Mobile Drawer */
     .mobile-menu-btn { display: none; }
-    .drawer-backdrop {
-      position: fixed; inset: 0; background: rgba(7, 26, 58, 0.45); z-index: 50; display: none;
-    }
+    .drawer-backdrop { position: fixed; inset: 0; background: rgba(7, 26, 58, 0.45); z-index: 50; display: none; }
     .drawer-backdrop.open { display: block; }
 
     @media (max-width: 880px) {
@@ -749,7 +726,7 @@ Content-Type: application/json
       <!-- ==================== TAB: SETTLEMENTS ==================== -->
       <section id="tab-settlements" class="tab-panel hidden">
         <div class="alert alert-info">
-          <strong>Manual Payout Verification:</strong> Withdrawals draw strictly from your <strong>Live Available Balance</strong>. Once requested, funds move to Pending while BRYT Technologies verifies and transfers directly to your configured settlement bank account.
+          <strong>Manual Payout Policy &amp; SLA:</strong> Withdrawals draw strictly from your <strong>Live Available Balance</strong> (minimum <strong>₦1,000.00</strong>). Requests are accepted daily from <strong>9:00 AM – 10:00 PM WAT</strong>, require a <strong>1-hour cooldown</strong> between requests, and are limited to <strong>2 pending withdrawals</strong> at a time. Payouts take <strong>30 minutes – 3 hours</strong> to be processed into your settlement bank account.
         </div>
 
         <div class="stats-grid">
@@ -761,7 +738,7 @@ Content-Type: application/json
           <div class="stat-card">
             <div class="stat-label">Live Pending Payout</div>
             <div class="stat-value" id="wd-live-pending">₦0.00</div>
-            <div class="stat-sub">Held awaiting bank transfer</div>
+            <div class="stat-sub" id="wd-pending-slot-sub">Active requests: 0 / 2</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Settlement Destination</div>
@@ -771,12 +748,29 @@ Content-Type: application/json
         </div>
 
         <div class="card">
-          <div class="card-title">Request Live Settlement Withdrawal</div>
+          <div class="flex-between">
+            <div>
+              <div class="card-title">Request Live Settlement Withdrawal</div>
+              <div class="text-muted">Processing time: <strong>30 minutes – 3 hours</strong> after submission</div>
+            </div>
+            <span id="wd-window-badge" class="badge badge-success">Window Open (WAT)</span>
+          </div>
+
+          <div class="policy-pills">
+            <span class="policy-pill">Min: ₦1,000</span>
+            <span class="policy-pill">Hours: 9:00 AM – 10:00 PM WAT</span>
+            <span class="policy-pill" id="wd-cooldown-pill">Cooldown: Ready</span>
+            <span class="policy-pill" id="wd-slots-pill">Pending Slots: 0 / 2</span>
+            <span class="policy-pill">ETA: 30 min – 3 hrs</span>
+          </div>
+
+          <div id="wd-guard-notice" class="alert alert-warning hidden mt-12"></div>
+
           <form id="withdrawal-form" class="mt-16">
             <div class="form-grid" style="max-width:560px;">
               <div>
                 <label class="form-label" for="wd-amount">Withdrawal Amount (NGN)</label>
-                <input id="wd-amount" class="form-input" type="number" min="1000" step="0.01" required placeholder="e.g. 25000" />
+                <input id="wd-amount" class="form-input" type="number" min="1000" step="0.01" required placeholder="e.g. 5000" />
               </div>
               <div style="display:flex;align-items:flex-end;">
                 <button id="wd-submit-btn" type="submit" class="btn btn-primary" style="width:100%;">Submit Payout Request</button>
@@ -913,11 +907,13 @@ Content-Type: application/json
   (() => {
     "use strict";
 
-    // Isolated Developer Portal Supabase Auth Client (no retail scripts)
     const SUPABASE_URL = "https://yivxlmjaiczsnxakumof.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpdnhsbWphaWN6c254YWt1bW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMzIzNDMsImV4cCI6MjEwNDgwODM0M30.Niu_DNJKGCF1CClm3xl4hjYr2yGgvgOs37w85OuThGQ";
     const PORTAL_API = "/api/partner-portal";
-    const IDLE_TIMEOUT_MS = 30 * 60 * 1000; // 30-minute auto-lock
+    const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
+    const MIN_WITHDRAWAL_NGN = 1000;
+    const MAX_PENDING_WITHDRAWALS = 2;
+    const COOLDOWN_MS = 60 * 60 * 1000;
 
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
@@ -940,9 +936,6 @@ Content-Type: application/json
       paymentsTotalPages: 1
     };
 
-    // =========================================================================
-    // SECURITY & FORMATTING HELPERS
-    // =========================================================================
     function esc(val) {
       return String(val ?? "")
         .replace(/&/g, "&amp;")
@@ -982,7 +975,7 @@ Content-Type: application/json
       el.textContent = msg;
       el.className = "show" + (type ? " " + type : "");
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => { el.className = ""; }, 3500);
+      toastTimer = setTimeout(() => { el.className = ""; }, 4000);
     }
 
     async function copyText(text) {
@@ -1015,14 +1008,11 @@ Content-Type: application/json
       document.getElementById("secret-modal").classList.add("hidden");
     }
 
-    // Idle auto-lock timer
     let idleTimer;
     function resetIdleTimer() {
       clearTimeout(idleTimer);
       if (!state.user) return;
-      idleTimer = setTimeout(async () => {
-        await handleLogout(true);
-      }, IDLE_TIMEOUT_MS);
+      idleTimer = setTimeout(async () => { await handleLogout(true); }, IDLE_TIMEOUT_MS);
     }
     ["click", "keydown", "mousemove", "touchstart"].forEach(evt => {
       document.addEventListener(evt, resetIdleTimer, { passive: true });
@@ -1053,9 +1043,38 @@ Content-Type: application/json
       return data;
     }
 
-    // =========================================================================
-    // VIEW MANAGEMENT & BOOT
-    // =========================================================================
+    // Mirrors backend withdrawal guards in partner-portal
+    function evaluateWithdrawalEligibility(withdrawals, partner) {
+      const lagosHour = (new Date().getUTCHours() + 1) % 24;
+      const windowOpen = lagosHour >= 9 && lagosHour < 22;
+
+      const activePending = (withdrawals || []).filter(w => w.status === "pending" || w.status === "approved").length;
+      const latestValid = (withdrawals || []).find(w => w.status !== "rejected");
+      let cooldownMinsLeft = 0;
+      if (latestValid?.created_at) {
+        const elapsed = Date.now() - new Date(latestValid.created_at).getTime();
+        if (elapsed < COOLDOWN_MS) {
+          cooldownMinsLeft = Math.max(1, Math.ceil((COOLDOWN_MS - elapsed) / 60000));
+        }
+      }
+
+      const reasons = [];
+      if (!partner?.settlement_account_number) {
+        reasons.push("Configure your settlement bank account in the Settings tab first.");
+      }
+      if (!windowOpen) {
+        reasons.push("Withdrawal window is currently closed (open daily 9:00 AM – 10:00 PM WAT).");
+      }
+      if (activePending >= MAX_PENDING_WITHDRAWALS) {
+        reasons.push(`Maximum ${MAX_PENDING_WITHDRAWALS} pending withdrawals reached. Wait for one to be processed.`);
+      }
+      if (cooldownMinsLeft > 0) {
+        reasons.push(`1-hour cooldown active — wait ${cooldownMinsLeft} minute(s) before placing another request.`);
+      }
+
+      return { windowOpen, activePending, cooldownMinsLeft, canSubmit: reasons.length === 0, reasons };
+    }
+
     function showAuthView(message = "") {
       closeAndScrubSecretModal();
       state.user = null;
@@ -1075,7 +1094,6 @@ Content-Type: application/json
     async function handleLogout(isIdle = false) {
       clearTimeout(idleTimer);
       await sb.auth.signOut().catch(() => {});
-      // Scrub rendered financial tables on sign-out
       ["overview-payments-body", "overview-ledger-body", "payments-table-body", "keys-table-body", "webhooks-endpoints-body", "webhooks-deliveries-body", "withdrawals-table-body"]
         .forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ""; });
       showAuthView(isIdle ? "Signed out automatically after 30 minutes of inactivity." : "");
@@ -1083,10 +1101,7 @@ Content-Type: application/json
 
     async function bootPortal() {
       const { data: { session } } = await sb.auth.getSession();
-      if (!session) {
-        showAuthView();
-        return;
-      }
+      if (!session) { showAuthView(); return; }
 
       try {
         const ctx = await apiCall({ action: "portal_context" });
@@ -1174,9 +1189,6 @@ Content-Type: application/json
       }
     }
 
-    // =========================================================================
-    // DATA RENDERERS
-    // =========================================================================
     function renderBalances() {
       if (!state.overviewData) return;
       const w = state.overviewData.wallets[state.environment] || {};
@@ -1249,6 +1261,28 @@ Content-Type: application/json
       } else {
         document.getElementById("wd-bank-display").textContent = "Not Configured";
         document.getElementById("wd-bank-sub").textContent = "Add your settlement bank account in Settings";
+      }
+
+      // Live Withdrawal Eligibility & Status Strip
+      const elig = evaluateWithdrawalEligibility(data.withdrawals, p);
+      const winBadge = document.getElementById("wd-window-badge");
+      winBadge.textContent = elig.windowOpen ? "Window Open (WAT)" : "Window Closed";
+      winBadge.className = "badge " + (elig.windowOpen ? "badge-success" : "badge-failed");
+
+      document.getElementById("wd-pending-slot-sub").textContent = `Active requests: ${elig.activePending} / ${MAX_PENDING_WITHDRAWALS}`;
+      document.getElementById("wd-slots-pill").textContent = `Pending Slots: ${elig.activePending} / ${MAX_PENDING_WITHDRAWALS}`;
+      document.getElementById("wd-cooldown-pill").textContent =
+        elig.cooldownMinsLeft > 0 ? `Cooldown: Wait ${elig.cooldownMinsLeft} min` : "Cooldown: Ready";
+
+      const guardNotice = document.getElementById("wd-guard-notice");
+      const wdBtn = document.getElementById("wd-submit-btn");
+      if (!elig.canSubmit) {
+        guardNotice.textContent = elig.reasons.join(" ");
+        guardNotice.classList.remove("hidden");
+        wdBtn.disabled = true;
+      } else {
+        guardNotice.classList.add("hidden");
+        wdBtn.disabled = false;
       }
 
       const wdBody = document.getElementById("withdrawals-table-body");
@@ -1396,22 +1430,11 @@ Content-Type: application/json
       }
     }
 
-    // =========================================================================
-    // DELEGATED SAFE EVENT HANDLERS (ZERO INLINE ONCLICK)
-    // =========================================================================
     document.addEventListener("click", async (e) => {
       const btn = e.target.closest("button");
       if (!btn) return;
-
-      if (btn.dataset.copy) {
-        await copyText(btn.dataset.copy);
-        return;
-      }
-
-      if (btn.dataset.goto) {
-        switchTab(btn.dataset.goto);
-        return;
-      }
+      if (btn.dataset.copy) { await copyText(btn.dataset.copy); return; }
+      if (btn.dataset.goto) { switchTab(btn.dataset.goto); return; }
 
       const action = btn.dataset.action;
       if (!action) return;
@@ -1448,9 +1471,6 @@ Content-Type: application/json
       }
     });
 
-    // =========================================================================
-    // FORM & CONTROL LISTENERS
-    // =========================================================================
     document.getElementById("login-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = document.getElementById("login-btn");
@@ -1589,7 +1609,21 @@ Content-Type: application/json
       e.preventDefault();
       const btn = document.getElementById("wd-submit-btn");
       const amount = Number(document.getElementById("wd-amount").value);
-      if (!confirm(`Request manual Live withdrawal of ${fmtNaira(amount)} to your configured settlement bank account?`)) return;
+      const liveAvailable = Number(state.overviewData?.wallets?.live?.available_balance || 0);
+
+      if (!Number.isFinite(amount) || amount < MIN_WITHDRAWAL_NGN) {
+        return showToast(`Minimum withdrawal amount is ${fmtNaira(MIN_WITHDRAWAL_NGN)}`, "error");
+      }
+      if (amount > liveAvailable) {
+        return showToast(`Insufficient Live balance. Available: ${fmtNaira(liveAvailable)}`, "error");
+      }
+
+      const elig = evaluateWithdrawalEligibility(state.overviewData?.withdrawals, state.overviewData?.partner);
+      if (!elig.canSubmit) {
+        return showToast(elig.reasons[0], "error");
+      }
+
+      if (!confirm(`Request manual Live withdrawal of ${fmtNaira(amount)} to your configured settlement bank account?\n\nProcessing takes 30 minutes – 3 hours.`)) return;
 
       btn.disabled = true;
       try {
@@ -1599,7 +1633,7 @@ Content-Type: application/json
           amount
         });
         document.getElementById("wd-amount").value = "";
-        showToast("Withdrawal submitted! BRYT Admin has been notified.", "success");
+        showToast("Withdrawal submitted! Processing takes 30 minutes – 3 hours.", "success");
         await loadOverview();
       } catch (err) {
         showToast(err.message, "error");
