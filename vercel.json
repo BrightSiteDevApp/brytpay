@@ -40,6 +40,52 @@
       ]
     }
   ],
+  "redirects": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "developer.brytpay.name.ng"
+        }
+      ],
+      "destination": "/developers/",
+      "permanent": false
+    },
+    {
+      "source": "/auth/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "developer.brytpay.name.ng"
+        }
+      ],
+      "destination": "/developers/",
+      "permanent": false
+    },
+    {
+      "source": "/dashboard/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "developer.brytpay.name.ng"
+        }
+      ],
+      "destination": "/developers/",
+      "permanent": false
+    },
+    {
+      "source": "/admin",
+      "has": [
+        {
+          "type": "host",
+          "value": "developer.brytpay.name.ng"
+        }
+      ],
+      "destination": "/developers/admin.html",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/v1/:path*",
@@ -52,26 +98,6 @@
     {
       "source": "/api/(.*)",
       "destination": "https://yivxlmjaiczsnxakumof.supabase.co/functions/v1/$1"
-    },
-    {
-      "source": "/",
-      "has": [
-        {
-          "type": "host",
-          "value": "developer.brytpay.name.ng"
-        }
-      ],
-      "destination": "/developers/index.html"
-    },
-    {
-      "source": "/admin",
-      "has": [
-        {
-          "type": "host",
-          "value": "developer.brytpay.name.ng"
-        }
-      ],
-      "destination": "/developers/admin.html"
     },
     {
       "source": "/share/:code",
