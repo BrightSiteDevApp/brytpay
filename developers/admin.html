@@ -146,6 +146,7 @@
       background: #EF4444; color: #fff; font-size: 0.68rem; font-weight: 800;
       padding: 2px 7px; border-radius: 999px;
     }
+    .nav-count.warn { background: #F59E0B; color: #0B1220; }
 
     .sidebar-footer {
       margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.12);
@@ -165,19 +166,21 @@
       display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
       position: sticky; top: 0; z-index: 40;
     }
-    .content { padding: 24px; max-width: 1240px; width: 100%; margin: 0 auto; }
+    .content { padding: 24px; max-width: 1260px; width: 100%; margin: 0 auto; }
 
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(195px, 1fr)); gap: 14px; margin-bottom: 20px; }
     .stat-card {
       background: var(--surface-white); border: 1px solid var(--border-color);
       border-radius: var(--radius-md); padding: 18px; box-shadow: var(--shadow-sm);
     }
     .stat-card.navy { background: var(--bryt-navy); color: #fff; border-color: transparent; box-shadow: var(--shadow-md); }
-    .stat-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-card.clickable { cursor: pointer; transition: var(--transition); }
+    .stat-card.clickable:hover { border-color: var(--bryt-primary); transform: translateY(-1px); }
+    .stat-label { font-size: 0.71rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
     .stat-card.navy .stat-label { color: var(--bryt-accent); }
-    .stat-value { font-size: 1.45rem; font-weight: 800; color: var(--bryt-navy); margin-top: 6px; }
+    .stat-value { font-size: 1.4rem; font-weight: 800; color: var(--bryt-navy); margin-top: 6px; }
     .stat-card.navy .stat-value { color: #fff; }
-    .stat-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+    .stat-sub { font-size: 0.74rem; color: var(--text-muted); margin-top: 4px; }
     .stat-card.navy .stat-sub { color: #94A3B8; }
 
     .card {
@@ -264,7 +267,7 @@
       <span class="badge badge-navy">Admin Console</span>
     </div>
     <h1 style="font-size:1.3rem;font-weight:800;color:var(--bryt-navy);margin-top:20px;">BRYT Admin Sign In</h1>
-    <p class="text-muted mt-12">Restricted to authorized BRYT Technologies administrators for partner governance and manual payout approvals.</p>
+    <p class="text-muted mt-12">Restricted to authorized BRYT Technologies administrators for partner governance, payment reconciliation, and manual payout approvals.</p>
 
     <div id="auth-error" class="alert alert-danger hidden mt-12"></div>
 
@@ -314,6 +317,13 @@
         </span>
         <span id="nav-pending-badge" class="nav-count hidden">0</span>
       </button>
+      <button class="nav-btn" type="button" data-tab="reconciliation">
+        <span class="nav-btn-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Reconciliation
+        </span>
+        <span id="nav-recon-badge" class="nav-count warn hidden">0</span>
+      </button>
       <button class="nav-btn" type="button" data-tab="partners">
         <span class="nav-btn-left">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -353,6 +363,11 @@
           <div class="stat-label">Pending Queue (Net to Send)</div>
           <div class="stat-value" id="kpi-pending-amount">₦0.00</div>
           <div class="stat-sub" id="kpi-pending-count">0 requests awaiting transfer</div>
+        </div>
+        <div id="kpi-recon-card" class="stat-card clickable" title="Open Payment Reconciliation Queue">
+          <div class="stat-label">Open Exceptions</div>
+          <div class="stat-value" id="kpi-open-exceptions">0</div>
+          <div class="stat-sub">Underpaid / overpaid to review</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Total Live Volume</div>
@@ -415,7 +430,58 @@
         </div>
       </section>
 
-      <!-- ==================== TAB 2: PARTNERS ==================== -->
+      <!-- ==================== TAB 2: PAYMENT RECONCILIATION ==================== -->
+      <section id="tab-reconciliation" class="tab-panel hidden">
+        <div class="alert alert-warning">
+          <strong>Exception Resolution Rules:</strong>
+          <strong>Underpaid</strong> transfers hold ₦0 in the partner wallet until you either <strong>Credit Partial</strong> (settles received amount minus BRYT's % fee and fires <span class="mono">payment.successful</span>) or <strong>Mark Refunded</strong> (closes as failed after you refund the sender).
+          <strong>Overpaid</strong> transfers settle automatically in full (after % fee) into the partner's wallet—click <strong>Resolve</strong> once reviewed or coordinated with the partner.
+        </div>
+
+        <div class="card">
+          <div class="flex-between">
+            <div>
+              <div class="card-title">Payment Exceptions &amp; Reconciliation Queue</div>
+              <div class="text-muted">Review underpayments and overpayments with full atomic ledger audit trails</div>
+            </div>
+            <div class="flex flex-wrap">
+              <select id="recon-env-filter" class="form-select" style="width:auto;padding:8px 12px;">
+                <option value="live">Live Mode</option>
+                <option value="test">Test (Sandbox)</option>
+                <option value="all">All Environments</option>
+              </select>
+              <select id="recon-type-filter" class="form-select" style="width:auto;padding:8px 12px;">
+                <option value="open">Open Exceptions Only</option>
+                <option value="underpaid">Open Underpaid</option>
+                <option value="overpaid">Open Overpaid</option>
+                <option value="reconciled">Reconciled History</option>
+                <option value="all">All Exceptions</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Reference &amp; Env</th>
+                  <th>Partner &amp; Customer</th>
+                  <th>Exception</th>
+                  <th>Expected / Received</th>
+                  <th>Status &amp; Rail</th>
+                  <th>Resolution / Notes</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-recon-body">
+                <tr><td colspan="7" class="empty-state">Loading payment exceptions...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 3: PARTNERS ==================== -->
       <section id="tab-partners" class="tab-panel hidden">
         <div class="card">
           <div class="card-title">Onboard New API Partner</div>
@@ -487,7 +553,7 @@
         </div>
       </section>
 
-      <!-- ==================== TAB 3: SECURITY & API AUDIT LOGS ==================== -->
+      <!-- ==================== TAB 4: SECURITY & API AUDIT LOGS ==================== -->
       <section id="tab-audit" class="tab-panel hidden">
         <div class="card">
           <div class="flex-between">
@@ -555,6 +621,35 @@
       <div class="flex mt-20" style="justify-content:flex-end;">
         <button id="rwd-cancel-btn" class="btn btn-outline" type="button">Cancel</button>
         <button id="rwd-submit-btn" class="btn btn-primary" type="submit">Confirm Action</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== MODAL: RECONCILE PAYMENT EXCEPTION ===================== -->
+<div id="reconcile-pay-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+  <div class="modal-content">
+    <h3 id="rp-title" style="font-size:1.1rem;font-weight:800;color:var(--bryt-navy);">Reconcile Payment Exception</h3>
+    <div id="rp-summary" class="summary-box"></div>
+    <div id="rp-action-note" class="alert alert-warning hidden"></div>
+
+    <form id="reconcile-pay-form">
+      <input type="hidden" id="rp-id" />
+      <input type="hidden" id="rp-action" />
+
+      <div id="rp-refund-wrap" class="mt-12">
+        <label id="rp-refund-label" class="form-label" for="rp-refund-ref">Refund Bank Transfer Reference</label>
+        <input id="rp-refund-ref" class="form-input mono" type="text" placeholder="e.g. REFUND-NIP-20261127-001" maxlength="120" />
+      </div>
+
+      <div class="mt-12">
+        <label class="form-label" for="rp-notes">Reconciliation Audit Notes (Optional)</label>
+        <textarea id="rp-notes" class="form-textarea" rows="3" placeholder="e.g. Partner approved crediting partial amount / Refunded sender via OPay" maxlength="250"></textarea>
+      </div>
+
+      <div class="flex mt-20" style="justify-content:flex-end;">
+        <button id="rp-cancel-btn" class="btn btn-outline" type="button">Cancel</button>
+        <button id="rp-submit-btn" class="btn btn-primary" type="submit">Confirm Reconciliation</button>
       </div>
     </form>
   </div>
@@ -670,7 +765,8 @@
       user: null,
       activeTab: "withdrawals",
       partners: [],
-      withdrawals: []
+      withdrawals: [],
+      exceptions: []
     };
 
     function esc(val) {
@@ -708,7 +804,7 @@
       const s = String(status || "").toLowerCase();
       if (["paid", "active"].includes(s)) return `<span class="badge badge-success">${esc(s)}</span>`;
       if (["pending", "approved"].includes(s)) return `<span class="badge badge-pending">${esc(s)}</span>`;
-      if (["suspended", "rejected", "failed"].includes(s)) return `<span class="badge badge-failed">${esc(s)}</span>`;
+      if (["suspended", "rejected", "failed", "underpaid"].includes(s)) return `<span class="badge badge-failed">${esc(s)}</span>`;
       return `<span class="badge badge-muted">${esc(s)}</span>`;
     }
 
@@ -718,7 +814,7 @@
       el.textContent = msg;
       el.className = "show" + (type ? " " + type : "");
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => { el.className = ""; }, 3800);
+      toastTimer = setTimeout(() => { el.className = ""; }, 4000);
     }
 
     let idleTimer;
@@ -773,7 +869,7 @@
     async function handleLogout(isIdle = false) {
       clearTimeout(idleTimer);
       await sb.auth.signOut().catch(() => {});
-      ["admin-withdrawals-body", "admin-partners-body", "admin-audit-body"].forEach(id => {
+      ["admin-withdrawals-body", "admin-recon-body", "admin-partners-body", "admin-audit-body"].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.innerHTML = "";
       });
@@ -789,6 +885,7 @@
       state.activeTab = tab;
       const titles = {
         withdrawals: "Manual Settlement Withdrawals",
+        reconciliation: "Payment Exceptions & Reconciliation",
         partners: "Partner Organizations & Governance",
         audit: "Security & API Audit Logs"
       };
@@ -796,7 +893,8 @@
       document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
       document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("hidden", p.id !== "tab-" + tab));
       setMobileDrawer(false);
-      if (tab === "audit") loadAuditLogs();
+      if (tab === "reconciliation") loadExceptions().catch(e => showToast(e.message, "error"));
+      if (tab === "audit") loadAuditLogs().catch(e => showToast(e.message, "error"));
     }
 
     async function bootAdmin() {
@@ -829,7 +927,7 @@
 
     async function refreshAll() {
       try {
-        await Promise.all([loadPartners(), loadWithdrawals()]);
+        await Promise.all([loadPartners(), loadWithdrawals(), loadExceptions()]);
         if (state.activeTab === "audit") await loadAuditLogs();
       } catch (err) {
         showToast(err.message, "error");
@@ -977,6 +1075,103 @@
       }).join("");
     }
 
+    async function loadExceptions() {
+      const envFilter = document.getElementById("recon-env-filter").value || "live";
+      const typeFilter = document.getElementById("recon-type-filter").value || "open";
+      const res = await apiCall({
+        action: "admin_list_exceptions",
+        environment: envFilter,
+        filter: typeFilter
+      });
+
+      state.exceptions = res.exceptions || [];
+      const openCount = Number(res.open_count || 0);
+
+      document.getElementById("kpi-open-exceptions").textContent = String(openCount);
+      const reconBadge = document.getElementById("nav-recon-badge");
+      reconBadge.textContent = String(openCount);
+      reconBadge.classList.toggle("hidden", openCount === 0);
+
+      const body = document.getElementById("admin-recon-body");
+      if (!state.exceptions.length) {
+        body.innerHTML = `<tr><td colspan="7" class="empty-state">No payment exceptions match this filter.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = state.exceptions.map(ex => {
+        const partner = Array.isArray(ex.partner) ? ex.partner[0] : ex.partner;
+        const isUnderpaid = ex.exception_type === "underpaid";
+        const variance = Number(ex.variance_amount || 0);
+        const varianceLabel = variance >= 0 ? `+${fmtNaira(variance)}` : `-${fmtNaira(Math.abs(variance))}`;
+        const varianceColor = isUnderpaid ? "var(--failed-text)" : "var(--pending-text)";
+        const typeBadge = isUnderpaid
+          ? `<span class="badge badge-failed">UNDERPAID</span>`
+          : `<span class="badge badge-pending">OVERPAID</span>`;
+
+        const reconLabelMap = {
+          credit_partial: "Credited Partial",
+          mark_refunded: "Refunded Sender",
+          ack_overpayment: "Overpayment Closed"
+        };
+
+        const resolutionCell = ex.is_reconciled
+          ? `
+              <span class="badge badge-primary">${esc(reconLabelMap[ex.reconciliation_action] || ex.reconciliation_action || "Reconciled")}</span>
+              ${ex.refund_reference ? `<div class="mono text-muted" style="margin-top:3px;">Ref: ${esc(ex.refund_reference)}</div>` : ""}
+              ${ex.reconciliation_notes ? `<div class="text-muted">${esc(ex.reconciliation_notes)}</div>` : ""}
+            `
+          : `<span class="text-muted">Awaiting Admin Action</span>`;
+
+        let actionCell = `<span class="text-muted">Resolved ${fmtDate(ex.reconciled_at)}</span>`;
+        if (!ex.is_reconciled) {
+          if (isUnderpaid) {
+            actionCell = `
+              <div class="flex flex-wrap">
+                <button class="btn btn-success btn-sm" type="button" data-action="recon-credit" data-id="${esc(ex.id)}">Credit Partial</button>
+                <button class="btn btn-danger btn-sm" type="button" data-action="recon-refund" data-id="${esc(ex.id)}">Mark Refunded</button>
+              </div>
+            `;
+          } else {
+            actionCell = `
+              <button class="btn btn-outline btn-sm" type="button" data-action="recon-ack" data-id="${esc(ex.id)}">Resolve</button>
+            `;
+          }
+        }
+
+        return `
+          <tr>
+            <td>
+              <div class="mono" style="font-weight:700;color:var(--bryt-navy);">${esc(ex.reference)}</div>
+              <div class="flex" style="gap:6px;margin-top:4px;">
+                <span class="badge ${ex.environment === "live" ? "badge-success" : "badge-pending"}">${esc(ex.environment)}</span>
+                <span class="text-muted">${fmtDate(ex.created_at)}</span>
+              </div>
+            </td>
+            <td>
+              <strong>${esc(partner?.name || ex.partner_id)}</strong>
+              <div class="text-muted">${esc(ex.customer_name)}</div>
+              <div class="text-muted">${esc(ex.customer_email)}</div>
+            </td>
+            <td>
+              ${typeBadge}
+              <div style="font-weight:800;color:${varianceColor};margin-top:4px;">${varianceLabel}</div>
+            </td>
+            <td>
+              <div class="text-muted">Exp: ${fmtNaira(ex.expected_amount)}</div>
+              <div><strong>Rcvd: ${fmtNaira(ex.amount_received)}</strong></div>
+              ${ex.status === "paid" ? `<div class="text-muted">Net: ${fmtNaira(ex.net_amount)}</div>` : ""}
+            </td>
+            <td>
+              ${statusBadge(ex.status)}
+              <div class="mono text-muted" style="margin-top:4px;">${esc(String(ex.provider || "").toUpperCase())}</div>
+            </td>
+            <td style="max-width:220px;word-break:break-word;">${resolutionCell}</td>
+            <td>${actionCell}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
     async function loadAuditLogs() {
       const partnerId = document.getElementById("audit-partner-filter").value || null;
       const onlyErrors = document.getElementById("audit-errors-only").checked;
@@ -1059,6 +1254,73 @@
       document.getElementById("resolve-wd-modal").classList.remove("hidden");
     }
 
+    function openReconcileModal(ex, action) {
+      const partner = Array.isArray(ex.partner) ? ex.partner[0] : ex.partner;
+      const expected = Number(ex.expected_amount || 0);
+      const received = Number(ex.amount_received || 0);
+      const variance = Number(ex.variance_amount || 0);
+      const feePct = Number(ex.fee_percent || 1.5);
+      const estFee = Math.round((received * feePct) / 100 * 100) / 100;
+      const estNet = Math.max(0, Math.round((received - estFee) * 100) / 100);
+
+      const titles = {
+        credit_partial: "Approve & Credit Partial Payment",
+        mark_refunded: "Mark Underpayment Refunded to Sender",
+        ack_overpayment: "Resolve & Close Overpayment"
+      };
+      document.getElementById("rp-title").textContent = titles[action] || "Reconcile Payment";
+      document.getElementById("rp-id").value = ex.id;
+      document.getElementById("rp-action").value = action;
+      document.getElementById("rp-refund-ref").value = "";
+      document.getElementById("rp-notes").value = "";
+
+      const refWrap = document.getElementById("rp-refund-wrap");
+      const refInput = document.getElementById("rp-refund-ref");
+      const refLabel = document.getElementById("rp-refund-label");
+      const noteBox = document.getElementById("rp-action-note");
+      const submitBtn = document.getElementById("rp-submit-btn");
+
+      if (action === "credit_partial") {
+        refWrap.classList.add("hidden");
+        refInput.required = false;
+        noteBox.textContent = `This will mark ${ex.reference} as PAID, credit approx. ${fmtNaira(estNet)} (after ${feePct}% fee) to ${partner?.name || "the partner"}'s ${ex.environment.toUpperCase()} wallet, and dispatch a signed payment.successful webhook.`;
+        noteBox.classList.remove("hidden");
+        submitBtn.className = "btn btn-success";
+        submitBtn.textContent = `Credit Partner (~${fmtNaira(estNet)})`;
+      } else if (action === "mark_refunded") {
+        refWrap.classList.remove("hidden");
+        refInput.required = true;
+        refLabel.textContent = "Refund Bank Transfer Reference / Session ID (Required)";
+        noteBox.textContent = `Only confirm after you have refunded ${fmtNaira(received)} to the sender. The payment will be closed as FAILED with ₦0 credited to the partner.`;
+        noteBox.classList.remove("hidden");
+        submitBtn.className = "btn btn-danger";
+        submitBtn.textContent = "Confirm Refund & Close";
+      } else {
+        refWrap.classList.remove("hidden");
+        refInput.required = false;
+        refLabel.textContent = "Refund / Adjustment Reference (Optional)";
+        noteBox.textContent = `Full net (${fmtNaira(ex.net_amount)}) after fee was already settled into ${partner?.name || "the partner"}'s wallet. Mark resolved once reviewed or communicated with the partner.`;
+        noteBox.classList.remove("hidden");
+        submitBtn.className = "btn btn-primary";
+        submitBtn.textContent = "Mark Overpayment Resolved";
+      }
+
+      const varText = variance >= 0 ? `+${fmtNaira(variance)} excess` : `-${fmtNaira(Math.abs(variance))} shortfall`;
+      document.getElementById("rp-summary").innerHTML = `
+        <div class="summary-row"><span class="text-muted">Partner</span><strong>${esc(partner?.name || "—")} (${esc(ex.environment.toUpperCase())})</strong></div>
+        <div class="summary-row"><span class="text-muted">Reference</span><span class="mono">${esc(ex.reference)}</span></div>
+        <div class="summary-row"><span class="text-muted">Customer</span><span>${esc(ex.customer_name)} (${esc(ex.customer_email)})</span></div>
+        <div class="summary-row"><span class="text-muted">Expected Amount</span><span>${fmtNaira(expected)}</span></div>
+        <div class="summary-row"><span class="text-muted">Amount Received</span><strong>${fmtNaira(received)}</strong></div>
+        <div class="summary-row highlight">
+          <strong>Variance</strong>
+          <strong style="color:${variance >= 0 ? "var(--pending-text)" : "var(--failed-text)"};">${varText}</strong>
+        </div>
+      `;
+
+      document.getElementById("reconcile-pay-modal").classList.remove("hidden");
+    }
+
     function openEditPartnerModal(p) {
       document.getElementById("ep-id").value = p.id;
       document.getElementById("ep-subtitle").textContent = `${p.name} (${p.slug})`;
@@ -1101,6 +1363,15 @@
         if (!wd) return;
         const map = { "wd-approve": "approved", "wd-paid": "paid", "wd-reject": "rejected" };
         openResolveModal(wd, map[action]);
+      } else if (action === "recon-credit" || action === "recon-refund" || action === "recon-ack") {
+        const ex = state.exceptions.find(x => x.id === id);
+        if (!ex) return;
+        const map = {
+          "recon-credit": "credit_partial",
+          "recon-refund": "mark_refunded",
+          "recon-ack": "ack_overpayment"
+        };
+        openReconcileModal(ex, map[action]);
       }
     });
 
@@ -1134,12 +1405,15 @@
     document.getElementById("mobile-menu-btn").addEventListener("click", () => setMobileDrawer(true));
     document.getElementById("drawer-backdrop").addEventListener("click", () => setMobileDrawer(false));
     document.getElementById("refresh-btn").addEventListener("click", refreshAll);
+    document.getElementById("kpi-recon-card").addEventListener("click", () => switchTab("reconciliation"));
 
     document.querySelectorAll(".nav-btn").forEach(btn => {
       btn.addEventListener("click", () => switchTab(btn.dataset.tab));
     });
 
     document.getElementById("wd-status-filter").addEventListener("change", () => loadWithdrawals().catch(e => showToast(e.message, "error")));
+    document.getElementById("recon-env-filter").addEventListener("change", () => loadExceptions().catch(e => showToast(e.message, "error")));
+    document.getElementById("recon-type-filter").addEventListener("change", () => loadExceptions().catch(e => showToast(e.message, "error")));
     document.getElementById("audit-apply-btn").addEventListener("click", () => loadAuditLogs().catch(e => showToast(e.message, "error")));
 
     document.getElementById("np-name").addEventListener("input", (e) => {
@@ -1208,6 +1482,34 @@
       }
     });
 
+    document.getElementById("reconcile-pay-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("rp-submit-btn");
+      const reconcileAction = document.getElementById("rp-action").value;
+      const refundRef = document.getElementById("rp-refund-ref").value.trim();
+      if (reconcileAction === "mark_refunded" && !refundRef) {
+        return showToast("Refund bank transfer reference is required", "error");
+      }
+
+      btn.disabled = true;
+      try {
+        const res = await apiCall({
+          action: "admin_reconcile_payment",
+          payment_id: document.getElementById("rp-id").value,
+          reconcile_action: reconcileAction,
+          refund_reference: refundRef || null,
+          notes: document.getElementById("rp-notes").value.trim() || null
+        });
+        document.getElementById("reconcile-pay-modal").classList.add("hidden");
+        showToast(res.message, "success");
+        await refreshAll();
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
     document.getElementById("edit-partner-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = document.getElementById("ep-submit-btn");
@@ -1258,6 +1560,9 @@
 
     document.getElementById("rwd-cancel-btn").addEventListener("click", () => {
       document.getElementById("resolve-wd-modal").classList.add("hidden");
+    });
+    document.getElementById("rp-cancel-btn").addEventListener("click", () => {
+      document.getElementById("reconcile-pay-modal").classList.add("hidden");
     });
     document.getElementById("ep-cancel-btn").addEventListener("click", () => {
       document.getElementById("edit-partner-modal").classList.add("hidden");
